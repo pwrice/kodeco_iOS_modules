@@ -1,7 +1,7 @@
 # kodeco_iOS_module1
 Kodeco module 1 homework
 
-Part One Questions:
+##Part One Questions:
 
 a) What does the command ‘git status’ output?
 
@@ -101,3 +101,57 @@ Int
 w) What is the difference between var and let?
 
 Variables defined with let are constants and cannot have their values re-assigned. Variables defined with let can have their values re-assigned.
+
+
+## Part 3 Questions
+
+
+As with the short answer questions earlier, try answering these questions from memory before looking for the answer. Some of the fill-in-the-blank questions have a letter before the second blank. This is the first letter of the expected word.
+
+
+In ContentView, lines 1 and 2 show the definition of ____state________ P____property__________.
+
+In ContentView, line 3 shows the definition of a      ____variable________  P____property__________.
+
+
+In ContentView, line 4 shows the definition of a     _____view_______ P_____property__________.
+
+
+In ContentView, line 5 shows an   _____instance____________ of Game calling the ______method_________ points.
+
+
+In ContentView, line 6 is the definition of the M____method______  doSomethingWithCounter().
+
+
+In Game, lines a, b, and c show the definition of   _______data________ _____properties______________.
+
+
+In Game, line d is the definition of the   _____method__________ points(sliderValue: Int).
+
+
+Lines 3, a, b, and c are the   ________data_________ P_____properties__________ and lines 6 and d are the   _____methods__________ of the structs.
+
+
+
+ struct ContentView: View {
+
+1    @State private var sliderValue: Int = 50
+2    @State private var game: Game = Game()
+3    private var counter = 0
+4    var body: some View {
+5        Text("The score is: \(game.points(sliderValue: sliderValue))")
+     }
+6    func doSomethingWithCounter() {
+         // to be determined
+     }
+ }
+
+
+ struct Game {
+a    var target: Int = 37
+b    var score: Int = 0
+c    var round: Int = 1
+d    func points(sliderValue: Int) -> Int {
+        return 999
+     }
+ }
