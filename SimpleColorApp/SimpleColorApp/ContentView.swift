@@ -14,15 +14,11 @@ struct ContentView: View {
   @State private var blueSliderValue: Double
   @State private var boxColor:Color
   
-  init() {
-    let defaultRed = 200.0
-    let defaultGreen = 100.0
-    let defaultBlue = 240.0
-    
-    self.redSliderValue = defaultRed
-    self.greenSliderValue = defaultGreen
-    self.blueSliderValue = defaultBlue
-    self.boxColor = ContentView.calculateBoxColor(red: defaultRed, green: defaultGreen, blue: defaultBlue)
+  init(red: Double = 0.6, green: Double = 0.3, blue: Double = 0.8) {
+    self.redSliderValue = red
+    self.greenSliderValue = green
+    self.blueSliderValue = blue
+    self.boxColor = Color(red: red, green: green, blue: blue)
   }
   
   var body: some View {
@@ -33,28 +29,24 @@ struct ContentView: View {
         .fill(boxColor)
       Text("Red")
       HStack {
-        Slider(value: $redSliderValue, in: 1.0...255.0)
-        Text(String(Int(redSliderValue.rounded())))
+        Slider(value: $redSliderValue)
+        Text(String(Int((redSliderValue * 255.0).rounded())))
       }
       Text("Green")
       HStack {
-        Slider(value: $greenSliderValue, in: 1.0...255.0)
-        Text(String(Int(greenSliderValue.rounded())))
+        Slider(value: $greenSliderValue)
+        Text(String(Int((greenSliderValue * 255.0).rounded())))
       }
       Text("Blue")
       HStack {
-        Slider(value: $blueSliderValue, in: 1.0...255.0)
-        Text(String(Int(blueSliderValue.rounded())))
+        Slider(value: $blueSliderValue)
+        Text(String(Int((blueSliderValue * 255.0).rounded())))
       }
       Button("Set Color") {
-        boxColor = ContentView.calculateBoxColor(red: redSliderValue, green: greenSliderValue, blue: blueSliderValue)
+        boxColor = Color(red: redSliderValue, green: greenSliderValue, blue: blueSliderValue)
       }
     }
     .padding()
-  }
-  
-  private static func calculateBoxColor(red: Double, green: Double, blue: Double) -> Color {
-    Color(red: red/255.0, green: green/255.0, blue: blue/255.0)
   }
 }
 
