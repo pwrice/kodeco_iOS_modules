@@ -11,7 +11,7 @@ import SwiftUI
 struct SimpleColorAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+          ContentView(red: 0.6, green: 0.3, blue: 0.8)
         }
     }
 }

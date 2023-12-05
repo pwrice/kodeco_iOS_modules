@@ -14,7 +14,7 @@ struct ContentView: View {
   @State private var blueSliderValue: Double
   @State private var boxColor:Color
   
-  init(red: Double = 0.6, green: Double = 0.3, blue: Double = 0.8) {
+  init(red: Double = 0.7, green: Double = 0.7, blue: Double = 0.7) {
     self.redSliderValue = red
     self.greenSliderValue = green
     self.blueSliderValue = blue
