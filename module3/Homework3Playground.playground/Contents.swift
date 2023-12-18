@@ -32,8 +32,8 @@ print(vowelCount)
 //The format follows the number from the first array, space, followed by the character *, space,  followed by the number from the second array, space,  followed by =, space, followed by the result of the number from the first array multiplied by the number from the second array (just like the example above). There are a couple of ways to achieve this, but String Interpolation is the easiest.
 
 print("c) ---------------")
-let arrayA = Array(1...4)
-let arrayB = Array(1...4)
+let arrayA = Array(0...4)
+let arrayB = Array(0...4)
 
 for numberA in arrayA {
   for numberB in arrayB {

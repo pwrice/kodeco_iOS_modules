@@ -2,7 +2,7 @@ Kodeco module 3 homework
 
 a) 0…5 and 0..<5 are two types of ____________. How are they different?
 
-They are two types of Ranges. The first range is a closed range and covers the values 1 to 5 including 5. The second range is a half-open range and covers the values 1 to 4 (one less than the second number 5).
+They are two types of Ranges. The first range is a closed range and covers the values 0 to 5 including 5. The second range is a half-open range and covers the values 0 to 4 (one less than the second number 5).
 
 b) Describe type inference in Swift and give an example.
 
