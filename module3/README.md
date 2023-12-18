@@ -66,3 +66,15 @@ Zero
 m) An unordered collection of unique values of the same type is a _____________.
 
 Set
+
+
+// Above and Beyond
+
+Playground output:
+
+Area: square1 - 16 square2 - 25
+Area: rectangle1 - 20 rectangle2 - 20
+
+Square is defined as a struct and the assignment of square1 to square2 results in copying the data of squary1 to a new instance of a Square struct. Then, when square2 is mutated, the values in square1 remain the same.
+
+Rectangle is defined as a class. When rectangle1 is assigned to rectangle2, they both refernce the same instance of the Rectangle class in memory. Thus, when rectangle2 is mutated, printing out the area of both rectangle1 and rectangle2 is the same, since there is only one instance of data that both vars point to.
