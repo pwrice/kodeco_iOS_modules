@@ -4,28 +4,27 @@ struct ContentView: View {
   @Environment(\.verticalSizeClass) var verticalSizeClass
   @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
-  @State private var alertIsVisible: Bool = false
   @State private var redColor: Double = Constants.defaultRedColor
   @State private var greenColor: Double = Constants.defaultGreenColor
   @State private var blueColor: Double = Constants.defaultBlueColor
 
   // When the app first runs, the default for previewColor shows up as white and not these values. Why?
-  @State private var previewColor: Color =  Color(red: Constants.defaultRedColor, green: Constants.defaultGreenColor, blue: Constants.defaultBlueColor)
+  @State private var previewColor: Color =  Color(red: Constants.defaultRedColor / Constants.colorRange, green: Constants.defaultGreenColor / Constants.colorRange, blue: Constants.defaultBlueColor / Constants.colorRange)
   
   var body: some View {
     
-    ZStack {
+    Group {
       // The size class vars are not getting set and evaluating this if-statement. Why?
-      if verticalSizeClass == .compact && horizontalSizeClass == .regular {
+      if horizontalSizeClass == .regular {
         // Handle landscape
         HStack(spacing: 20) {
-          ColorPreviewView(previewColor: $previewColor)
+          ColorPreviewView(previewColor: previewColor)
           ColorSlidersView(redColor: $redColor, greenColor: $greenColor, blueColor: $blueColor, previewColor: $previewColor)
         }
       } else {
         // Default to portriat layout
         VStack(spacing: 20) {
-          ColorPreviewView(previewColor: $previewColor)
+          ColorPreviewView(previewColor: previewColor)
           ColorSlidersView(redColor: $redColor, greenColor: $greenColor, blueColor: $blueColor, previewColor: $previewColor)
         }
       }
@@ -37,7 +36,7 @@ struct ContentView: View {
 }
 
 struct ColorPreviewView: View {
-  @Binding var previewColor: Color
+  var previewColor: Color
                                                     
   var body: some View {
     VStack {
@@ -64,7 +63,7 @@ struct ColorSlidersView: View {
       ColorSlider(color: $redColor, labelText: "Red", accentColor: .red)
       ColorSlider(color: $greenColor, labelText: "Green", accentColor: .green)
       ColorSlider(color: $blueColor, labelText: "Blue", accentColor: .blue)
-      SetColorButton(redColor: $redColor, greenColor: $greenColor, blueColor: $blueColor, foregroundColor: $previewColor)
+      SetColorButton(redColor: $redColor, greenColor: $greenColor, blueColor: $blueColor, previewColor: $previewColor)
     }
   }
 }
@@ -93,11 +92,11 @@ struct SetColorButton: View {
   @Binding var redColor: Double
   @Binding var greenColor: Double
   @Binding var blueColor: Double
-  @Binding var foregroundColor: Color
+  @Binding var previewColor: Color
   
   var body: some View {
     Button("Set Color") {
-      foregroundColor = Color(red: redColor / Constants.colorRange, green: greenColor / Constants.colorRange, blue: blueColor / Constants.colorRange)
+      previewColor = Color(red: redColor / Constants.colorRange, green: greenColor / Constants.colorRange, blue: blueColor / Constants.colorRange)
     }
     .padding(20)
     .background(Color("ButtonColor"))
