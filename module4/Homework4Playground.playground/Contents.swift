@@ -86,7 +86,7 @@ let numsWithNil: [Int?] = [79, nil, 80, nil, 90, nil, 100, 72]
 
 var numsBy2: [Int] = Array(1...50).map { $0 * 2 }
 print(numsBy2)
-numsBy2 = Array(stride(from:2, through: 100, by: 2)) //function (or stride(from:through:by:))
+numsBy2 = Array(stride(from:2, through: 100, by: 2))
 print(numsBy2)
 
 //Create an array of Int called numsBy4 with values starting at 2 through 100, by 4.
