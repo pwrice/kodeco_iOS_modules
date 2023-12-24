@@ -52,11 +52,11 @@ center, center
 
 n) A stack always gets one ________________ from each of its children.
 
-alignmnet guide
+view, alignmnet guide
 
 o) The alignment guide for an HStack is ______________. And the alignment guide for a VStack is _______________.
 
-HorizontalAlignment, VerticalAlignment
+ VerticalAlignment, HorizontalAlignment
 
 
 p) Grids only come in ____________ variants.
@@ -65,4 +65,6 @@ Lazy
 
 q) The Grid Item Array defines the _______________ of the Grid.
 
-columns
+the layout properties. 
+
+columns for VGrid, rows for HGrid
