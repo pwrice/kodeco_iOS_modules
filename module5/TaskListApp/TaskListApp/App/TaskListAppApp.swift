@@ -9,10 +9,9 @@ import SwiftUI
 
 @main
 struct TaskListAppApp: App {
-  @StateObject var tasksStore = TasksStore()
     var body: some Scene {
         WindowGroup {
-          TaskListView(tasksStore: tasksStore)
+          TaskListView()
         }
     }
 }

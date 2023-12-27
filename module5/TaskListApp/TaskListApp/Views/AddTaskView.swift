@@ -10,8 +10,8 @@ import SwiftUI
 struct AddTaskView: View {
   var tasksStore: TasksStore
   @State var taskTitle: String = ""
-  @State var taskNotes: String = ""
-  @Binding var showingAddTaskView: Bool
+  @State var taskNotes: String = ""  
+  @Environment(\.dismiss) var dismiss
   
   var body: some View {
     NavigationView {
@@ -30,13 +30,13 @@ struct AddTaskView: View {
       .navigationBarTitle(Text("Add New Task"), displayMode: .inline)
       .navigationBarItems(
         leading: Button(action: {
-          showingAddTaskView = false
+          dismiss()
         }, label: {
           Text("Cancel")
         }),
         trailing: Button(action: {
           tasksStore.addTask(title: taskTitle, notes: taskNotes)
-          showingAddTaskView = false
+          dismiss()
         }, label: {
           Text("Add")
         })
@@ -48,7 +48,7 @@ struct AddTaskView: View {
 
 struct AddTaskView_Previews: PreviewProvider {
   static var previews: some View {
-    AddTaskView(tasksStore: TasksStore(), showingAddTaskView: .constant(true))
+    AddTaskView(tasksStore: TasksStore())
   }
 }
 
