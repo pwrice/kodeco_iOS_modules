@@ -31,7 +31,7 @@ struct TaskDetailsView: View {
             Text("Completed: ")
               .bold()
           }
-          .onChange(of: taskCompleted) {
+          .onChange(of: taskCompleted, initial: task.isCompleted) { oldValue, newValue in
             tasksStore.setTask(with: task.id, completed: taskCompleted)
           }
         }
@@ -47,7 +47,7 @@ struct TaskDetailsView_Previews: PreviewProvider {
   static var previews: some View {
     TaskDetailsView(
       tasksStore: TasksStore(),
-      task: Task(id: UUID(), title: "Task Title", isCompleted: false, notes: "test notes")
+      task: Task(title: "Task Title", isCompleted: false, notes: "test notes")
     )
   }
 }

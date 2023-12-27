@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TaskListView: View {
-  @ObservedObject var tasksStore: TasksStore
+  @StateObject var tasksStore = TasksStore()
   @State var showingAddTaskView: Bool = false
   
   var body: some View {
@@ -24,7 +24,7 @@ struct TaskListView: View {
       }
       .padding()
       .fullScreenCover(isPresented: $showingAddTaskView, content: {
-        AddTaskView(tasksStore: tasksStore, showingAddTaskView: $showingAddTaskView)
+        AddTaskView(tasksStore: tasksStore)
       })
     }
   }
@@ -86,7 +86,7 @@ struct FooterView: View {
 
 struct TaskList_Previews: PreviewProvider {
   static var previews: some View {
-    TaskListView(tasksStore: TasksStore())
+    TaskListView()
   }
 }
 
