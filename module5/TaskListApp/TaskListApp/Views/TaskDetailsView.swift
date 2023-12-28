@@ -31,7 +31,7 @@ struct TaskDetailsView: View {
             Text("Completed: ")
               .bold()
           }
-          .onChange(of: taskCompleted, initial: task.isCompleted) { oldValue, newValue in
+          .onChange(of: taskCompleted, initial: task.isCompleted) { _, _ in
             tasksStore.setTask(with: task.id, completed: taskCompleted)
           }
         }
