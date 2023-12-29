@@ -116,10 +116,10 @@ struct CategoryCard: View {
   
   var body: some View {
     Button(action: {
-      if selectedCategory == nil {
-        selectedCategory = category
-      } else {
+      if selectedCategory == category {
         selectedCategory = nil
+      } else {
+        selectedCategory = category
       }
     }, label: {
       VStack(spacing: 20) {
