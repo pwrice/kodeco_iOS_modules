@@ -23,10 +23,40 @@ class TasksStore: ObservableObject {
   
   @Published var tasks: [Task]
   
+  var completedTasks: [Task] {
+    tasks.filter({ $0.isCompleted })
+  }
+
+  var uncompletedTasks: [Task] {
+    tasks.filter({ !$0.isCompleted })
+  }
+  
+  func searchTasks(searchTerm: String, tasksList: [Task]) -> [Task] {
+    if !searchTerm.isEmpty {
+      return tasksList.filter {
+        $0.title.lowercased().contains(searchTerm.lowercased())
+      }
+    }
+    return tasksList
+
+  }
+  
+  func searchCompletedTasks(searchTerm: String) -> [Task] {
+    searchTasks(searchTerm: searchTerm, tasksList: completedTasks)
+  }
+
+  func searchUncompletedTasks(searchTerm: String) -> [Task] {
+    searchTasks(searchTerm: searchTerm, tasksList: uncompletedTasks)
+  }
+  
   init() {
     tasks = defaultTasks
   }
   
+  init(with inputTasks: [Task]) {
+    tasks = inputTasks
+  }
+
   func addTask(title: String, notes: String) {
     tasks.append(Task(title: title, notes: notes))
   }

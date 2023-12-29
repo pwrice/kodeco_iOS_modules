@@ -10,76 +10,109 @@ import SwiftUI
 struct TaskListView: View {
   @StateObject var tasksStore = TasksStore()
   @State var showingAddTaskView: Bool = false
+  @State var selectedTab = 0
+  @State var searchTaskName: String = ""
+
+  var uncompletedTasks: [Task] {
+    if !searchTaskName.isEmpty {
+      return tasksStore.searchUncompletedTasks(searchTerm: searchTaskName)
+    }
+    return tasksStore.uncompletedTasks
+  }
   
+  var completedTasks: [Task] {
+    if !searchTaskName.isEmpty {
+      return tasksStore.searchCompletedTasks(searchTerm: searchTaskName)
+    }
+    return tasksStore.completedTasks
+
+  }
+    
   var body: some View {
     NavigationStack {
-      VStack(alignment: .leading) {
-        InlineTaskListView(tasksStore: tasksStore)
-        Spacer()
-        FooterView(showingAddTaskView: $showingAddTaskView)
+      TabView(selection: $selectedTab) {
+        InlineTaskListView(tasks: uncompletedTasks, tasksStore: tasksStore)
+          .tabItem {
+            Image(systemName: "list.bullet.circle")
+              .resizable()
+            Text("Tasks")
+          }
+          .tag(0)
+        InlineTaskListView(tasks: completedTasks, tasksStore: tasksStore)
+          .tabItem {
+            Image(systemName: "checkmark.circle")
+              .resizable()
+            Text("Completed")
+          }
+          .tag(1)
       }
       .navigationTitle(Text("My Tasks"))
+      .navigationBarItems(
+        trailing: Button(action: {
+          showingAddTaskView = true
+        }, label: {
+          Image(systemName: "plus.circle.fill")
+            .bold()
+        }))
       .navigationDestination(for: Task.self) { task in
         TaskDetailsView(tasksStore: tasksStore, task: task)
       }
-      .padding()
       .fullScreenCover(isPresented: $showingAddTaskView, content: {
         AddTaskView(tasksStore: tasksStore)
       })
+      .searchable(text: $searchTaskName, prompt: "Task Name")
+
     }
   }
 }
 
 struct InlineTaskListView: View {
-  @ObservedObject var tasksStore: TasksStore
-  
+  let tasks: [Task]
+  let tasksStore: TasksStore
+
   var body: some View {
-    ScrollView {
-      LazyVStack {
-        ForEach(tasksStore.tasks) { task in
-          NavigationLink(value: task) {
-            VStack {
-              TaskRowView(task: task)
-              Divider()
-            }
-          }
-        }
+    List(tasks) { task in
+      NavigationLink(value: task) {
+        TaskRowView(task: task, tasksStore: tasksStore)
       }
     }
+    .listStyle(.plain)
   }
 }
 
 struct TaskRowView: View {
   let task: Task
+  let tasksStore: TasksStore
+  @State var isCompleted: Bool = false
+
   
   var body: some View {
     HStack {
       Text(task.title)
         .bold()
       Spacer()
-      if task.isCompleted {
-        Image(systemName: "checkmark.square")
-          .foregroundColor(.green)
-          .bold()
-      } else {
-        Image(systemName: "square")
-          .foregroundColor(.red)
-          .bold()
-      }
+      Button(action: {
+        withAnimation(.easeInOut(duration: 0.5)) {
+          isCompleted = !isCompleted
+        } completion: {
+          tasksStore.setTask(with: task.id, completed: !task.isCompleted)
+        }
+      }, label: {
+        if isCompleted {
+          Image(systemName: "checkmark.square")
+            .foregroundColor(.green)
+            .bold()
+        } else {
+          Image(systemName: "square")
+            .foregroundColor(.red)
+            .bold()
+        }
+      })
+      .buttonStyle(.borderless)
     }
     .padding()
-  }
-}
-
-struct FooterView: View {
-  @Binding var showingAddTaskView: Bool
-  
-  var body: some View {
-    Button(action: {
-      showingAddTaskView = true
-    }) {
-      Label("New Task", systemImage: "plus.circle.fill")
-        .bold()
+    .onAppear {
+      isCompleted = task.isCompleted
     }
   }
 }
@@ -93,31 +126,14 @@ struct TaskList_Previews: PreviewProvider {
 
 
 // TODO
-// - [DONE]Make task model and store
-// - add mutation logic for tasks store
-//    [DONE]- mark task done
-//    [DONE]- add new task
-// - Make task list view
-//  [DONE]- header
-//  [DONE]- task lists
-//  [DONE]- footer w button
-// [DONE]- style text in task list view
-//   [DONE]- add SF Symbols
-//   [DONE]- task title
-//   [DONE]- header
-//   [DONE]- new task button
-// [DONE]- Extract views from task list view
-//  [DONE]- header
-//  [DONE]- footer
-//  [DONE]- task list
-//  [DONE]- task row
-// [DONE]- add task details veiw
-// [DONE]- style task details view
-// [DONE]- hookup task completed toggle
-// [DONE]- hook up list navigation to details
-// [DONE]- add add task screen
-// [DONE]- hookup add task screen to actually add a taks
-// [DONE]- make tasklist scrollable
-// [DONE]- re-implement navigation view with navigation stack
-// [DONE]- disable add button when there is no title
-// [DONE]- swap note to multi-line text field
+//[DONE]- convert LazyVStack to list
+//  [DONE]- adjust style and padding
+// [DONE]- move add task button to nav tool bar and get rid of text
+//  [DONE]- get rid of footer view
+// [DONE]- Modify TaskListView  to display only those tasks where isCompleted property is set to false.
+// [DONE]- Add a TabView to the project, with two tabs.
+//  [DONE]- The first tab should display the list of incomplete tasks using the SF Symbol list.bullet.circle as the image and “Tasks” as the text.
+//  [DONE]- The second tab should showcase completed tasks with the SF Symbol checkmark.circle as the image and “Completed” as the text. Ensure that the TabView is presented when the user launches the app.
+// [DONE]- Add the ability for the user to search Tasks, both completed and not completed.
+// [DONE] Add unit tests for TaskStore
+// [DONE]- Allow the user to toggle the isCompleted property of a task by tapping on the square or checkmark. Animate the transition between the square and the check mark symbols.
