@@ -45,6 +45,13 @@ struct TaskListView: View {
             Text("Completed")
           }
           .tag(1)
+        InlineTaskCategoryView(tasksStore: tasksStore)
+          .tabItem {
+            Image(systemName: "tag.circle")
+              .resizable()
+            Text("Categories")
+          }
+          .tag(2)
       }
       .navigationTitle(Text("My Tasks"))
       .navigationBarItems(
@@ -77,6 +84,55 @@ struct InlineTaskListView: View {
       }
     }
     .listStyle(.plain)
+  }
+}
+
+struct InlineTaskCategoryView: View {
+  @ObservedObject var tasksStore: TasksStore
+  @State var selectedCategory: TaskCategory? = nil
+
+  var body: some View {
+    VStack {
+      LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], content: {
+        ForEach(tasksStore.categories, id: \.self) { category in
+          CategoryCard(tasksStore: tasksStore, category: category, selectedCategory: $selectedCategory)
+        }
+      })
+      .padding()
+      List(tasksStore.tasks(for: selectedCategory)) { task in
+        NavigationLink(value: task) {
+          TaskRowView(task: task, tasksStore: tasksStore)
+        }
+      }
+      .listStyle(.plain)
+    }
+  }
+}
+
+struct CategoryCard: View {
+  @ObservedObject var tasksStore: TasksStore
+  let category: TaskCategory
+  @Binding var selectedCategory: TaskCategory?
+  
+  var body: some View {
+    Button(action: {
+      if selectedCategory == nil {
+        selectedCategory = category
+      } else {
+        selectedCategory = nil
+      }
+    }, label: {
+      VStack(spacing: 20) {
+        Text(category.rawValue)
+        Text(String(tasksStore.taskCount(for: category)))
+      }
+      .font(.title3)
+      .bold()
+      .foregroundColor(.white)
+      .frame( minWidth: 0, maxWidth: .infinity, minHeight: 120)
+      .background(.red)
+      .cornerRadius(15)
+    })
   }
 }
 
@@ -137,3 +193,13 @@ struct TaskList_Previews: PreviewProvider {
 // [DONE]- Add the ability for the user to search Tasks, both completed and not completed.
 // [DONE] Add unit tests for TaskStore
 // [DONE]- Allow the user to toggle the isCompleted property of a task by tapping on the square or checkmark. Animate the transition between the square and the check mark symbols.
+// ABOVE & BEYOND
+// - add category enum
+// - add tasks by category getter, count functions to store
+// - add third tab + category view
+// - add grid view
+// - extract and style grid view cards
+// - hookup category counts
+// - hookup category card tap behavior
+// - add unit tests for store
+

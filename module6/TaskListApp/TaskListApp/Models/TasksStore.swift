@@ -9,16 +9,16 @@ import Foundation
 
 class TasksStore: ObservableObject {
   let defaultTasks = [
-    Task(title: "Task 1", isCompleted: false, notes: ""),
-    Task(title: "Task 2", isCompleted: false, notes: ""),
-    Task(title: "Task 3", isCompleted: false, notes: ""),
-    Task(title: "Task 4", isCompleted: false, notes: ""),
-    Task(title: "Task 5", isCompleted: true, notes: "some notes"),
-    Task(title: "Task 6", isCompleted: false, notes: ""),
-    Task(title: "Task 7", isCompleted: false, notes: ""),
-    Task(title: "Task 8", isCompleted: false, notes: ""),
-    Task(title: "Task 9", isCompleted: false, notes: ""),
-    Task(title: "Task 10", isCompleted: false, notes: "")
+    Task(title: "Task 1", isCompleted: false, notes: "", category: .home),
+    Task(title: "Task 2", isCompleted: false, notes: "", category: .personal),
+    Task(title: "Task 3", isCompleted: false, notes: "", category: .work),
+    Task(title: "Task 4", isCompleted: false, notes: "", category: .none),
+    Task(title: "Task 5", isCompleted: true, notes: "some notes", category: .home),
+    Task(title: "Task 6", isCompleted: false, notes: "", category: .personal),
+    Task(title: "Task 7", isCompleted: false, notes: "", category: .work),
+    Task(title: "Task 8", isCompleted: false, notes: "", category: .none),
+    Task(title: "Task 9", isCompleted: false, notes: "", category: .home),
+    Task(title: "Task 10", isCompleted: false, notes: "", category: .personal)
   ]
   
   @Published var tasks: [Task]
@@ -31,6 +31,21 @@ class TasksStore: ObservableObject {
     tasks.filter({ !$0.isCompleted })
   }
   
+  var categories: [TaskCategory] {
+    TaskCategory.allCases
+  }
+  
+  func tasks(for category: TaskCategory?) -> [Task] {
+    guard let category = category else {
+      return tasks
+    }
+    return tasks.filter({ $0.category == category })
+  }
+  
+  func taskCount(for category: TaskCategory?) -> Int {
+    tasks(for: category).count
+  }
+
   func searchTasks(searchTerm: String, tasksList: [Task]) -> [Task] {
     if !searchTerm.isEmpty {
       return tasksList.filter {
@@ -71,15 +86,24 @@ class TasksStore: ObservableObject {
   }
 }
 
+enum TaskCategory: String, CaseIterable {
+  case personal = "Personal"
+  case work = "Work"
+  case home = "Home"
+  case none = "No Category"
+}
+
 struct Task: Identifiable, Hashable {
   let id = UUID()
   var title: String
   var isCompleted: Bool
   var notes: String
+  var category: TaskCategory
   
-  init(title: String, isCompleted: Bool = false, notes: String) {
+  init(title: String, isCompleted: Bool = false, notes: String, category: TaskCategory = .none) {
     self.title = title
     self.isCompleted = isCompleted
     self.notes = notes
+    self.category = category
   }
 }
