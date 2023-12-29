@@ -11,12 +11,11 @@ final class TasksStoreTests: XCTestCase {
   var tasksStore: TasksStore?
 
   let testTasks = [
-    Task(title: "Task 1", isCompleted: false, notes: ""),
-    Task(title: "Task 2", isCompleted: false, notes: ""),
-    Task(title: "Task 3", isCompleted: true, notes: ""),
-    Task(title: "Task 4", isCompleted: true, notes: ""),
+    Task(title: "Task 1", isCompleted: false, notes: "", category: .home),
+    Task(title: "Task 2", isCompleted: false, notes: "", category: .work),
+    Task(title: "Task 3", isCompleted: true, notes: "", category: .personal),
+    Task(title: "Task 4", isCompleted: true, notes: "", category: .none),
   ]
-
   
   override func setUpWithError() throws {
     tasksStore = TasksStore()
@@ -98,6 +97,24 @@ final class TasksStoreTests: XCTestCase {
 
     matchingTasks = tasksStore!.searchCompletedTasks(searchTerm: "1")
     XCTAssertEqual(matchingTasks.count, 0)
-
+  }
+  
+  func testTaskCategories() throws {
+    let categories = tasksStore!.categories
+    XCTAssertEqual(categories.count, 4)
+    
+    XCTAssertEqual(categories[0].rawValue, "Personal")
+    XCTAssertEqual(categories[1].rawValue, "Work")
+    XCTAssertEqual(categories[2].rawValue, "Home")
+    XCTAssertEqual(categories[3].rawValue, "No Category")
+  }
+  
+  func testTasksByCategory() throws {
+    tasksStore = TasksStore(with: testTasks)
+    for category in tasksStore!.categories {
+      let categoryTasks = tasksStore!.tasks(for: category)
+      XCTAssert(categoryTasks.count > 0)
+      XCTAssertEqual(categoryTasks.first?.category, category)
+    }
   }
 }

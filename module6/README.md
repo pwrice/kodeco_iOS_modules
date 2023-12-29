@@ -2,7 +2,7 @@ Kodeco module 6 homework
 
 a) In SwiftUI, you describe your interfaces _____________ and leave the ___________ to the Framework.
 
-declaratively, implemetation details (??)
+declaratively, rendering
 
 b) When a View first appears, and you want it to animate in, you can do so in the Views ___________ modifier.
 
