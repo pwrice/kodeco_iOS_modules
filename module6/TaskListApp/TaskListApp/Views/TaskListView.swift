@@ -12,7 +12,7 @@ struct TaskListView: View {
   @State var showingAddTaskView: Bool = false
   @State var selectedTab = 0
   @State var searchTaskName: String = ""
-
+  
   var uncompletedTasks: [Task] {
     if !searchTaskName.isEmpty {
       return tasksStore.searchUncompletedTasks(searchTerm: searchTaskName)
@@ -25,9 +25,9 @@ struct TaskListView: View {
       return tasksStore.searchCompletedTasks(searchTerm: searchTaskName)
     }
     return tasksStore.completedTasks
-
-  }
     
+  }
+  
   var body: some View {
     NavigationStack {
       TabView(selection: $selectedTab) {
@@ -45,7 +45,7 @@ struct TaskListView: View {
             Text("Completed")
           }
           .tag(1)
-        InlineTaskCategoryView(tasksStore: tasksStore)
+        InlineTaskCategoryView(vm: InlineTaskCategoryViewModel(tasksStore: tasksStore))
           .tabItem {
             Image(systemName: "tag.circle")
               .resizable()
@@ -68,7 +68,7 @@ struct TaskListView: View {
         AddTaskView(tasksStore: tasksStore)
       })
       .searchable(text: $searchTaskName, prompt: "Task Name")
-
+      
     }
   }
 }
@@ -76,7 +76,7 @@ struct TaskListView: View {
 struct InlineTaskListView: View {
   let tasks: [Task]
   let tasksStore: TasksStore
-
+  
   var body: some View {
     List(tasks) { task in
       NavigationLink(value: task) {
@@ -88,20 +88,19 @@ struct InlineTaskListView: View {
 }
 
 struct InlineTaskCategoryView: View {
-  @ObservedObject var tasksStore: TasksStore
-  @State var selectedCategory: TaskCategory? = nil
-
+  @ObservedObject var vm: InlineTaskCategoryViewModel
+  
   var body: some View {
     VStack {
       LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], content: {
-        ForEach(tasksStore.categories, id: \.self) { category in
-          CategoryCard(tasksStore: tasksStore, category: category, selectedCategory: $selectedCategory)
+        ForEach(vm.categories, id: \.self) { category in
+          CategoryCard(vm: vm, category: category)
         }
       })
       .padding()
-      List(tasksStore.tasks(for: selectedCategory)) { task in
+      List(vm.tasksForSelectedCategory) { task in
         NavigationLink(value: task) {
-          TaskRowView(task: task, tasksStore: tasksStore)
+          TaskRowView(task: task, tasksStore: vm.tasksStore)
         }
       }
       .listStyle(.plain)
@@ -110,21 +109,16 @@ struct InlineTaskCategoryView: View {
 }
 
 struct CategoryCard: View {
-  @ObservedObject var tasksStore: TasksStore
+  @ObservedObject var vm: InlineTaskCategoryViewModel
   let category: TaskCategory
-  @Binding var selectedCategory: TaskCategory?
   
   var body: some View {
     Button(action: {
-      if selectedCategory == category {
-        selectedCategory = nil
-      } else {
-        selectedCategory = category
-      }
+      vm.tapCategory(category: category)
     }, label: {
       VStack(spacing: 20) {
         Text(category.rawValue)
-        Text(String(tasksStore.taskCount(for: category)))
+        Text(String(vm.taskCount(for: category)))
       }
       .font(.title3)
       .bold()
@@ -140,7 +134,7 @@ struct TaskRowView: View {
   let task: Task
   let tasksStore: TasksStore
   @State var isCompleted: Bool = false
-
+  
   
   var body: some View {
     HStack {
