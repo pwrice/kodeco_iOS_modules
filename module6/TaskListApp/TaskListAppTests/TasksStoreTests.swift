@@ -18,33 +18,29 @@ final class TasksStoreTests: XCTestCase {
   ]
   
   override func setUpWithError() throws {
-    tasksStore = TasksStore()
+    tasksStore = TasksStore(with: testTasks)
   }
   
   override func tearDownWithError() throws {}
   
   func testDefaultTasks() throws {
-    XCTAssertEqual(tasksStore!.tasks, tasksStore!.defaultTasks)
-    XCTAssertEqual(tasksStore!.tasks.count, 10)
+    tasksStore = TasksStore()
+    XCTAssertEqual(tasksStore!.tasks, tasksStore!.defaultTasks, "Task store was not initialized with defaultTasks")
   }
 
   func testSetTaskComplete() throws {
-    let firstTask = tasksStore!.tasks.first!
-    let firstTaskId = firstTask.id
-    XCTAssertEqual(firstTask.isCompleted, false)
-
+    tasksStore = TasksStore(with:  [
+      Task(title: "Test Task", isCompleted: false, notes: "", category: .home)])
+    let firstTaskId = tasksStore!.tasks.first!.id
+ 
     tasksStore?.setTask(with: firstTaskId, completed: true)
     
-    let taskIndex = tasksStore!.tasks.firstIndex(where: { $0.id == firstTaskId })!
-    let updatedTask = tasksStore!.tasks[taskIndex]
-    XCTAssertEqual(updatedTask.isCompleted, true)
-    XCTAssertEqual(taskIndex, 0)
+    let updatedTask = tasksStore!.tasks[0]
+    XCTAssertEqual(updatedTask.isCompleted, true, "Expected updatedTask.isCompleted to be true but got \(updatedTask.isCompleted)")
   }
 
   func testAddTask() throws {
     let originalTaskList = tasksStore!.tasks
-    XCTAssertEqual(originalTaskList.count, 10)
-    
     let newTaskTitle = "New Task Title"
     let newTaskNotes = "New Task Notes"
     XCTAssertNil(originalTaskList.first(where: { $0.title == newTaskTitle }))
@@ -52,7 +48,7 @@ final class TasksStoreTests: XCTestCase {
     tasksStore?.addTask(title: newTaskTitle, notes: newTaskNotes)
     
     let updatedTaskList = tasksStore!.tasks
-    XCTAssertEqual(updatedTaskList.count, 11)
+    XCTAssertEqual(updatedTaskList.count, originalTaskList.count + 1, "Expected updatedTaskList to be 1 longer than originalTaskList but got \(updatedTaskList.count) and \(originalTaskList.count) respectively.")
     let newTask = updatedTaskList.first(where: { $0.title == newTaskTitle })!
     XCTAssertEqual(newTask.title, newTaskTitle)
     XCTAssertEqual(newTask.notes, newTaskNotes)
@@ -60,61 +56,55 @@ final class TasksStoreTests: XCTestCase {
   }
   
   func testCompletedTasks() throws {
-    XCTAssertEqual(tasksStore!.tasks, tasksStore!.defaultTasks)
-    XCTAssertEqual(tasksStore!.tasks.count, 10)
-    
-    XCTAssertEqual(tasksStore!.completedTasks.count, 1)
-    XCTAssertEqual(tasksStore!.completedTasks.first?.isCompleted, true)
+    XCTAssertEqual(tasksStore!.completedTasks.count, 2, "The test fixture has two completed tasks, but found \(tasksStore!.completedTasks.count)")
+    let firstCompletedTask = tasksStore!.completedTasks.first!
+    XCTAssertEqual(firstCompletedTask.isCompleted, true, "The first completed task.isCompleted should be true but found \(firstCompletedTask.isCompleted)")
   }
 
   func testUncompletedTasks() throws {
-    XCTAssertEqual(tasksStore!.tasks, tasksStore!.defaultTasks)
-    XCTAssertEqual(tasksStore!.tasks.count, 10)
-    
-    XCTAssertEqual(tasksStore!.uncompletedTasks.count, 9)
+    XCTAssertEqual(tasksStore!.uncompletedTasks.count, 2, "The test fixture has 2 uncompleted tasks, but found \(tasksStore!.uncompletedTasks.count)")
     for task in tasksStore!.uncompletedTasks {
-      XCTAssertEqual(task.isCompleted, false)
+      XCTAssertEqual(task.isCompleted, false, "Task \(task.title) isComplete should be false but is \(task.isCompleted)")
     }
   }
 
-  func testSearchUncompletedTasks() throws {
-    tasksStore = TasksStore(with: testTasks)
-    
-    var matchingTasks = tasksStore!.searchUncompletedTasks(searchTerm: "1")
-    XCTAssertEqual(matchingTasks.count, 1)
-    XCTAssertEqual(matchingTasks.first?.title, "Task 1")
-
-    matchingTasks = tasksStore!.searchUncompletedTasks(searchTerm: "3")
-    XCTAssertEqual(matchingTasks.count, 0)
+  func testSearchUncompletedTasksReturnsMatch() throws {
+    let matchingTasks = tasksStore!.searchUncompletedTasks(searchTerm: "1")
+    XCTAssertEqual(matchingTasks.count, 1, "The test fixutre should have 1 matching task but found \(matchingTasks.count)")
+    XCTAssertEqual(matchingTasks.first?.title, "Task 1", "The matching title should be 'Task 1' but found \(String(describing: matchingTasks.first?.title))")
   }
 
-  func testSearchCompletedTasks() throws {
+  func testSearchUncompletedTasksReturnsNoMatch() throws {
+    let matchingTasks = tasksStore!.searchUncompletedTasks(searchTerm: "3")
+    XCTAssertEqual(matchingTasks.count, 0, "The test fixture should have 0 matching tasks but found \(matchingTasks.count)")
+  }
+
+  
+  func testSearchCompletedTasksReturnsMatch() throws {
+    let matchingTasks = tasksStore!.searchCompletedTasks(searchTerm: "3")
+    XCTAssertEqual(matchingTasks.count, 1, "The test fixutre should have 1 matching task but found \(matchingTasks.count)")
+    XCTAssertEqual(matchingTasks.first?.title, "Task 3", "The matching title should be 'Task 3' but found \(String(describing: matchingTasks.first?.title))")
+  }
+
+  func testSearchCompletedTasksReturnsNoMatch() throws {
     tasksStore = TasksStore(with: testTasks)
     
-    var matchingTasks = tasksStore!.searchCompletedTasks(searchTerm: "3")
-    XCTAssertEqual(matchingTasks.count, 1)
-    XCTAssertEqual(matchingTasks.first?.title, "Task 3")
-
-    matchingTasks = tasksStore!.searchCompletedTasks(searchTerm: "1")
-    XCTAssertEqual(matchingTasks.count, 0)
+    let matchingTasks = tasksStore!.searchCompletedTasks(searchTerm: "1")
+    XCTAssertEqual(matchingTasks.count, 0, "The test fixture should have 0 matching tasks but found \(matchingTasks.count)")
   }
+
   
   func testTaskCategories() throws {
-    let categories = tasksStore!.categories
-    XCTAssertEqual(categories.count, 4)
-    
-    XCTAssertEqual(categories[0].rawValue, "Personal")
-    XCTAssertEqual(categories[1].rawValue, "Work")
-    XCTAssertEqual(categories[2].rawValue, "Home")
-    XCTAssertEqual(categories[3].rawValue, "No Category")
+    let categoriesNameList = tasksStore!.categories.map( \.rawValue )
+    XCTAssertEqual(categoriesNameList, ["Personal", "Work", "Home", "No Category"], "The default category list should be Personal, Work, Home, No Category but found \(categoriesNameList)")
   }
   
   func testTasksByCategory() throws {
     tasksStore = TasksStore(with: testTasks)
     for category in tasksStore!.categories {
       let categoryTasks = tasksStore!.tasks(for: category)
-      XCTAssert(categoryTasks.count > 0)
-      XCTAssertEqual(categoryTasks.first?.category, category)
+      XCTAssert(categoryTasks.count > 0, "There should be at least 1 category for \(category.rawValue) but found \(categoryTasks.count)")      
+      XCTAssertEqual(categoryTasks.first?.category, category, "The firstTask.category should be \(category.rawValue) but found \(String(describing: categoryTasks.first?.category.rawValue))")
     }
   }
 }

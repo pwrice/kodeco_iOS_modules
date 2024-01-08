@@ -6,7 +6,7 @@ declaratively, rendering
 
 b) When a View first appears, and you want it to animate in, you can do so in the Views ___________ modifier.
 
-transtion
+onAppear()
 
 c) In Swift, the native types ______________ and ____________ implement the Hashable protocol
 
