@@ -84,6 +84,7 @@ struct InlineTaskListView: View {
       }
     }
     .listStyle(.plain)
+    .animation(.default, value: tasks)
   }
 }
 
@@ -104,6 +105,7 @@ struct InlineTaskCategoryView: View {
         }
       }
       .listStyle(.plain)
+      .animation(.default, value: vm.tasksForSelectedCategory)
     }
   }
 }
