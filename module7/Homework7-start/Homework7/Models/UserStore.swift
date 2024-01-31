@@ -52,7 +52,7 @@ class UserStore: ObservableObject, JSONDataLoadingStore {
     bundleJSONURL = URL(fileURLWithPath: fileName,
                              relativeTo: Bundle.main.bundleURL).appendingPathExtension("json")
     documentsJSONURL = URL(fileURLWithPath: fileName,
-                                relativeTo: FileManager.documentsDirectoryURL).appendingPathExtension("json")
+                                relativeTo: URL.documentsDirectory).appendingPathExtension("json")
     dataState = .notLoaded
   }
 
@@ -63,7 +63,7 @@ class UserStore: ObservableObject, JSONDataLoadingStore {
   }
   
   func extractDataFromContainer(_ container: UserDataJSONContainer) -> UserData? {
-    return container.results.first
+    return container.results?.first
   }
   
   func createContainerFromData(_ data: UserData?) -> UserDataJSONContainer {

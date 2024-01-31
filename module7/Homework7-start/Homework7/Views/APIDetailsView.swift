@@ -41,21 +41,22 @@ struct APIDetailsView: View {
       Form {
         Section(header:Text("Name"))
         {
-          Text(apiData.name)
+          Text(apiData.name ?? "")
             .bold()
         }
         Section(header:Text("Description"))
         {
-          Text(apiData.description)
+          Text(apiData.description ?? "")
             .bold()
         }
         Section(header:Text("Details"))
         {
           VStack {
             DataRowView(label: "Auth", dataValue: apiData.auth, showDivider: true)
-            DataRowView(label: "Https", dataValue: apiData.https ? "Yes" : "No", showDivider: true)
-            DataRowView(label: "Cors", dataValue: apiData.cors ? "Yes" : "No", showDivider: true)
-            DataRowView(label: "URL", dataValue: apiData.url, showDivider: true)
+            DataRowView(label: "Https", boolVal: apiData.https, showDivider: true)
+            DataRowView(label: "Cors", boolVal: apiData.cors, showDivider: true)
+            let urlString: String? = apiData.url != nil ?  "[\(apiData.url!)](\(apiData.url!))" : nil
+            DataRowView(label: "URL", dataValue: urlString, showDivider: true)
             DataRowView(label: "Category", dataValue: apiData.category)
           }
         }

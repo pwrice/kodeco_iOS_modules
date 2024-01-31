@@ -53,7 +53,7 @@ class APIStore: ObservableObject, JSONDataLoadingStore {
     self.bundleJSONURL = URL(fileURLWithPath: fileName,
                                relativeTo: Bundle.main.bundleURL).appendingPathExtension("json")
     self.documentsJSONURL = URL(fileURLWithPath: fileName,
-                                   relativeTo: FileManager.documentsDirectoryURL).appendingPathExtension("json")
+                                   relativeTo: URL.documentsDirectory).appendingPathExtension("json")
     dataState = .notLoaded
   }
 

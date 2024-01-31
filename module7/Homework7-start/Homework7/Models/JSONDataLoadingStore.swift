@@ -71,23 +71,22 @@ extension JSONDataLoadingStore {
     }
   }
 
-  func readJSONFromUrl(url: URL) -> DataType? {
+  func readJSONFromUrl(url: URL) throws -> DataType? {
     let decoder = JSONDecoder()
     do {
       let unstructuredUserData = try Data(contentsOf: url)
       let dataJSONContainer = try decoder.decode(DataContainerType.self, from: unstructuredUserData)
       return extractDataFromContainer(dataJSONContainer)
     } catch let error {
-      print(error)
+      throw JSONDataLoadingStoreError.DataFileNotFound("Error loading and parsing file at \(url)")
     }
-    return nil
   }
   
   func readJSON(with primaryURL: URL, fallingBackTo fallbackURL: URL) throws -> DataType?  {
     if FileManager.default.fileExists(atPath: primaryURL.path) {
-      return readJSONFromUrl(url: primaryURL)
+      return try readJSONFromUrl(url: primaryURL)
     } else if FileManager.default.fileExists(atPath: fallbackURL.path) {
-      return readJSONFromUrl(url: fallbackURL)
+      return try readJSONFromUrl(url: fallbackURL)
     } else {
       throw JSONDataLoadingStoreError.DataFileNotFound("Api data file not found at primaryURL: \(primaryURL) or \(fallbackURL)")
     }

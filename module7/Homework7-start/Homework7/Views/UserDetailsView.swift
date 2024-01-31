@@ -42,7 +42,7 @@ struct UserDetailsView: View {
         Form {
           Section()
           {
-            DataRowView(label: "Name", dataValue: userStore.userData?.name.fullName)
+            DataRowView(label: "Name", dataValue: userStore.userData?.name?.fullName)
             DataRowView(label: "Gender", dataValue: userStore.userData?.gender)
             DataRowView(label: "DOB", dataValue: userStore.userData?.dob.date)
             DataRowView(label: "Age", intVal: userStore.userData?.dob.age)
@@ -58,12 +58,12 @@ struct UserDetailsView: View {
 
           Section(header:Text("Location"))
           {
-            DataRowView(label: "Street", dataValue: userStore.userData?.location.street.addressName)
+            DataRowView(label: "Street", dataValue: userStore.userData?.location.street?.addressName)
             DataRowView(label: "City", dataValue: userStore.userData?.location.city)
             DataRowView(label: "State", dataValue: userStore.userData?.location.state)
-            DataRowView(label: "Post Code", intVal: userStore.userData?.location.postcode)
-            DataRowView(label: "Lat / Lng", dataValue: userStore.userData?.location.coordinates.displayName)
-            DataRowView(label: "Timezone", dataValue: userStore.userData?.location.timezone.displayName)
+            DataRowView(label: "Post Code", dataValue: userStore.userData?.location.postcode)
+            DataRowView(label: "Lat / Lng", dataValue: userStore.userData?.location.coordinates?.displayName)
+            DataRowView(label: "Timezone", dataValue: userStore.userData?.location.timezone?.displayName)
           }
 
           Section(header:Text("Account"))
