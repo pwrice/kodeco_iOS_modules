@@ -35,8 +35,10 @@ import XCTest
 final class AppStoreTests: XCTestCase {
   var apiStore: APIStore!
   let missingURL = URL(fileURLWithPath: "missingFile",
-                       relativeTo: FileManager.documentsDirectoryURL).appendingPathExtension("json")
-  
+                       relativeTo: URL.documentsDirectory).appendingPathExtension("json")
+  let missingKeysJsonURL = URL(fileURLWithPath: "apilistMissingKeys",
+                             relativeTo: Bundle.main.bundleURL).appendingPathExtension("json")
+
   
   override func setUpWithError() throws {
     apiStore = APIStore()
@@ -55,7 +57,7 @@ final class AppStoreTests: XCTestCase {
   }
   
   func testReadAPIJSONFromUrl() throws {
-    let apiData = apiStore.readJSONFromUrl(url: apiStore.bundleJSONURL) ?? []
+    let apiData = try apiStore.readJSONFromUrl(url: apiStore.bundleJSONURL) ?? []
     XCTAssertEqual(apiData.isEmpty, false, "apiStore.readJSONFromUrl(url: apiStore.bundleJSONURL) should read non-empty data")
   }
 
@@ -112,7 +114,7 @@ final class AppStoreTests: XCTestCase {
     apiStore.writeJSON()
     XCTAssertEqual(FileManager.default.fileExists(atPath: apiStore.documentsJSONURL.path), true,
                    "after writing, the file JSON does exist in the documents directopry")
-    let writtenApiData = apiStore.readJSONFromUrl(url: apiStore.documentsJSONURL) ?? []
+    let writtenApiData = try apiStore.readJSONFromUrl(url: apiStore.documentsJSONURL) ?? []
     XCTAssertEqual(writtenApiData.count, apiStore.apiDataList.count,
                    "The writtenApiData has the same number of items as the appStore.apiDataList")
     for index in apiStore.apiDataList.indices {
@@ -126,5 +128,29 @@ final class AppStoreTests: XCTestCase {
     apiStore = APIStore(bundleJSONURL: missingURL, documentsJSONURL: missingURL)
     apiStore.readJSON()
     XCTAssertEqual(apiStore.dataState, .errorLoading, "Attempting to read from missingURL puts appStore.dataState in .errorLoading")
+  }
+  
+  func testHandlesMissingKeysWhenReadingAPIJSON() throws {
+    apiStore = APIStore(bundleJSONURL: missingKeysJsonURL, documentsJSONURL: missingKeysJsonURL)
+    apiStore.readJSON()
+    let firstAPIDataItem = apiStore.apiDataList.first!
+    XCTAssertEqual(firstAPIDataItem.name, "AdoptAPet", "Its name should be 'AdoptAPet'")
+    XCTAssertEqual(firstAPIDataItem.description, "Resource to help get pets adopted", "Its description should be 'Resource to help get pets adopted'")
+    XCTAssertEqual(firstAPIDataItem.auth, nil, "Its auth should be nil")
+    XCTAssertEqual(firstAPIDataItem.cors, nil, "Its cors should be nil")
+    XCTAssertEqual(firstAPIDataItem.https, nil, "Its https should be nil")
+    XCTAssertEqual(firstAPIDataItem.url, "https://www.adoptapet.com/public/apis/pet_list.html", "It's url should be 'https://www.adoptapet.com/public/apis/pet_list.html'")
+    XCTAssertEqual(firstAPIDataItem.category, "Animals", "Its category should be 'Animals")
+  }
+
+  func testWriteAPIJSONWithMissingKeys() throws {
+    apiStore = APIStore(bundleJSONURL: missingKeysJsonURL, documentsJSONURL: missingKeysJsonURL)
+    apiStore.readJSON()
+    apiStore.writeJSON()
+    let writtenApiData = try apiStore.readJSONFromUrl(url: apiStore.documentsJSONURL) ?? []
+    for index in apiStore.apiDataList.indices {
+      XCTAssertEqual(writtenApiData[index], apiStore.apiDataList[index],
+                     "the written apiData item should match the in memory apiData item")
+    }
   }
 }

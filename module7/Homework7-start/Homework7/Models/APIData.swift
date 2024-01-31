@@ -34,13 +34,13 @@ import Foundation
 
 struct APIData: Encodable, Identifiable, Hashable {
   let id = UUID()
-  let name: String
-  let description: String
-  let auth: String
-  let https: Bool
-  let cors: Bool
-  let url: String
-  let category: String
+  let name: String?
+  let description: String?
+  let auth: String?
+  let https: Bool?
+  let cors: Bool?
+  let url: String?
+  let category: String?
   
   enum CodingKeys: String, CodingKey {
     case name = "API",
@@ -58,7 +58,9 @@ struct APIData: Encodable, Identifiable, Hashable {
     try container.encode(description, forKey: .description)
     try container.encode(auth, forKey: .auth)
     try container.encode(https, forKey: .https)
-    try container.encode(cors ? "yes" : "no", forKey: .cors)
+    if let cors = cors {
+      try container.encode(cors ? "yes" : "no", forKey: .cors)
+    }
     try container.encode(url, forKey: .url)
     try container.encode(category, forKey: .category)
   }
@@ -67,13 +69,13 @@ struct APIData: Encodable, Identifiable, Hashable {
 extension APIData: Decodable {
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    name = try container.decode(String.self, forKey: .name)
-    description = try container.decode(String.self, forKey: .description)
-    auth = try container.decode(String.self, forKey: .auth)
-    https = try container.decode(Bool.self, forKey: .https)
-    cors = try container.decode(String.self, forKey: .cors) == "yes"
-    url = try container.decode(String.self, forKey: .url)
-    category = try container.decode(String.self, forKey: .category)
+    name = try? container.decode(String.self, forKey: .name)
+    description = try? container.decode(String.self, forKey: .description)
+    auth = try? container.decode(String.self, forKey: .auth)
+    https = try? container.decode(Bool.self, forKey: .https)
+    cors = try? container.decode(String.self, forKey: .cors) == "yes"
+    url = try? container.decode(String.self, forKey: .url)
+    category = try? container.decode(String.self, forKey: .category)
   }
 }
 
@@ -90,8 +92,8 @@ extension APIData: Equatable {
 }
 
 struct APIDataJSONContainer: Codable {
-  let count: Int
-  let entries: [APIData]
+  let count: Int?
+  let entries: [APIData]?
 }
 
 

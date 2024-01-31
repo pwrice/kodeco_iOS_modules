@@ -40,7 +40,7 @@ struct DataRowView: View {
   var body: some View {
     VStack {
       HStack {
-        Text(label+":").bold()
+        Text("\(label):").bold()
         Spacer()
         Text(dataValue ?? "")
       }
@@ -62,5 +62,16 @@ struct DataRowView: View {
     self.dataValue = intVal == nil ? "" : String(intVal ?? 0)
     self.showDivider = showDivider
   }
+
+  init(label: String, boolVal: Bool?, showDivider: Bool = false) {
+    self.label = label
+    if let boolVal = boolVal {
+      self.dataValue = boolVal ? "Yes" : "No"
+    } else {
+      self.dataValue = ""
+    }
+    self.showDivider = showDivider
+  }
+
   
 }

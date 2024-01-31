@@ -33,7 +33,7 @@
 import Foundation
 
 struct UserData: Codable, Equatable {
-  let name: Name
+  let name: Name?
   let gender: String
   let location: Location
   let email: String
@@ -59,21 +59,71 @@ struct UserData: Codable, Equatable {
   }
   
   struct Location: Codable, Equatable {
-    let street: Street
-    let city: String
-    let state: String
-    let country: String
-    let postcode: Int // Note these can be strings as well - how to parse both?
-    let coordinates: LatLng
-    let timezone: Timezone
+    let street: Street?
+    let city: String?
+    let state: String?
+    let country: String?
+    let postcode: String?
+    let coordinates: LatLng?
+    let timezone: Timezone?
+    
+    enum CodingKeys: String, CodingKey {
+      case street, city, state, country, postcode, coordinates, timezone
+    }
+    
+    init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      
+      street = try? container.decode(Street.self, forKey: .street)
+      city = try? container.decode(String.self, forKey: .city)
+      state = try? container.decode(String.self, forKey: .state)
+      country = try? container.decode(String.self, forKey: .country)
+      
+      do {
+        postcode = try container.decode(String.self, forKey: .postcode)
+      } catch {
+        do {
+          let postcodeInt = try container.decode(Int.self, forKey: .postcode)
+          postcode = String(postcodeInt)
+        } catch {
+          postcode = nil
+        }
+      }
+      
+      coordinates = try? container.decode(LatLng.self, forKey: .coordinates)
+      timezone = try? container.decode(Timezone.self, forKey: .timezone)
+    }
         
     struct Street: Codable, Equatable {
-      let number: Int
-      let name: String
+      let number: String?
+      let name: String?
       
       var addressName: String {
         get {
-           "\(number) \(name)"
+          if let name = name, let number = number {
+            return "\(number) \(name)"
+          }
+          return ""
+        }
+      }
+      
+      enum CodingKeys: String, CodingKey {
+        case name, number
+      }
+
+      init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try? container.decode(String.self, forKey: .name)
+        
+        do {
+          number = try container.decode(String.self, forKey: .number)
+        } catch {
+          do {
+            let numberInt = try container.decode(Int.self, forKey: .number)
+            number = String(numberInt)
+          } catch {
+              number = nil
+          }
         }
       }
     }
@@ -135,14 +185,14 @@ struct UserData: Codable, Equatable {
 }
 
 struct UserDataJSONContainer: Codable, Equatable {
-  let results: [UserData]
-  let info: Info
+  let results: [UserData]?
+  let info: Info?
   
   struct Info: Codable, Equatable {
-    let seed: String
-    let results: Int
-    let page: Int
-    let version: String
+    let seed: String?
+    let results: Int?
+    let page: Int?
+    let version: String?
 
     init() {
       seed = ""

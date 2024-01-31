@@ -68,7 +68,7 @@ import foundation
 
 m) Give an example of Snake Case.
 
-ThisIsAnExampleOfSnakeCase
+this_is_an_example_of_snake_case
 
 n) A struct that will be used in the reading and writing of data must conform to the __________________ Protocol
 
@@ -76,13 +76,12 @@ Codable
 
 o) Show the line of code used to access the user’s document directory for the running app.
 
-maybe you mean:
+URL.documentsDirectory
 
-FileManager.default.contentsOfDirectory(atPath: FileManager.documentsDirectoryURL.path) 
 
 ?
 
 p) Files added to the project that will be used by the app can be found in the __________ _________ when the app is running.
 
-application bundle
+Main application bundle
 

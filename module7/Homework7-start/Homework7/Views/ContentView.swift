@@ -71,7 +71,7 @@ struct APIListView: View {
       List {
         ForEach(apiStore.apiDataList) { apiData in
           NavigationLink(value: apiData) {
-            Text(apiData.name)
+            Text(apiData.name ?? "")
               .padding(.vertical)
           }
         }
