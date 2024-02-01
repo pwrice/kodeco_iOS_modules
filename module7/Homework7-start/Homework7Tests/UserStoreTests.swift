@@ -34,23 +34,21 @@ import XCTest
 
 final class UserStoreTests: XCTestCase {
   var userStore: UserStore!
-  let missingURL = URL(fileURLWithPath: "missingFile",
-                       relativeTo: URL.documentsDirectory).appendingPathExtension("json")
-  
-  
+  let missingURL = URL(
+    fileURLWithPath: "missingFile",
+    relativeTo: URL.documentsDirectory)
+    .appendingPathExtension("json")
+
   override func setUpWithError() throws {
     userStore = UserStore()
   }
-  
-  override func tearDownWithError() throws {
-  }
-  
+
   func testAppStoreInitialState() throws {
     XCTAssertNotNil(userStore, "userStore should initialize but was nil")
     XCTAssertNil(userStore.userData, "Initial userStore.userData should be nil")
     XCTAssertEqual(userStore.dataState, .notLoaded, "Intial userStore.dataState should be .notLoaded")
   }
-  
+
   func testReadAPIJSONFromUrl() throws {
     let apiData = try userStore.readJSONFromUrl(url: userStore.bundleJSONURL)
     XCTAssertNotNil(apiData, "userStore.readAPIJSONFromUrl(url: userStore.bundleJSONURL) should read non-nil data")
@@ -60,7 +58,7 @@ final class UserStoreTests: XCTestCase {
     let fileExistsAtMissingPath = FileManager.default.fileExists(atPath: missingURL.path)
     XCTAssertEqual(fileExistsAtMissingPath, false, "No file should exist at missingURL.path")
   }
-  
+
   func testReadAPIJSONFromPrimaryUrl() throws {
     let userData = try userStore.readJSON(with: userStore.bundleJSONURL, fallingBackTo: missingURL)
     XCTAssertNotNil(userData, "userStore.readAPIJSON(with:fallingBackTo:) successfully reads from primary url")
@@ -68,29 +66,35 @@ final class UserStoreTests: XCTestCase {
 
   func testReadAPIJSONFromFallbackUrl() throws {
     let userData = try userStore.readJSON(with: missingURL, fallingBackTo: userStore.bundleJSONURL)
-    XCTAssertNotNil(userData, "userStore.readJSON(with:fallingBackTo:) successfully falls back to secondary url when primary url does not exist")
+    XCTAssertNotNil(
+      userData,
+      "userStore.readJSON(with:fallingBackTo:) successfully falls back to secondary url when primary url does not exist")
   }
 
   func testReadUserJSON() throws {
     userStore.readJSON()
-    XCTAssertNotNil(userStore.data,
-                   "After successful load userStore.data should not be empty")
-    XCTAssertEqual(userStore.dataState, .loaded,
-                   "After successful load, userStore.dataState should be .loaded")
+    XCTAssertNotNil(
+      userStore.data,
+      "After successful load userStore.data should not be empty")
+    XCTAssertEqual(
+      userStore.dataState,
+        .loaded,
+      "After successful load, userStore.dataState should be .loaded")
   }
 
   func testReadJSONFromFallbackUrlThrowsError() {
     XCTAssertThrowsError(
       try userStore.readJSON(with: missingURL, fallingBackTo: missingURL),
-      "", { error in
+      "") { error in
         let error = error as! JSONDataLoadingStoreError
         XCTAssertEqual(
           error,
-          JSONDataLoadingStoreError.DataFileNotFound("Api data file not found at primaryURL: \(missingURL) or \(missingURL)"),
+          JSONDataLoadingStoreError.dataFileNotFound(
+            "Api data file not found at primaryURL: \(missingURL) or \(missingURL)"),
           "userStore.readJSON(with:fallingBackTo:) should throw JSONDataLoadingStoreError.DataFileNotFound on missing paths \(missingURL)")
-      })
+    }
   }
-  
+
   func testWriteAPIJSON() throws {
     // Cleanup from any previous run
     if FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path) {
@@ -98,18 +102,25 @@ final class UserStoreTests: XCTestCase {
     }
 
     userStore.readJSON()
-    XCTAssertEqual(FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path), false,
-                   "before writing, the JSON file does not exist in the documents directory")
+    XCTAssertEqual(
+      FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path),
+      false,
+      "before writing, the JSON file does not exist in the documents directory")
     userStore.writeJSON()
-    XCTAssertEqual(FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path), true,
-                   "after writing, the file JSON does exist in the documents directory")
+    XCTAssertEqual(
+      FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path),
+      true,
+      "after writing, the file JSON does exist in the documents directory")
     let writtenData = try userStore.readJSONFromUrl(url: userStore.documentsJSONURL)
     XCTAssertEqual(writtenData, userStore.userData, "the written data should match the in memory data ")
   }
-  
+
   func testErrorStateReadingUserJSON() throws {
     userStore = UserStore(bundleJSONURL: missingURL, documentsJSONURL: missingURL)
     userStore.readJSON()
-    XCTAssertEqual(userStore.dataState, .errorLoading, "Attempting to read from missingURL puts userStore.dataState in .errorLoading")
+    XCTAssertEqual(
+      userStore.dataState,
+      .errorLoading,
+      "Attempting to read from missingURL puts userStore.dataState in .errorLoading")
   }
 }

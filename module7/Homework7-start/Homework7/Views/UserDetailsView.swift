@@ -35,13 +35,12 @@ import SwiftUI
 struct UserDetailsView: View {
   @ObservedObject var userStore = UserStore()
   @Binding var showingErrorView: Bool
-  
+
   var body: some View {
     NavigationStack {
       VStack {
         Form {
-          Section()
-          {
+          Section {
             DataRowView(label: "Name", dataValue: userStore.userData?.name?.fullName)
             DataRowView(label: "Gender", dataValue: userStore.userData?.gender)
             DataRowView(label: "DOB", dataValue: userStore.userData?.dob.date)
@@ -49,15 +48,13 @@ struct UserDetailsView: View {
             DataRowView(label: "Nationality", dataValue: userStore.userData?.nat)
           }
 
-          Section(header:Text("Contact"))
-          {
+          Section(header: Text("Contact")) {
             DataRowView(label: "Email", dataValue: userStore.userData?.email)
             DataRowView(label: "Phone", dataValue: userStore.userData?.phone)
             DataRowView(label: "Cell", dataValue: userStore.userData?.cell)
           }
 
-          Section(header:Text("Location"))
-          {
+          Section(header: Text("Location")) {
             DataRowView(label: "Street", dataValue: userStore.userData?.location.street?.addressName)
             DataRowView(label: "City", dataValue: userStore.userData?.location.city)
             DataRowView(label: "State", dataValue: userStore.userData?.location.state)
@@ -66,22 +63,20 @@ struct UserDetailsView: View {
             DataRowView(label: "Timezone", dataValue: userStore.userData?.location.timezone?.displayName)
           }
 
-          Section(header:Text("Account"))
-          {
+          Section(header: Text("Account")) {
             DataRowView(label: "Username", dataValue: userStore.userData?.login.username)
             DataRowView(label: "Password", dataValue: userStore.userData?.login.password)
             DataRowView(label: "Date Registered", dataValue: userStore.userData?.registered.date)
             DataRowView(label: "Age Registered", intVal: userStore.userData?.registered.age)
           }
-          
-          Section(header:Text("Picture"))
-          {
+
+          Section(header: Text("Picture")) {
             DataRowView(label: "large", dataValue: userStore.userData?.picture.large)
             DataRowView(label: "medium", dataValue: userStore.userData?.picture.medium)
             DataRowView(label: "thumbnail", dataValue: userStore.userData?.picture.thumbnail)
           }
         }
-      }      
+      }
       .listStyle(.plain)
       .navigationTitle(Text("User Details"))
     }
@@ -98,7 +93,7 @@ struct UserDetailsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
       UserDetailsView(showingErrorView: .constant(false))
-      
+
       UserDetailsView(showingErrorView: .constant(true))
     }
   }

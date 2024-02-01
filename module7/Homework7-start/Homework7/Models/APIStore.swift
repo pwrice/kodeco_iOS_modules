@@ -35,11 +35,10 @@ import Combine
 
 
 class APIStore: ObservableObject, JSONDataLoadingStore {
-  
   let fileName = "apilist"
   var bundleJSONURL: URL
   var documentsJSONURL: URL
-  
+
   var data: [APIData]? {
     didSet {
       apiDataList = data ?? []
@@ -50,10 +49,14 @@ class APIStore: ObservableObject, JSONDataLoadingStore {
   @Published var apiDataList: [APIData] = []
 
   init() {
-    self.bundleJSONURL = URL(fileURLWithPath: fileName,
-                               relativeTo: Bundle.main.bundleURL).appendingPathExtension("json")
-    self.documentsJSONURL = URL(fileURLWithPath: fileName,
-                                   relativeTo: URL.documentsDirectory).appendingPathExtension("json")
+    self.bundleJSONURL = URL(
+      fileURLWithPath: fileName,
+      relativeTo: Bundle.main.bundleURL)
+    .appendingPathExtension("json")
+    self.documentsJSONURL = URL(
+      fileURLWithPath: fileName,
+      relativeTo: URL.documentsDirectory)
+    .appendingPathExtension("json")
     dataState = .notLoaded
   }
 
@@ -67,9 +70,8 @@ class APIStore: ObservableObject, JSONDataLoadingStore {
   func extractDataFromContainer(_ container: APIDataJSONContainer) -> [APIData]? {
     return container.entries
   }
-  
+
   func createContainerFromData(_ data: [APIData]?) -> APIDataJSONContainer {
     return APIDataJSONContainer(count: data?.count ?? 0, entries: data ?? [])
   }
-
 }
