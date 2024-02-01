@@ -34,25 +34,28 @@ import Foundation
 import Combine
 
 class UserStore: ObservableObject, JSONDataLoadingStore {
-  
   let fileName = "week7aboveandbeyond"
   var bundleJSONURL: URL
   var documentsJSONURL: URL
-  
+
   var data: UserData? {
     didSet {
       userData = data
     }
   }
-  
+
   @Published var userData: UserData?
   @Published var dataState: JSONDataLoadingStoreDataState
 
   init() {
-    bundleJSONURL = URL(fileURLWithPath: fileName,
-                             relativeTo: Bundle.main.bundleURL).appendingPathExtension("json")
-    documentsJSONURL = URL(fileURLWithPath: fileName,
-                                relativeTo: URL.documentsDirectory).appendingPathExtension("json")
+    bundleJSONURL = URL(
+      fileURLWithPath: fileName,
+      relativeTo: Bundle.main.bundleURL)
+    .appendingPathExtension("json")
+    documentsJSONURL = URL(
+      fileURLWithPath: fileName,
+      relativeTo: URL.documentsDirectory)
+    .appendingPathExtension("json")
     dataState = .notLoaded
   }
 
@@ -61,12 +64,16 @@ class UserStore: ObservableObject, JSONDataLoadingStore {
     self.documentsJSONURL = documentsJSONURL
     dataState = .notLoaded
   }
-  
+
   func extractDataFromContainer(_ container: UserDataJSONContainer) -> UserData? {
     return container.results?.first
   }
-  
+
   func createContainerFromData(_ data: UserData?) -> UserDataJSONContainer {
-    return UserDataJSONContainer(results: data != nil ? [data!] : []  , info: UserDataJSONContainer.Info())
+    var dataArray: [UserData]? = []
+    if let data = data {
+      dataArray = [data]
+    }
+    return UserDataJSONContainer(results: dataArray, info: UserDataJSONContainer.Info())
   }
 }

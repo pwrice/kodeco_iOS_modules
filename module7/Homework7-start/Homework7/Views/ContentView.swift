@@ -34,13 +34,13 @@ import SwiftUI
 
 struct ContentView: View {
   @ObservedObject var apiStore = APIStore()
-  @State var showingAPIErrorView: Bool = false
-  
+  @State var showingAPIErrorView = false
+
   @ObservedObject var userStore = UserStore()
-  @State var showingUserErrorView: Bool = false
-  
+  @State var showingUserErrorView = false
+
   @State var selectedTab = 0
-    
+
   var body: some View {
     TabView(selection: $selectedTab) {
       APIListView(apiStore: apiStore, showingErrorView: $showingAPIErrorView)
@@ -50,7 +50,7 @@ struct ContentView: View {
           Text("API List")
         }
         .tag(0)
-      
+
       UserDetailsView(userStore: userStore, showingErrorView: $showingUserErrorView)
         .tabItem {
           Image(systemName: "person")
@@ -65,7 +65,7 @@ struct ContentView: View {
 struct APIListView: View {
   @ObservedObject var apiStore = APIStore()
   @Binding var showingErrorView: Bool
-  
+
   var body: some View {
     NavigationStack {
       List {
@@ -95,7 +95,7 @@ struct APIListView: View {
 
 struct ErrorSheet: View {
   @Binding var showErrorView: Bool
-  
+
   var body: some View {
     NavigationView {
       VStack {
@@ -112,38 +112,16 @@ struct ErrorSheet: View {
   }
 }
 
-
-
 struct APIListView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
       ContentView(showingAPIErrorView: false, selectedTab: 0)
-      
+
       ContentView(showingAPIErrorView: true, selectedTab: 0)
 
       ContentView(showingUserErrorView: false, selectedTab: 1)
-      
+
       ContentView(showingUserErrorView: true, selectedTab: 1)
     }
   }
 }
-
-
-/*
- TDOD
- [DONE]- Break out views into separate files
- [DONE]- Add messages for tests
- [DONE]- Add tests for data load state
- [DONE]- Style error sheet
- [DONE]- add close button
- [DONE]- Style details view
- [DONE]- add rest of details info
- 
- // ABOVE AND BEYOND TODO
- [DONE]- Add a new model that allows the JSON data to be encoded and decoded.
- [DONE]- Add a new store object that handles the loading and saving of JSON.
- [DONE]- refactor stores to put shared functionality into protocol
- [DONE]- Add a Tab View is added to the project to switch between the API and user data.
- [DONE]- Add a view that displays the user data.
- 
- */

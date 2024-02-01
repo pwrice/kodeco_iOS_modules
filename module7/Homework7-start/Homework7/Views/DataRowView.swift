@@ -36,7 +36,6 @@ struct DataRowView: View {
   let label: String
   let dataValue: String?
   let showDivider: Bool
-  
   var body: some View {
     VStack {
       HStack {
@@ -56,7 +55,7 @@ struct DataRowView: View {
     self.dataValue = dataValue
     self.showDivider = showDivider
   }
-  
+
   init(label: String, intVal: Int?, showDivider: Bool = false) {
     self.label = label
     self.dataValue = intVal == nil ? "" : String(intVal ?? 0)
@@ -72,6 +71,4 @@ struct DataRowView: View {
     }
     self.showDivider = showDivider
   }
-
-  
 }

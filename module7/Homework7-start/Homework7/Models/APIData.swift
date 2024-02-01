@@ -41,17 +41,17 @@ struct APIData: Encodable, Identifiable, Hashable {
   let cors: Bool?
   let url: String?
   let category: String?
-  
+
   enum CodingKeys: String, CodingKey {
     case name = "API",
-         description = "Description",
-         auth = "Auth",
-         https = "HTTPS",
-         cors = "Cors",
-         url = "Link",
-         category = "Category"
+      description = "Description",
+      auth = "Auth",
+      https = "HTTPS",
+      cors = "Cors",
+      url = "Link",
+      category = "Category"
   }
-  
+
   func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(name, forKey: .name)
@@ -95,5 +95,3 @@ struct APIDataJSONContainer: Codable {
   let count: Int?
   let entries: [APIData]?
 }
-
-

@@ -36,27 +36,30 @@ struct APIDetailsView: View {
   var appStore: APIStore
   let apiData: APIData
 
+  var apiUrlMarkdown: String? {
+    if let url = apiData.url {
+      return "[\(url)](\(url))"
+    }
+    return nil
+  }
+
   var body: some View {
     VStack {
       Form {
-        Section(header:Text("Name"))
-        {
+        Section(header: Text("Name")) {
           Text(apiData.name ?? "")
             .bold()
         }
-        Section(header:Text("Description"))
-        {
+        Section(header: Text("Description")) {
           Text(apiData.description ?? "")
             .bold()
         }
-        Section(header:Text("Details"))
-        {
+        Section(header: Text("Details")) {
           VStack {
             DataRowView(label: "Auth", dataValue: apiData.auth, showDivider: true)
             DataRowView(label: "Https", boolVal: apiData.https, showDivider: true)
             DataRowView(label: "Cors", boolVal: apiData.cors, showDivider: true)
-            let urlString: String? = apiData.url != nil ?  "[\(apiData.url!)](\(apiData.url!))" : nil
-            DataRowView(label: "URL", dataValue: urlString, showDivider: true)
+            DataRowView(label: "URL", dataValue: apiUrlMarkdown, showDivider: true)
             DataRowView(label: "Category", dataValue: apiData.category)
           }
         }
