@@ -38,14 +38,32 @@ class UserStore: ObservableObject, JSONDataLoadingStore {
   var bundleJSONURL: URL
   var documentsJSONURL: URL
 
+  var remoteJSONURL: URL?
+  var byteLoader: ByteLoading?
+
   var data: UserData? {
     didSet {
-      userData = data
+      Task {
+        await MainActor.run {
+          userData = data
+        }
+      }
+    }
+  }
+  
+  var dataState: JSONDataLoadingStoreDataState {
+    didSet {
+      Task {
+        await MainActor.run {
+          userDataState = dataState
+        }
+      }
     }
   }
 
+
   @Published var userData: UserData?
-  @Published var dataState: JSONDataLoadingStoreDataState
+  @Published var userDataState: JSONDataLoadingStoreDataState
 
   init() {
     bundleJSONURL = URL(
@@ -57,12 +75,14 @@ class UserStore: ObservableObject, JSONDataLoadingStore {
       relativeTo: URL.documentsDirectory)
     .appendingPathExtension("json")
     dataState = .notLoaded
+    userDataState = .notLoaded
   }
 
   init(bundleJSONURL: URL, documentsJSONURL: URL) {
     self.bundleJSONURL = bundleJSONURL
     self.documentsJSONURL = documentsJSONURL
     dataState = .notLoaded
+    userDataState = .notLoaded
   }
 
   func extractDataFromContainer(_ container: UserDataJSONContainer) -> UserData? {

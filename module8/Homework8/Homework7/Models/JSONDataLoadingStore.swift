@@ -31,6 +31,7 @@
 /// THE SOFTWARE.
 
 import Foundation
+import SwiftUI
 
 enum JSONDataLoadingStoreDataState {
   case notLoaded
@@ -43,15 +44,24 @@ enum JSONDataLoadingStoreDataState {
 
 enum JSONDataLoadingStoreError: Error, Equatable {
   case dataFileNotFound(String)
+  case remoteJSONUrlCreationFailed
+  case remoteJSONDataParseError(String)
+  case remoteJSONUrlNotPresent(String)
+  case remoteJSONRequestFailed(String)
+
 }
 
 protocol JSONDataLoadingStore: AnyObject {
   associatedtype DataType: Codable
   associatedtype DataContainerType: Codable
 
-  var dataState: JSONDataLoadingStoreDataState { get set }
   var bundleJSONURL: URL { get set }
   var documentsJSONURL: URL { get set }
+
+  var remoteJSONURL: URL? { get set }
+  var byteLoader: ByteLoading? { get set }
+
+  var dataState: JSONDataLoadingStoreDataState { get set }
   var data: DataType? { get set }
 
   func extractDataFromContainer(_ container: DataContainerType) -> DataType?
@@ -59,32 +69,50 @@ protocol JSONDataLoadingStore: AnyObject {
 }
 
 extension JSONDataLoadingStore {
-  func readJSON() {
+  func readJSON(progress: Binding<Float>? = nil) async {
+    dataState = .loading
+    // First attempt to load from remote URL
+    if let remoteJSONURL = remoteJSONURL, let byteLoader = byteLoader {
+      do {
+        // If dataload is successful, set data state to loaded and return
+        data = try await readRemoteJSON(
+          at: remoteJSONURL,
+          byteLoader: byteLoader,
+          progress: progress
+        )
+        dataState = .loaded
+        return
+      } catch {
+        print("error loading remote url \(remoteJSONURL)")
+      }
+    }
+
     do {
-      dataState = .loading
-      data = try readJSON(with: bundleJSONURL, fallingBackTo: documentsJSONURL)
+      data = try readLocalJSON(with: bundleJSONURL, fallingBackTo: documentsJSONURL)
       dataState = .loaded
+      return
     } catch {
       dataState = .errorLoading
+      return
     }
   }
 
-  func readJSONFromUrl(url: URL) throws -> DataType? {
+  func readJSONFromLocalUrl(url: URL) throws -> DataType? {
     let decoder = JSONDecoder()
     do {
-      let unstructuredUserData = try Data(contentsOf: url)
-      let dataJSONContainer = try decoder.decode(DataContainerType.self, from: unstructuredUserData)
+      let unstructuredData = try Data(contentsOf: url)
+      let dataJSONContainer = try decoder.decode(DataContainerType.self, from: unstructuredData)
       return extractDataFromContainer(dataJSONContainer)
     } catch {
       throw JSONDataLoadingStoreError.dataFileNotFound("Error loading and parsing file at \(url)")
     }
   }
 
-  func readJSON(with primaryURL: URL, fallingBackTo fallbackURL: URL) throws -> DataType? {
+  func readLocalJSON(with primaryURL: URL, fallingBackTo fallbackURL: URL) throws -> DataType? {
     if FileManager.default.fileExists(atPath: primaryURL.path) {
-      return try readJSONFromUrl(url: primaryURL)
+      return try readJSONFromLocalUrl(url: primaryURL)
     } else if FileManager.default.fileExists(atPath: fallbackURL.path) {
-      return try readJSONFromUrl(url: fallbackURL)
+      return try readJSONFromLocalUrl(url: fallbackURL)
     } else {
       throw JSONDataLoadingStoreError.dataFileNotFound(
         "Api data file not found at primaryURL: \(primaryURL) or \(fallbackURL)")
@@ -102,6 +130,71 @@ extension JSONDataLoadingStore {
       dataState = .loaded
     } catch {
       dataState = .errorWriting
+    }
+  }
+
+  func readRemoteJSON(at url: URL, byteLoader: ByteLoading, progress: Binding<Float>?) async throws -> DataType? {
+    do {
+      let unstructuredData = try await byteLoader.readBytesFromUrl(url: url, progress: progress)
+
+      let decoder = JSONDecoder()
+      let dataJSONContainer = try decoder.decode(DataContainerType.self, from: unstructuredData)
+      return extractDataFromContainer(dataJSONContainer)
+    } catch {
+      throw JSONDataLoadingStoreError.remoteJSONDataParseError("Error loading and parsing file at \(url)")
+    }
+  }
+}
+
+protocol ByteLoading {
+  func readBytesFromUrl(url: URL, progress: Binding<Float>?) async throws -> Data
+}
+
+struct RemoteByteLoader: ByteLoading {
+  func readBytesFromUrl(url: URL, progress: Binding<Float>?) async throws -> Data {
+    let configuration = URLSessionConfiguration.default
+    let session = URLSession(configuration: configuration)
+
+    let (asyncBytes, response) = try await session.bytes(from: url)
+
+    guard let httpResponse = response as? HTTPURLResponse else {
+      throw JSONDataLoadingStoreError.remoteJSONRequestFailed(
+        "remoteJSONRequestFailed invalid response type \(response) for url \(url)")
+    }
+    if !(200..<300).contains(httpResponse.statusCode) {
+      throw JSONDataLoadingStoreError.remoteJSONRequestFailed(
+        "remoteJSONRequestFailed \(httpResponse.statusCode) for url \(url)")
+    }
+
+    let contentLength = Float(response.expectedContentLength)
+    var unstructuredData = Data(capacity: Int(contentLength))
+
+    for try await byte in asyncBytes {
+      unstructuredData.append(byte)
+
+      let currentProgress = contentLength > 0 ? Float(unstructuredData.count) / contentLength : 0.5
+
+      if let progress = progress, Int(progress.wrappedValue * 100) != Int(currentProgress * 100) {
+        progress.wrappedValue = currentProgress
+      }
+    }
+
+    return unstructuredData
+  }
+}
+
+struct MockByteLoader: ByteLoading {
+  let mockLocalJSONURL: URL
+
+  func readBytesFromUrl(url: URL, progress: Binding<Float>?) async throws -> Data {
+    do {
+      let unstructuredData = try Data(contentsOf: mockLocalJSONURL)
+      if let progress = progress {
+        progress.wrappedValue = 100
+      }
+      return unstructuredData
+    } catch {
+      throw JSONDataLoadingStoreError.dataFileNotFound("Error loading at \(url)")
     }
   }
 }

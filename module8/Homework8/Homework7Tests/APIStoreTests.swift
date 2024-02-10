@@ -31,9 +31,13 @@
 /// THE SOFTWARE.
 
 import XCTest
+import SwiftUI
+import Combine
 
 final class AppStoreTests: XCTestCase {
   var apiStore: APIStore!
+  var apiStoreCancellable: AnyCancellable?
+  
   let missingURL = URL(
     fileURLWithPath: "missingFile",
     relativeTo: URL.documentsDirectory)
@@ -44,23 +48,45 @@ final class AppStoreTests: XCTestCase {
     .appendingPathExtension("json")
 
   override func setUpWithError() throws {
-    apiStore = APIStore()
+    let fileName = "apilist"
+    let bundleJSONURL = URL(
+      fileURLWithPath: fileName,
+      relativeTo: Bundle.main.bundleURL)
+    .appendingPathExtension("json")
+
+    let documentsJSONURL = URL(
+      fileURLWithPath: fileName,
+      relativeTo: URL.documentsDirectory)
+    .appendingPathExtension("json")
+
+    apiStore = APIStore(bundleJSONURL: bundleJSONURL, documentsJSONURL: documentsJSONURL)
   }
 
   override func tearDownWithError() throws {
-    if FileManager.default.fileExists(atPath: apiStore.documentsJSONURL.path) {
-      try FileManager.default.removeItem(at: apiStore.documentsJSONURL)
-    }
+  }
+
+  func readJsonAndWaitForMainActorUpdate(_ apiStore: APIStore) async {
+    let expectation = XCTestExpectation(description: "apiDataList updated")
+    apiStoreCancellable = apiStore.$apiDataList
+      .sink { _ in
+        expectation.fulfill()
+      }
+
+    await apiStore.readJSON()
+
+    XCTAssertEqual(apiStore.apiDataState, .loading)
+
+    await fulfillment(of: [expectation], timeout: 1)
   }
 
   func testAppStoreInitialState() throws {
     XCTAssertNotNil(apiStore, "appStore should initialize but was nil")
     XCTAssertEqual(apiStore.apiDataList.count, 0, "Initial apiStore.apiDataList should be empty")
-    XCTAssertEqual(apiStore.dataState, .notLoaded, "Intial apiStore.dataState should be .notLoaded")
+    XCTAssertEqual(apiStore.apiDataState, .notLoaded, "Intial apiStore.apiDataState should be .notLoaded")
   }
 
   func testReadAPIJSONFromUrl() throws {
-    let apiData = try apiStore.readJSONFromUrl(url: apiStore.bundleJSONURL) ?? []
+    let apiData = try apiStore.readJSONFromLocalUrl(url: apiStore.bundleJSONURL) ?? []
     XCTAssertEqual(
       apiData.isEmpty,
       false,
@@ -73,32 +99,34 @@ final class AppStoreTests: XCTestCase {
   }
 
   func testReadAPIJSONFromPrimaryUrl() throws {
-    let apiData = try apiStore.readJSON(with: apiStore.bundleJSONURL, fallingBackTo: missingURL) ?? []
+    let apiData = try apiStore.readLocalJSON(with: apiStore.bundleJSONURL, fallingBackTo: missingURL) ?? []
     XCTAssertEqual(apiData.isEmpty, false, "apiStore.readJSON(with:fallingBackTo:) successfully reads from primary url")
   }
 
   func testReadAPIJSONFromFallbackUrl() throws {
-    let apiData = try apiStore.readJSON(with: missingURL, fallingBackTo: apiStore.bundleJSONURL) ?? []
+    let apiData = try apiStore.readLocalJSON(with: missingURL, fallingBackTo: apiStore.bundleJSONURL) ?? []
     XCTAssertEqual(
       apiData.isEmpty,
       false,
       "apiStore.readJSON(with:fallingBackTo:) successfully falls back to secondary url when primary url does not exist")
   }
 
-  func testReadAPIJSON() throws {
-    apiStore.readJSON()
+  func testReadAPIJSON() async throws {
+    await readJsonAndWaitForMainActorUpdate(apiStore)
+
     XCTAssertEqual(
       apiStore.apiDataList.isEmpty,
       false,
       "After successful load apiStore.apiDataList should not be empty")
     XCTAssertEqual(
-      apiStore.dataState,
+      apiStore.apiDataState,
       .loaded,
-      "After successful load, apiStore.dataState should be .loaded")
+      "After successful load, apiStore.apiDataState should be .loaded")
   }
 
-  func testReadAPIJSONSuccessfullyParsesFixtureForFirstItem() throws {
-    apiStore.readJSON()
+  func testReadAPIJSONSuccessfullyParsesFixtureForFirstItem() async throws {
+    await readJsonAndWaitForMainActorUpdate(apiStore)
+
     let firstAPIDataItem = apiStore.apiDataList.first!
     XCTAssertEqual(
       firstAPIDataItem.name,
@@ -116,7 +144,7 @@ final class AppStoreTests: XCTestCase {
 
   func testReadAPIJSONFromFallbackUrlThrowsError() {
     XCTAssertThrowsError(
-      try apiStore.readJSON(with: missingURL, fallingBackTo: missingURL),
+      try apiStore.readLocalJSON(with: missingURL, fallingBackTo: missingURL),
       "") { error in
         let apiStoreError = error as! JSONDataLoadingStoreError
         XCTAssertEqual(
@@ -127,8 +155,14 @@ final class AppStoreTests: XCTestCase {
     }
   }
 
-  func testWriteAPIJSON() throws {
-    apiStore.readJSON()
+  func testWriteAPIJSON() async throws {
+    // Cleanup from any previous run
+    if FileManager.default.fileExists(atPath: apiStore.documentsJSONURL.path) {
+      try FileManager.default.removeItem(at: apiStore.documentsJSONURL)
+    }
+
+    await self.readJsonAndWaitForMainActorUpdate(apiStore)
+
     XCTAssertEqual(
       FileManager.default.fileExists(atPath: apiStore.documentsJSONURL.path),
       false,
@@ -140,7 +174,7 @@ final class AppStoreTests: XCTestCase {
       true,
       "after writing, the file JSON does exist in the documents directopry")
 
-    let writtenApiData = try apiStore.readJSONFromUrl(url: apiStore.documentsJSONURL) ?? []
+    let writtenApiData = try apiStore.readJSONFromLocalUrl(url: apiStore.documentsJSONURL) ?? []
     XCTAssertEqual(
       writtenApiData.count,
       apiStore.apiDataList.count,
@@ -154,18 +188,20 @@ final class AppStoreTests: XCTestCase {
     }
   }
 
-  func testErrorStateReadingAPIJSON() throws {
+  func testErrorStateReadingAPIJSON() async throws {
     apiStore = APIStore(bundleJSONURL: missingURL, documentsJSONURL: missingURL)
-    apiStore.readJSON()
+
+    await self.readJsonAndWaitForMainActorUpdate(apiStore)
+
     XCTAssertEqual(
-      apiStore.dataState,
+      apiStore.apiDataState,
       .errorLoading,
-      "Attempting to read from missingURL puts appStore.dataState in .errorLoading")
+      "Attempting to read from missingURL puts appStore.apiDataState in .errorLoading")
   }
 
-  func testHandlesMissingKeysWhenReadingAPIJSON() throws {
+  func testHandlesMissingKeysWhenReadingAPIJSON() async throws {
     apiStore = APIStore(bundleJSONURL: missingKeysJsonURL, documentsJSONURL: missingKeysJsonURL)
-    apiStore.readJSON()
+    await self.readJsonAndWaitForMainActorUpdate(apiStore)
     let firstAPIDataItem = apiStore.apiDataList.first!
     XCTAssertEqual(firstAPIDataItem.name, "AdoptAPet", "Its name should be 'AdoptAPet'")
     XCTAssertEqual(
@@ -179,16 +215,99 @@ final class AppStoreTests: XCTestCase {
     XCTAssertEqual(firstAPIDataItem.category, "Animals", "Its category should be 'Animals")
   }
 
-  func testWriteAPIJSONWithMissingKeys() throws {
+  func testWriteAPIJSONWithMissingKeys() async throws {
+    // Cleanup from any previous run
+    if FileManager.default.fileExists(atPath: apiStore.documentsJSONURL.path) {
+      try FileManager.default.removeItem(at: apiStore.documentsJSONURL)
+    }
+
     apiStore = APIStore(bundleJSONURL: missingKeysJsonURL, documentsJSONURL: missingKeysJsonURL)
-    apiStore.readJSON()
+    await self.readJsonAndWaitForMainActorUpdate(apiStore)
     apiStore.writeJSON()
-    let writtenApiData = try apiStore.readJSONFromUrl(url: apiStore.documentsJSONURL) ?? []
+    let writtenApiData = try apiStore.readJSONFromLocalUrl(url: apiStore.documentsJSONURL) ?? []
     for index in apiStore.apiDataList.indices {
       XCTAssertEqual(
         writtenApiData[index],
         apiStore.apiDataList[index],
         "the written apiData item should match the in memory apiData item")
     }
+  }
+
+  func testReadRemoteJSON() async throws {
+    let mockByteLoader = MockByteLoader(mockLocalJSONURL: URL(
+      fileURLWithPath: "apilist",
+      relativeTo: Bundle.main.bundleURL)
+      .appendingPathExtension("json"))
+
+    var progress: Float = 0.0
+    let progressBinding = Binding<Float> {
+      progress
+    } set: { inVal in
+      progress = inVal
+    }
+
+    let apiData = try await apiStore.readRemoteJSON(
+      at: URL(string: "https://itunes.apple.com/search?media=music&entity=song&term=starlight")!,
+      byteLoader: mockByteLoader,
+      progress: progressBinding
+    ) ?? []
+
+    XCTAssertEqual(
+      apiData.isEmpty,
+      false,
+      "apiStore.readRemoteJSON() should read non-empty data")
+    XCTAssertEqual(progress, 100, "apiStore.readRemoteJSON() should set the progress binding to 100, found \(progress)")
+  }
+
+  func testReadJSONWithRemoteJSONSucceeds() async throws {
+    apiStore = APIStore(
+      bundleJSONURL: missingURL,
+      documentsJSONURL: missingURL,
+      remoteJSONURL: URL(string: "https://api.publicapis.org/entries"),
+      byteLoader: MockByteLoader(mockLocalJSONURL: URL(
+        fileURLWithPath: "apilist",
+        relativeTo: Bundle.main.bundleURL)
+        .appendingPathExtension("json"))
+    )
+    XCTAssertEqual(
+      apiStore.apiDataState,
+      .notLoaded,
+      "Initially, apiStore.apiDataState should be .notLoaded, found \(apiStore.apiDataState)")
+
+    await readJsonAndWaitForMainActorUpdate(apiStore)
+
+    XCTAssertEqual(
+      apiStore.apiDataList.isEmpty,
+      false,
+      "apiStore.apiDataList should be non-empty data")
+    XCTAssertEqual(
+      apiStore.apiDataState,
+      .loaded,
+      "After successful load, apiStore.apiDataState should be .loaded")
+  }
+
+  func testMissingRemoteAndLocalJSONIsError() async throws {
+    apiStore = APIStore(
+      bundleJSONURL: missingURL,
+      documentsJSONURL: missingURL,
+      remoteJSONURL: URL(string: "https://api.publicapis.org/entries"),
+      byteLoader: MockByteLoader( // Force an error by passing in missingURL
+        mockLocalJSONURL: missingURL)
+    )
+    XCTAssertEqual(
+      apiStore.apiDataState,
+      .notLoaded,
+      "Initially, apiStore.apiDataState should be .notLoaded, found \(apiStore.apiDataState)")
+
+    await readJsonAndWaitForMainActorUpdate(apiStore)
+
+    XCTAssertEqual(
+      apiStore.apiDataList.isEmpty,
+      true,
+      "apiStore.apiDataList should be empty, found \(apiStore.apiDataList.count) items")
+    XCTAssertEqual(
+      apiStore.apiDataState,
+      .errorLoading,
+      "After error, apiStore.apiDataState should be .errorLoading, found \(apiStore.apiDataState)")
   }
 }

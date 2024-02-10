@@ -1,15 +1,15 @@
-/// Copyright (c) 2023 Kodeco Inc.
-///
+/// Copyright (c) 2024 Kodeco Inc.
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
-///
+/// 
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
-///
+/// 
 /// Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
 /// distribute, sublicense, create a derivative work, and/or sell copies of the
 /// Software in any work that is designed, intended, or marketed for pedagogical or
@@ -17,7 +17,7 @@
 /// or information technology.  Permission for such use, copying, modification,
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
-///
+/// 
 /// This project and source code may use libraries or frameworks that are
 /// released under various Open-Source licenses. Use of those libraries and
 /// frameworks are governed by their own individual licenses.
@@ -32,80 +32,59 @@
 
 import SwiftUI
 
-
-struct ContentView: View {
-  @StateObject var apiListViewModel = APIListViewModel(apiStore: APIStore())
-
-  @StateObject var userStore = UserStore()
-  @State var showingUserErrorView = false
-
-  @State var selectedTab = 0
+struct APIListView: View {
+  @ObservedObject var apiStore = APIStore()
+  @Binding var showingErrorView: Bool
+  var showingAPILoadingIndicator = false
 
   var body: some View {
-    TabView(selection: $selectedTab) {
-      APIListView(
-        apiStore: apiListViewModel.apiStore,
-        showingErrorView: $apiListViewModel.showingAPIErrorView,
-        showingAPILoadingIndicator: apiListViewModel.showingAPILoadingIndicator
-      )
-        .tabItem {
-          Image(systemName: "icloud.and.arrow.down")
-            .resizable()
-          Text("API List")
+    NavigationStack {
+      ZStack {
+        List {
+          ForEach(apiStore.apiDataList) { apiData in
+            NavigationLink(value: apiData) {
+              Text(apiData.name ?? "")
+                .padding(.vertical)
+            }
+          }
         }
-        .tag(0)
-
-      UserDetailsView(userStore: userStore, showingErrorView: $showingUserErrorView)
-        .tabItem {
-          Image(systemName: "person")
-            .resizable()
-          Text("User")
+        if showingAPILoadingIndicator {
+          ProgressView()
         }
-        .tag(1)
-    }
-  }
-}
-
-
-struct ErrorSheet: View {
-  @Binding var showErrorView: Bool
-
-  var body: some View {
-    NavigationView {
-      VStack {
-        Text("There was an error loading the data.")
       }
-      .navigationBarItems(
-        trailing: Button(action: {
-          showErrorView = false
-        }, label: {
-          Text("Close")
-        }))
+      .listStyle(.plain)
+      .navigationDestination(for: APIData.self) { apiData in
+        APIDetailsView(appStore: apiStore, apiData: apiData)
+          .navigationTitle(Text("API Details"))
+      }
+      .navigationTitle(Text("APIs"))
     }
-    .presentationDetents([.medium])
+    .onAppear {
+      if apiStore.apiDataState != .loaded {
+        Task {
+          await apiStore.readJSON()
+        }
+      }
+    }
+    .sheet(isPresented: $showingErrorView) {
+      ErrorSheet(showErrorView: $showingErrorView)
+    }
   }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct APIListView_Previews: PreviewProvider {
   static var previews: some View {
-    Group {
-      ContentView(
-        apiListViewModel: APIListViewModel(
-          apiStore: APIStore()), selectedTab: 0)
+    APIListView(
+      apiStore: APIStore(),
+      showingErrorView: .constant(false))
 
-      ContentView(
-        apiListViewModel: APIListViewModel(
-          apiStore: APIStore(),
-          showingAPILoadingIndicator: true), selectedTab: 0)
+    APIListView(
+      apiStore: APIStore(),
+      showingErrorView: .constant(false),
+      showingAPILoadingIndicator: true)
 
-      ContentView(
-        apiListViewModel: APIListViewModel(
-          apiStore: APIStore(),
-          showingAPIErrorView: true), selectedTab: 0)
-
-      ContentView(showingUserErrorView: false, selectedTab: 1)
-
-      ContentView(showingUserErrorView: true, selectedTab: 1)
-    }
+    APIListView(
+      apiStore: APIStore(),
+      showingErrorView: .constant(true))
   }
 }
