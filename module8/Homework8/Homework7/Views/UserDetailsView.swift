@@ -81,7 +81,9 @@ struct UserDetailsView: View {
       .navigationTitle(Text("User Details"))
     }
     .onAppear {
-      userStore.readJSON()
+      Task {
+        await userStore.readJSON()
+      }
     }
     .sheet(isPresented: $showingErrorView) {
       ErrorSheet(showErrorView: $showingErrorView)

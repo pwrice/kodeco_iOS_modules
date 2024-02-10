@@ -43,14 +43,26 @@ final class UserStoreTests: XCTestCase {
     userStore = UserStore()
   }
 
+  func readJsonAndWaitForMainActorUpdate(_ userStore: UserStore) async {
+    let expectation = XCTestExpectation(description: "userData updated")
+    userStore.$userData
+      .sink { _ in
+        expectation.fulfill()
+      }
+
+    await userStore.readJSON()
+
+    await fulfillment(of: [expectation], timeout: 1)
+  }
+  
   func testAppStoreInitialState() throws {
     XCTAssertNotNil(userStore, "userStore should initialize but was nil")
     XCTAssertNil(userStore.userData, "Initial userStore.userData should be nil")
     XCTAssertEqual(userStore.dataState, .notLoaded, "Intial userStore.dataState should be .notLoaded")
   }
 
-  func testReadAPIJSONFromUrl() throws {
-    let apiData = try userStore.readJSONFromUrl(url: userStore.bundleJSONURL)
+  func testReadJSONFromUrl() throws {
+    let apiData = try userStore.readJSONFromLocalUrl(url: userStore.bundleJSONURL)
     XCTAssertNotNil(apiData, "userStore.readAPIJSONFromUrl(url: userStore.bundleJSONURL) should read non-nil data")
   }
 
@@ -59,20 +71,21 @@ final class UserStoreTests: XCTestCase {
     XCTAssertEqual(fileExistsAtMissingPath, false, "No file should exist at missingURL.path")
   }
 
-  func testReadAPIJSONFromPrimaryUrl() throws {
-    let userData = try userStore.readJSON(with: userStore.bundleJSONURL, fallingBackTo: missingURL)
+  func testReaJSONFromPrimaryUrl() throws {
+    let userData = try userStore.readLocalJSON(with: userStore.bundleJSONURL, fallingBackTo: missingURL)
     XCTAssertNotNil(userData, "userStore.readAPIJSON(with:fallingBackTo:) successfully reads from primary url")
   }
 
-  func testReadAPIJSONFromFallbackUrl() throws {
-    let userData = try userStore.readJSON(with: missingURL, fallingBackTo: userStore.bundleJSONURL)
+  func testReadJSONFromFallbackUrl() throws {
+    let userData = try userStore.readLocalJSON(with: missingURL, fallingBackTo: userStore.bundleJSONURL)
     XCTAssertNotNil(
       userData,
       "userStore.readJSON(with:fallingBackTo:) successfully falls back to secondary url when primary url does not exist")
   }
 
-  func testReadUserJSON() throws {
-    userStore.readJSON()
+  func testReadUserJSON() async throws {
+    await readJsonAndWaitForMainActorUpdate(userStore)
+    
     XCTAssertNotNil(
       userStore.data,
       "After successful load userStore.data should not be empty")
@@ -84,7 +97,7 @@ final class UserStoreTests: XCTestCase {
 
   func testReadJSONFromFallbackUrlThrowsError() {
     XCTAssertThrowsError(
-      try userStore.readJSON(with: missingURL, fallingBackTo: missingURL),
+      try userStore.readLocalJSON(with: missingURL, fallingBackTo: missingURL),
       "") { error in
         let error = error as! JSONDataLoadingStoreError
         XCTAssertEqual(
@@ -95,13 +108,13 @@ final class UserStoreTests: XCTestCase {
     }
   }
 
-  func testWriteAPIJSON() throws {
+  func testWriteAPIJSON() async throws {
     // Cleanup from any previous run
     if FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path) {
       try FileManager.default.removeItem(at: userStore.documentsJSONURL)
     }
 
-    userStore.readJSON()
+    await readJsonAndWaitForMainActorUpdate(userStore)
     XCTAssertEqual(
       FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path),
       false,
@@ -111,13 +124,13 @@ final class UserStoreTests: XCTestCase {
       FileManager.default.fileExists(atPath: userStore.documentsJSONURL.path),
       true,
       "after writing, the file JSON does exist in the documents directory")
-    let writtenData = try userStore.readJSONFromUrl(url: userStore.documentsJSONURL)
+    let writtenData = try userStore.readJSONFromLocalUrl(url: userStore.documentsJSONURL)
     XCTAssertEqual(writtenData, userStore.userData, "the written data should match the in memory data ")
   }
 
-  func testErrorStateReadingUserJSON() throws {
+  func testErrorStateReadingUserJSON() async throws {
     userStore = UserStore(bundleJSONURL: missingURL, documentsJSONURL: missingURL)
-    userStore.readJSON()
+    await readJsonAndWaitForMainActorUpdate(userStore)
     XCTAssertEqual(
       userStore.dataState,
       .errorLoading,

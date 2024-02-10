@@ -1,15 +1,15 @@
 /// Copyright (c) 2024 Kodeco Inc.
-///
+/// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
-///
+/// 
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
-///
+/// 
 /// Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
 /// distribute, sublicense, create a derivative work, and/or sell copies of the
 /// Software in any work that is designed, intended, or marketed for pedagogical or
@@ -17,7 +17,7 @@
 /// or information technology.  Permission for such use, copying, modification,
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
-///
+/// 
 /// This project and source code may use libraries or frameworks that are
 /// released under various Open-Source licenses. Use of those libraries and
 /// frameworks are governed by their own individual licenses.
@@ -32,74 +32,34 @@
 
 import Foundation
 import Combine
-import SwiftUI
 
-class APIStore: ObservableObject, JSONDataLoadingStore {
-  let fileName = "apilist"
-  var bundleJSONURL: URL
-  var documentsJSONURL: URL
+class APIListViewModel: ObservableObject {
+  @Published var apiStore: APIStore
+  @Published var showingAPIErrorView = false
+  @Published var showingAPILoadingIndicator = false
+  var apiDataStateCancellable: AnyCancellable?
 
-  var data: [APIData]? {
-    didSet {
-      Task {
-        await MainActor.run {
-          apiDataList = data ?? []
-        }
+  init(
+    apiStore: APIStore,
+    showingAPIErrorView: Bool = false,
+    showingAPILoadingIndicator: Bool = false
+  ) {
+    self.apiStore = apiStore
+    self.showingAPIErrorView = showingAPIErrorView
+    self.showingAPILoadingIndicator = showingAPILoadingIndicator
+
+    apiDataStateCancellable = apiStore.$apiDataState.sink { [weak self] state in
+      var showingAPIErrorView = false
+      var showingAPILoadingIndicator = false
+
+      if state == .loading {
+        showingAPILoadingIndicator = true
+      } else if state == .errorLoading || state == .errorWriting {
+        showingAPIErrorView = true
       }
+
+      self?.showingAPILoadingIndicator = showingAPILoadingIndicator
+      self?.showingAPIErrorView = showingAPIErrorView
     }
-  }
-  var dataState: JSONDataLoadingStoreDataState {
-    didSet {
-      Task {
-        await MainActor.run {
-          apiDataState = dataState
-        }
-      }
-    }
-  }
-
-  var remoteJSONURL: URL?
-  var byteLoader: ByteLoading?
-
-  // Breaking out separate properties to publish on MainActor to Views
-  @Published var apiDataList: [APIData] = []
-  @Published var apiDataState: JSONDataLoadingStoreDataState
-
-  init() {
-    self.bundleJSONURL = URL(
-      fileURLWithPath: fileName,
-      relativeTo: Bundle.main.bundleURL)
-    .appendingPathExtension("json")
-
-    self.documentsJSONURL = URL(
-      fileURLWithPath: fileName,
-      relativeTo: URL.documentsDirectory)
-    .appendingPathExtension("json")
-
-    self.remoteJSONURL = URL(string: "https://api.publicapis.org/entries")
-    self.byteLoader = RemoteByteLoader()
-
-    self.data = []
-    dataState = .notLoaded
-    apiDataState = .notLoaded
-  }
-
-  init(bundleJSONURL: URL, documentsJSONURL: URL, remoteJSONURL: URL? = nil, byteLoader: ByteLoading? = nil) {
-    self.bundleJSONURL = bundleJSONURL
-    self.documentsJSONURL = documentsJSONURL
-    self.remoteJSONURL = remoteJSONURL
-    self.byteLoader = byteLoader
-
-    self.data = []
-    self.dataState = .notLoaded
-    self.apiDataState = .notLoaded
-  }
-
-  func extractDataFromContainer(_ container: APIDataJSONContainer) -> [APIData]? {
-    return container.entries
-  }
-
-  func createContainerFromData(_ data: [APIData]?) -> APIDataJSONContainer {
-    return APIDataJSONContainer(count: data?.count ?? 0, entries: data ?? [])
   }
 }
