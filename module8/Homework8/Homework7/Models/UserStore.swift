@@ -50,7 +50,7 @@ class UserStore: ObservableObject, JSONDataLoadingStore {
       }
     }
   }
-  
+
   var dataState: JSONDataLoadingStoreDataState {
     didSet {
       Task {

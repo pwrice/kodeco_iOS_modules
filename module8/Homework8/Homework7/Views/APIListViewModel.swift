@@ -37,7 +37,9 @@ class APIListViewModel: ObservableObject {
   @Published var apiStore: APIStore
   @Published var showingAPIErrorView = false
   @Published var showingAPILoadingIndicator = false
-  var apiDataStateCancellable: AnyCancellable?
+  @Published var apiLoadingProgess: Float = 0
+
+  var cancellables: [AnyCancellable?] = []
 
   init(
     apiStore: APIStore,
@@ -48,7 +50,7 @@ class APIListViewModel: ObservableObject {
     self.showingAPIErrorView = showingAPIErrorView
     self.showingAPILoadingIndicator = showingAPILoadingIndicator
 
-    apiDataStateCancellable = apiStore.$apiDataState.sink { [weak self] state in
+    cancellables.append(apiStore.$apiDataState.sink { [weak self] state in
       var showingAPIErrorView = false
       var showingAPILoadingIndicator = false
 
@@ -60,6 +62,12 @@ class APIListViewModel: ObservableObject {
 
       self?.showingAPILoadingIndicator = showingAPILoadingIndicator
       self?.showingAPIErrorView = showingAPIErrorView
+    })
+
+    self.apiStore.byteLoader?.updateProgressCallback = { progress in
+      await MainActor.run { [weak self] in
+        self?.apiLoadingProgess = progress
+      }
     }
   }
 }

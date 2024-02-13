@@ -48,7 +48,6 @@ enum JSONDataLoadingStoreError: Error, Equatable {
   case remoteJSONDataParseError(String)
   case remoteJSONUrlNotPresent(String)
   case remoteJSONRequestFailed(String)
-
 }
 
 protocol JSONDataLoadingStore: AnyObject {
@@ -69,7 +68,7 @@ protocol JSONDataLoadingStore: AnyObject {
 }
 
 extension JSONDataLoadingStore {
-  func readJSON(progress: Binding<Float>? = nil) async {
+  func readJSON() async {
     dataState = .loading
     // First attempt to load from remote URL
     if let remoteJSONURL = remoteJSONURL, let byteLoader = byteLoader {
@@ -77,8 +76,7 @@ extension JSONDataLoadingStore {
         // If dataload is successful, set data state to loaded and return
         data = try await readRemoteJSON(
           at: remoteJSONURL,
-          byteLoader: byteLoader,
-          progress: progress
+          byteLoader: byteLoader
         )
         dataState = .loaded
         return
@@ -133,9 +131,9 @@ extension JSONDataLoadingStore {
     }
   }
 
-  func readRemoteJSON(at url: URL, byteLoader: ByteLoading, progress: Binding<Float>?) async throws -> DataType? {
+  func readRemoteJSON(at url: URL, byteLoader: ByteLoading) async throws -> DataType? {
     do {
-      let unstructuredData = try await byteLoader.readBytesFromUrl(url: url, progress: progress)
+      let unstructuredData = try await byteLoader.readBytesFromUrl(url: url)
 
       let decoder = JSONDecoder()
       let dataJSONContainer = try decoder.decode(DataContainerType.self, from: unstructuredData)
@@ -146,14 +144,20 @@ extension JSONDataLoadingStore {
   }
 }
 
-protocol ByteLoading {
-  func readBytesFromUrl(url: URL, progress: Binding<Float>?) async throws -> Data
+protocol ByteLoading: AnyObject {
+  func readBytesFromUrl(url: URL) async throws -> Data
+  var loadingProgress: Float { get set }
+  var updateProgressCallback: ((Float) async -> Void)? { get set }
 }
 
-struct RemoteByteLoader: ByteLoading {
-  func readBytesFromUrl(url: URL, progress: Binding<Float>?) async throws -> Data {
+class RemoteByteLoader: ByteLoading, ObservableObject {
+  var loadingProgress: Float = 0
+  var updateProgressCallback: ((Float) async -> Void)?
+
+  func readBytesFromUrl(url: URL) async throws -> Data {
     let configuration = URLSessionConfiguration.default
     let session = URLSession(configuration: configuration)
+    loadingProgress = 0
 
     let (asyncBytes, response) = try await session.bytes(from: url)
 
@@ -174,8 +178,11 @@ struct RemoteByteLoader: ByteLoading {
 
       let currentProgress = contentLength > 0 ? Float(unstructuredData.count) / contentLength : 0.5
 
-      if let progress = progress, Int(progress.wrappedValue * 100) != Int(currentProgress * 100) {
-        progress.wrappedValue = currentProgress
+      if Int(loadingProgress * 100) != Int(currentProgress * 100) {
+        loadingProgress = currentProgress
+        if let updateProgressCallback = updateProgressCallback {
+          await updateProgressCallback(loadingProgress)
+        }
       }
     }
 
@@ -183,15 +190,24 @@ struct RemoteByteLoader: ByteLoading {
   }
 }
 
-struct MockByteLoader: ByteLoading {
+class MockByteLoader: ByteLoading {
   let mockLocalJSONURL: URL
+  var loadingProgress: Float = 0
+  var updateProgressCallback: ((Float) async -> Void)?
 
-  func readBytesFromUrl(url: URL, progress: Binding<Float>?) async throws -> Data {
+  init(mockLocalJSONURL: URL) {
+    self.mockLocalJSONURL = mockLocalJSONURL
+  }
+
+  func readBytesFromUrl(url: URL) async throws -> Data {
     do {
       let unstructuredData = try Data(contentsOf: mockLocalJSONURL)
-      if let progress = progress {
-        progress.wrappedValue = 100
+
+      loadingProgress = 100
+      if let updateProgressCallback = updateProgressCallback {
+        await updateProgressCallback(loadingProgress)
       }
+
       return unstructuredData
     } catch {
       throw JSONDataLoadingStoreError.dataFileNotFound("Error loading at \(url)")
