@@ -36,8 +36,8 @@ import Combine
 
 final class AppStoreTests: XCTestCase {
   var apiStore: APIStore!
-  var apiStoreCancellable: AnyCancellable?
-  
+  var cancellables: [AnyCancellable?] = []
+
   let missingURL = URL(
     fileURLWithPath: "missingFile",
     relativeTo: URL.documentsDirectory)
@@ -66,17 +66,17 @@ final class AppStoreTests: XCTestCase {
   }
 
   func readJsonAndWaitForMainActorUpdate(_ apiStore: APIStore) async {
-    let expectation = XCTestExpectation(description: "apiDataList updated")
-    apiStoreCancellable = apiStore.$apiDataList
-      .sink { _ in
-        expectation.fulfill()
-      }
+    let apiDataStateExpectation = XCTestExpectation(description: "apiDataState updated")
+    cancellables.append(apiStore.$apiDataState
+      .sink { dataState in
+        if dataState == .errorLoading || dataState == .errorWriting || dataState == .loaded {
+          apiDataStateExpectation.fulfill()
+        }
+      })
 
     await apiStore.readJSON()
 
-    XCTAssertEqual(apiStore.apiDataState, .loading)
-
-    await fulfillment(of: [expectation], timeout: 1)
+    await fulfillment(of: [apiDataStateExpectation], timeout: 1)
   }
 
   func testAppStoreInitialState() throws {
@@ -196,7 +196,7 @@ final class AppStoreTests: XCTestCase {
     XCTAssertEqual(
       apiStore.apiDataState,
       .errorLoading,
-      "Attempting to read from missingURL puts appStore.apiDataState in .errorLoading")
+      "Attempting to read from missingURL puts appStore.apiDataState in .errorLoading, found \(apiStore.apiDataState)")
   }
 
   func testHandlesMissingKeysWhenReadingAPIJSON() async throws {
@@ -234,29 +234,24 @@ final class AppStoreTests: XCTestCase {
   }
 
   func testReadRemoteJSON() async throws {
-    let mockByteLoader = MockByteLoader(mockLocalJSONURL: URL(
+    var mockByteLoader = MockByteLoader(mockLocalJSONURL: URL(
       fileURLWithPath: "apilist",
       relativeTo: Bundle.main.bundleURL)
       .appendingPathExtension("json"))
 
-    var progress: Float = 0.0
-    let progressBinding = Binding<Float> {
-      progress
-    } set: { inVal in
-      progress = inVal
-    }
-
     let apiData = try await apiStore.readRemoteJSON(
       at: URL(string: "https://itunes.apple.com/search?media=music&entity=song&term=starlight")!,
-      byteLoader: mockByteLoader,
-      progress: progressBinding
+      byteLoader: mockByteLoader
     ) ?? []
 
     XCTAssertEqual(
       apiData.isEmpty,
       false,
       "apiStore.readRemoteJSON() should read non-empty data")
-    XCTAssertEqual(progress, 100, "apiStore.readRemoteJSON() should set the progress binding to 100, found \(progress)")
+    XCTAssertEqual(
+      mockByteLoader.loadingProgress,
+      100,
+      "apiStore.readRemoteJSON() should set the progress binding to 100, found \(mockByteLoader.loadingProgress)")
   }
 
   func testReadJSONWithRemoteJSONSucceeds() async throws {
