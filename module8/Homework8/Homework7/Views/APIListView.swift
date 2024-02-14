@@ -33,41 +33,39 @@
 import SwiftUI
 
 struct APIListView: View {
-  @ObservedObject var apiStore = APIStore()
-  @Binding var showingErrorView: Bool
-  var showingAPILoadingIndicator = false
+  @ObservedObject var apiListViewModel = APIListViewModel(apiStore: APIStore())
 
   var body: some View {
     NavigationStack {
       ZStack {
         List {
-          ForEach(apiStore.apiDataList) { apiData in
+          ForEach(apiListViewModel.apiStore.apiDataList) { apiData in
             NavigationLink(value: apiData) {
               Text(apiData.name ?? "")
                 .padding(.vertical)
             }
           }
         }
-        if showingAPILoadingIndicator {
+        if apiListViewModel.showingAPILoadingIndicator {
           ProgressView()
         }
       }
       .listStyle(.plain)
       .navigationDestination(for: APIData.self) { apiData in
-        APIDetailsView(appStore: apiStore, apiData: apiData)
+        APIDetailsView(appStore: apiListViewModel.apiStore, apiData: apiData)
           .navigationTitle(Text("API Details"))
       }
       .navigationTitle(Text("APIs"))
     }
     .onAppear {
-      if apiStore.apiDataState != .loaded {
+      if apiListViewModel.apiStore.apiDataState != .loaded {
         Task {
-          await apiStore.readJSON()
+          await apiListViewModel.apiStore.readJSON()
         }
       }
     }
-    .sheet(isPresented: $showingErrorView) {
-      ErrorSheet(showErrorView: $showingErrorView)
+    .sheet(isPresented: $apiListViewModel.showingAPIErrorView) {
+      ErrorSheet(showErrorView: $apiListViewModel.showingAPIErrorView)
     }
   }
 }
@@ -75,16 +73,19 @@ struct APIListView: View {
 struct APIListView_Previews: PreviewProvider {
   static var previews: some View {
     APIListView(
-      apiStore: APIStore(),
-      showingErrorView: .constant(false))
+      apiListViewModel: APIListViewModel(
+        apiStore: APIStore()))
 
     APIListView(
-      apiStore: APIStore(),
-      showingErrorView: .constant(false),
-      showingAPILoadingIndicator: true)
+      apiListViewModel: APIListViewModel(
+        apiStore: APIStore(),
+        showingAPIErrorView: false,
+        showingAPILoadingIndicator: true))
 
     APIListView(
-      apiStore: APIStore(),
-      showingErrorView: .constant(true))
+      apiListViewModel: APIListViewModel(
+        apiStore: APIStore(),
+        showingAPIErrorView: true,
+        showingAPILoadingIndicator: false))
   }
 }
