@@ -41,7 +41,7 @@ struct DataRowView: View {
       HStack {
         Text("\(label):").bold()
         Spacer()
-        Text(dataValue ?? "")
+        Text((try? AttributedString(markdown: dataValue ?? "")) ?? "")
       }
       .padding(.vertical)
       if showDivider {
