@@ -43,11 +43,7 @@ struct ContentView: View {
 
   var body: some View {
     TabView(selection: $selectedTab) {
-      APIListView(
-        apiStore: apiListViewModel.apiStore,
-        showingErrorView: $apiListViewModel.showingAPIErrorView,
-        showingAPILoadingIndicator: apiListViewModel.showingAPILoadingIndicator
-      )
+      APIListView(apiListViewModel: apiListViewModel)
         .tabItem {
           Image(systemName: "icloud.and.arrow.down")
             .resizable()
@@ -92,16 +88,6 @@ struct ContentView_Previews: PreviewProvider {
       ContentView(
         apiListViewModel: APIListViewModel(
           apiStore: APIStore()), selectedTab: 0)
-
-      ContentView(
-        apiListViewModel: APIListViewModel(
-          apiStore: APIStore(),
-          showingAPILoadingIndicator: true), selectedTab: 0)
-
-      ContentView(
-        apiListViewModel: APIListViewModel(
-          apiStore: APIStore(),
-          showingAPIErrorView: true), selectedTab: 0)
 
       ContentView(showingUserErrorView: false, selectedTab: 1)
 
