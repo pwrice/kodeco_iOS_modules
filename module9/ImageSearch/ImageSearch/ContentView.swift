@@ -22,3 +22,11 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+
+// TODO
+// - setup account and API key on  https://www.pexels.com/
+// - integrate swiftlint into build phases
+// - API Key: 
+
+
+// REmove API KEY and put in plist file

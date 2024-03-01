@@ -14,6 +14,8 @@
 		C19AA0002B8F79E5009CD2ED /* ImageSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A9FFF2B8F79E5009CD2ED /* ImageSearchTests.swift */; };
 		C19AA00A2B8F79E5009CD2ED /* ImageSearchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19AA0092B8F79E5009CD2ED /* ImageSearchUITests.swift */; };
 		C19AA00C2B8F79E5009CD2ED /* ImageSearchUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19AA00B2B8F79E5009CD2ED /* ImageSearchUITestsLaunchTests.swift */; };
+		C19AA0192B8F7D2A009CD2ED /* Plexels-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C19AA0182B8F7D2A009CD2ED /* Plexels-Info.plist */; };
+		C19AA01B2B8F7E58009CD2ED /* Plexels-Info-Sample.plist in Resources */ = {isa = PBXBuildFile; fileRef = C19AA01A2B8F7E58009CD2ED /* Plexels-Info-Sample.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +46,8 @@
 		C19AA0052B8F79E5009CD2ED /* ImageSearchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageSearchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C19AA0092B8F79E5009CD2ED /* ImageSearchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchUITests.swift; sourceTree = "<group>"; };
 		C19AA00B2B8F79E5009CD2ED /* ImageSearchUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C19AA0182B8F7D2A009CD2ED /* Plexels-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Plexels-Info.plist"; sourceTree = "<group>"; };
+		C19AA01A2B8F7E58009CD2ED /* Plexels-Info-Sample.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Plexels-Info-Sample.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +102,8 @@
 				C19A9FF02B8F79E4009CD2ED /* ContentView.swift */,
 				C19A9FF22B8F79E5009CD2ED /* Assets.xcassets */,
 				C19A9FF42B8F79E5009CD2ED /* Preview Content */,
+				C19AA0182B8F7D2A009CD2ED /* Plexels-Info.plist */,
+				C19AA01A2B8F7E58009CD2ED /* Plexels-Info-Sample.plist */,
 			);
 			path = ImageSearch;
 			sourceTree = "<group>";
@@ -231,6 +237,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C19AA01B2B8F7E58009CD2ED /* Plexels-Info-Sample.plist in Resources */,
+				C19AA0192B8F7D2A009CD2ED /* Plexels-Info.plist in Resources */,
 				C19A9FF62B8F79E5009CD2ED /* Preview Assets.xcassets in Resources */,
 				C19A9FF32B8F79E5009CD2ED /* Assets.xcassets in Resources */,
 			);
