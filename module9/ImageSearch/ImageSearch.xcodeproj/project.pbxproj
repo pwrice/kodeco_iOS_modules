@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C10DE12D2B975653007E1430 /* ImageSearchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE12C2B975653007E1430 /* ImageSearchModels.swift */; };
+		C10DE12E2B975653007E1430 /* ImageSearchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE12C2B975653007E1430 /* ImageSearchModels.swift */; };
 		C19A9FEF2B8F79E4009CD2ED /* ImageSearchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A9FEE2B8F79E4009CD2ED /* ImageSearchApp.swift */; };
 		C19A9FF12B8F79E4009CD2ED /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A9FF02B8F79E4009CD2ED /* ContentView.swift */; };
 		C19A9FF32B8F79E5009CD2ED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19A9FF22B8F79E5009CD2ED /* Assets.xcassets */; };
@@ -16,6 +18,12 @@
 		C19AA00C2B8F79E5009CD2ED /* ImageSearchUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19AA00B2B8F79E5009CD2ED /* ImageSearchUITestsLaunchTests.swift */; };
 		C19AA0192B8F7D2A009CD2ED /* Plexels-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C19AA0182B8F7D2A009CD2ED /* Plexels-Info.plist */; };
 		C19AA01B2B8F7E58009CD2ED /* Plexels-Info-Sample.plist in Resources */ = {isa = PBXBuildFile; fileRef = C19AA01A2B8F7E58009CD2ED /* Plexels-Info-Sample.plist */; };
+		C19AA0202B9215BE009CD2ED /* ImageSearchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19AA01F2B9215BE009CD2ED /* ImageSearchStore.swift */; };
+		C19AA0212B9215BE009CD2ED /* ImageSearchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19AA01F2B9215BE009CD2ED /* ImageSearchStore.swift */; };
+		C19AA0232B921675009CD2ED /* ImageSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19AA0222B921675009CD2ED /* ImageSearchViewModel.swift */; };
+		C19AA0242B921675009CD2ED /* ImageSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19AA0222B921675009CD2ED /* ImageSearchViewModel.swift */; };
+		C19AA0272B921BC1009CD2ED /* MockResponse.json in Resources */ = {isa = PBXBuildFile; fileRef = C19AA0262B921BC1009CD2ED /* MockResponse.json */; };
+		C19AA0292B922464009CD2ED /* MockResponse.json in Resources */ = {isa = PBXBuildFile; fileRef = C19AA0262B921BC1009CD2ED /* MockResponse.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C10DE12C2B975653007E1430 /* ImageSearchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchModels.swift; sourceTree = "<group>"; };
 		C19A9FEB2B8F79E4009CD2ED /* ImageSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C19A9FEE2B8F79E4009CD2ED /* ImageSearchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchApp.swift; sourceTree = "<group>"; };
 		C19A9FF02B8F79E4009CD2ED /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -48,6 +57,9 @@
 		C19AA00B2B8F79E5009CD2ED /* ImageSearchUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		C19AA0182B8F7D2A009CD2ED /* Plexels-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Plexels-Info.plist"; sourceTree = "<group>"; };
 		C19AA01A2B8F7E58009CD2ED /* Plexels-Info-Sample.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Plexels-Info-Sample.plist"; sourceTree = "<group>"; };
+		C19AA01F2B9215BE009CD2ED /* ImageSearchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchStore.swift; sourceTree = "<group>"; };
+		C19AA0222B921675009CD2ED /* ImageSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchViewModel.swift; sourceTree = "<group>"; };
+		C19AA0262B921BC1009CD2ED /* MockResponse.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = MockResponse.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,8 +110,10 @@
 		C19A9FED2B8F79E4009CD2ED /* ImageSearch */ = {
 			isa = PBXGroup;
 			children = (
-				C19A9FEE2B8F79E4009CD2ED /* ImageSearchApp.swift */,
-				C19A9FF02B8F79E4009CD2ED /* ContentView.swift */,
+				C19AA0252B921B90009CD2ED /* Resources */,
+				C19AA01E2B9213C4009CD2ED /* App */,
+				C19AA01D2B9213BD009CD2ED /* Views */,
+				C19AA01C2B9213AF009CD2ED /* Models */,
 				C19A9FF22B8F79E5009CD2ED /* Assets.xcassets */,
 				C19A9FF42B8F79E5009CD2ED /* Preview Content */,
 				C19AA0182B8F7D2A009CD2ED /* Plexels-Info.plist */,
@@ -131,6 +145,40 @@
 				C19AA00B2B8F79E5009CD2ED /* ImageSearchUITestsLaunchTests.swift */,
 			);
 			path = ImageSearchUITests;
+			sourceTree = "<group>";
+		};
+		C19AA01C2B9213AF009CD2ED /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C19AA01F2B9215BE009CD2ED /* ImageSearchStore.swift */,
+				C10DE12C2B975653007E1430 /* ImageSearchModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C19AA01D2B9213BD009CD2ED /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C19A9FF02B8F79E4009CD2ED /* ContentView.swift */,
+				C19AA0222B921675009CD2ED /* ImageSearchViewModel.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C19AA01E2B9213C4009CD2ED /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C19A9FEE2B8F79E4009CD2ED /* ImageSearchApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C19AA0252B921B90009CD2ED /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C19AA0262B921BC1009CD2ED /* MockResponse.json */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -238,6 +286,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C19AA01B2B8F7E58009CD2ED /* Plexels-Info-Sample.plist in Resources */,
+				C19AA0292B922464009CD2ED /* MockResponse.json in Resources */,
 				C19AA0192B8F7D2A009CD2ED /* Plexels-Info.plist in Resources */,
 				C19A9FF62B8F79E5009CD2ED /* Preview Assets.xcassets in Resources */,
 				C19A9FF32B8F79E5009CD2ED /* Assets.xcassets in Resources */,
@@ -248,6 +297,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C19AA0272B921BC1009CD2ED /* MockResponse.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +317,9 @@
 			files = (
 				C19A9FF12B8F79E4009CD2ED /* ContentView.swift in Sources */,
 				C19A9FEF2B8F79E4009CD2ED /* ImageSearchApp.swift in Sources */,
+				C19AA0232B921675009CD2ED /* ImageSearchViewModel.swift in Sources */,
+				C19AA0202B9215BE009CD2ED /* ImageSearchStore.swift in Sources */,
+				C10DE12D2B975653007E1430 /* ImageSearchModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,7 +327,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C19AA0242B921675009CD2ED /* ImageSearchViewModel.swift in Sources */,
 				C19AA0002B8F79E5009CD2ED /* ImageSearchTests.swift in Sources */,
+				C19AA0212B9215BE009CD2ED /* ImageSearchStore.swift in Sources */,
+				C10DE12E2B975653007E1430 /* ImageSearchModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
