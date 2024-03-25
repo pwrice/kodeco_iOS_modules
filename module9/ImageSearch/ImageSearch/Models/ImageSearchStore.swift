@@ -30,22 +30,34 @@ class ImageSearchStore: ObservableObject {
   let baseSearchURLString = "https://api.pexels.com/v1/search"
   var plexelsAPIAuthKey: String?
   
-  //  let imageSearchNURL: URL? = URL(string: "https://api.pexels.com/v1/search?query=nature&per_page=1")
-  // curl -H "Authorization: UxSOTkfIHUWkbY2t5xaxqVAH4oMLVgMhMY3W3fD7ckrLawgGUdUZ44cz" \
-  //  "https://api.pexels.com/v1/search?query=nature&per_page=1"
-  
-  
   var searchLoadingState = SearchLoadingState.noSearch
   var currentQuery: String?
   var totalResults: Int?
   var currentPage: Int?
-  var imageResults: [PlexelImage]?
+  @Published var imageResults: [PlexelImage] = []
   var nextPageURL: URL?
   
   // Public API
   
   convenience init () {
     self.init(urlSessionLoader: URLSessionLoader(), apiKeyFileName: "Plexels-Info")
+  }
+  
+  convenience init(withMockResults fileName: String, query: String) {
+    let mockJSONURL = URL(
+      fileURLWithPath: fileName,
+      relativeTo: Bundle.main.bundleURL)
+      .appendingPathExtension("json")
+    let mockResponse = HTTPURLResponse(url: mockJSONURL, statusCode: 200, httpVersion: "2.2", headerFields: nil)!
+    let mockUrlSessionLoader = MockURLSessionLoader(
+      mockDataUrl: mockJSONURL,
+      mockResponse: mockResponse,
+      mockError: nil)
+    
+    self.init(urlSessionLoader: mockUrlSessionLoader, apiKeyFileName: "Plexels-Info-Sample")
+    
+    performNewSearch(query: query)
+    mockUrlSessionLoader.resolveCompletionHandler()
   }
   
   init (urlSessionLoader: URLSessionLoading, apiKeyFileName: String) {
@@ -103,7 +115,7 @@ class ImageSearchStore: ObservableObject {
   
   func loadPlexelsAPIKey(fileName: String) -> String {
     guard let filePath = Bundle.main.path(forResource: fileName, ofType: "plist") else {
-      // TODO
+      // TODO own error enum for error handling
       fatalError("loadPlexelsAPIKey: Couldn't find file '\(fileName).plist'.")
     }
     let plist = NSDictionary(contentsOfFile: filePath)
@@ -123,7 +135,7 @@ class ImageSearchStore: ObservableObject {
   
   func processSearchFetch(data: Data?, response: URLResponse?, error: Error?) {
     if let data = data, let response = response as? HTTPURLResponse {
-      print(response.statusCode)
+      print("processSearchFetch response.statusCode \(response.statusCode)")
       if response.statusCode != 200 {
         self.searchLoadingState = .error // weak referecnce for self?
       }
@@ -133,7 +145,8 @@ class ImageSearchStore: ObservableObject {
         let imageSearchResponse = try decoder.decode(ImageSearchResponse.self, from: data)
         self.updateLocalStateWithSearchResponse(searchResponse: imageSearchResponse) // weak reference for self?
         
-      } catch {
+      } catch let error {
+        print("Error decoding response \(String(describing: error))")
         self.searchLoadingState = .error // weak referecnce for self?
       }
     } else {
@@ -145,7 +158,7 @@ class ImageSearchStore: ObservableObject {
   }
   
   func updateLocalStateWithSearchResponse(searchResponse: ImageSearchResponse) {
-    imageResults?.append(contentsOf: searchResponse.images)
+    imageResults.append(contentsOf: searchResponse.images)
     totalResults = searchResponse.totalResults
     currentPage = searchResponse.page
     nextPageURL = URL(string: searchResponse.nextPage)
