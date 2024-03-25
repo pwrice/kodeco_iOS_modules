@@ -24,8 +24,7 @@ struct ImageSearchResponse: Codable {
   }
 }
 
-
-struct PlexelImage: Codable {
+struct PlexelImage: Codable, Identifiable, Hashable {
   let id: Int
   let width: Int
   let height: Int
@@ -49,7 +48,7 @@ struct PlexelImage: Codable {
   }
 }
 
-struct PlexelImageSourceURLs: Codable {
+struct PlexelImageSourceURLs: Codable, Hashable {
   let original: String
   let large2x: String
   let large: String
@@ -59,4 +58,3 @@ struct PlexelImageSourceURLs: Codable {
   let landscape: String
   let tiny: String
 }
-

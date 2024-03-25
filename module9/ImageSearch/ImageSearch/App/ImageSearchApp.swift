@@ -11,7 +11,7 @@ import SwiftUI
 struct ImageSearchApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SearchGridView()
         }
     }
 }

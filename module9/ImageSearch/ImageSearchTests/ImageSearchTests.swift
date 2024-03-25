@@ -24,7 +24,7 @@ final class ImageSearchTests: XCTestCase {
     let unstructuredData = try Data(contentsOf: mockJSONURL)
     let imageSearchResponse = try decoder.decode(ImageSearchResponse.self, from: unstructuredData)
 
-    XCTAssertEqual(imageSearchResponse.images.count, 1)
+    XCTAssertEqual(imageSearchResponse.images.count, 9)
     let image = imageSearchResponse.images.first!
     
     XCTAssertEqual(image.id, 3573351)
@@ -33,8 +33,8 @@ final class ImageSearchTests: XCTestCase {
     XCTAssertEqual(image.url, "https://www.pexels.com/photo/trees-during-day-3573351/")
     XCTAssertEqual(image.photographer, "Lukas Rodriguez")
     XCTAssertEqual(image.photographerUrl, "https://www.pexels.com/@lukas-rodriguez-1845331")
-    XCTAssertEqual(image.title, "Brown Rocks During Golden Hour")
-    XCTAssertEqual(image.liked, false)    
+    XCTAssertEqual(image.title, "Trees During Day")
+    XCTAssertEqual(image.liked, false)
     XCTAssertEqual(image.sourceURLs.original, "https://images.pexels.com/photos/3573351/pexels-photo-3573351.png")
     XCTAssertEqual(image.sourceURLs.large2x, "https://images.pexels.com/photos/3573351/pexels-photo-3573351.png?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940")
     XCTAssertEqual(image.sourceURLs.large, "https://images.pexels.com/photos/3573351/pexels-photo-3573351.png?auto=compress&cs=tinysrgb&h=650&w=940")
@@ -56,7 +56,7 @@ final class ImageSearchTests: XCTestCase {
     let imageSearchStore = ImageSearchStore(urlSessionLoader: mockURLSessionLoader, apiKeyFileName: "Plexels-Info-Sample")
     
     XCTAssertEqual(imageSearchStore.searchLoadingState, .noSearch)
-    XCTAssertEqual(imageSearchStore.imageResults?.count, 0)
+    XCTAssertEqual(imageSearchStore.imageResults.count, 0)
     XCTAssertNil(imageSearchStore.totalResults)
     XCTAssertNil(imageSearchStore.currentPage)
     XCTAssertNil(imageSearchStore.nextPageURL)
@@ -92,10 +92,10 @@ final class ImageSearchTests: XCTestCase {
 
     // Verify state after response
     XCTAssertEqual(imageSearchStore.searchLoadingState, .loadedSearch)
-    XCTAssertEqual(imageSearchStore.imageResults?.count, 1)
+    XCTAssertEqual(imageSearchStore.imageResults.count, 9)
     XCTAssertEqual(imageSearchStore.totalResults, 10000)
     XCTAssertEqual(imageSearchStore.currentPage, 1)
-    XCTAssertEqual(imageSearchStore.nextPageURL, URL(string: "https://api.pexels.com/v1/search/?page=2&per_page=1&query=nature"))
+    XCTAssertEqual(imageSearchStore.nextPageURL, URL(string: "https://api.pexels.com/v1/search/?page=2&per_page=9&query=nature"))
   }
 
   func testImageStorePerformNextPageSearch() throws {
@@ -116,9 +116,9 @@ final class ImageSearchTests: XCTestCase {
     mockURLSessionLoader.resolveCompletionHandler()
 
     XCTAssertEqual(imageSearchStore.searchLoadingState, .loadedSearch)
-    XCTAssertEqual(imageSearchStore.imageResults?.count, 2)
+    XCTAssertEqual(imageSearchStore.imageResults.count, 18)
     XCTAssertEqual(imageSearchStore.totalResults, 10000)
     XCTAssertEqual(imageSearchStore.currentPage, 1)
-    XCTAssertEqual(imageSearchStore.nextPageURL, URL(string: "https://api.pexels.com/v1/search/?page=2&per_page=1&query=nature"))
+    XCTAssertEqual(imageSearchStore.nextPageURL, URL(string: "https://api.pexels.com/v1/search/?page=2&per_page=9&query=nature"))
   }  
 }
