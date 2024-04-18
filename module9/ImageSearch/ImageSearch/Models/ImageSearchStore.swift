@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 enum SearchLoadingState {
   case noSearch,
        loadingSearch,

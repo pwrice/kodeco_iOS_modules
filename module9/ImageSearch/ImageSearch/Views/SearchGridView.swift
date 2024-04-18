@@ -100,11 +100,10 @@ struct SearchGridView_Previews: PreviewProvider {
 // [DONE]- implement basic search results view
 // [DONE]- implement fix grid layout and spacing
 // [DONE]- implement search bar and button
-// - hook up search input
-//  - tapping enter should do trigger the search
-// - test against live API
-// - implement view model
-// - implement details view
-// - imoplement image download in store
+// [DONE]- hook up search input
+//  [DONE]- tapping enter should do trigger the search
+// [DONE]- test against live API
+// - implement background download on details view
+// - hook up loading state on grid view
 // - implement loading progress bar
 
