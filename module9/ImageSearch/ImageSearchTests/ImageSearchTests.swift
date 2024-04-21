@@ -10,14 +10,14 @@ import XCTest
 
 final class ImageSearchTests: XCTestCase {
   var mockJSONURL: URL!
-  
+
   override func setUpWithError() throws {
     mockJSONURL = URL(
       fileURLWithPath: "MockResponse",
       relativeTo: Bundle.main.bundleURL)
       .appendingPathExtension("json")
   }
-    
+
   func testParsingJsonResponse() throws {
     let decoder = JSONDecoder()
     // Question - had to include MockResponse.json in the main app target for this to work. Why?
@@ -26,7 +26,7 @@ final class ImageSearchTests: XCTestCase {
 
     XCTAssertEqual(imageSearchResponse.images.count, 9)
     let image = imageSearchResponse.images.first!
-    
+
     XCTAssertEqual(image.id, 3573351)
     XCTAssertEqual(image.width, 3066)
     XCTAssertEqual(image.height, 3968)
@@ -44,17 +44,19 @@ final class ImageSearchTests: XCTestCase {
     XCTAssertEqual(image.sourceURLs.landscape, "https://images.pexels.com/photos/3573351/pexels-photo-3573351.png?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200")
     XCTAssertEqual(image.sourceURLs.tiny, "https://images.pexels.com/photos/3573351/pexels-photo-3573351.png?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280")
   }
-  
+
   // TODO - add test to show that JSON parser gracefully handles missing keys for fields we dont care about
-  
+
   func testImageStoreInitialState() throws {
     let mockURLSessionLoader = MockURLSessionLoader(
       mockDataUrl: mockJSONURL,
       mockResponse: HTTPURLResponse(url: mockJSONURL, statusCode: 200, httpVersion: "2.2", headerFields: nil)!,
       mockError: nil)
-    
-    let imageSearchStore = ImageSearchStore(urlSessionLoader: mockURLSessionLoader, apiKeyFileName: "Plexels-Info-Sample")
-    
+
+    let imageSearchStore = ImageSearchStore(
+      urlSessionLoader: mockURLSessionLoader,
+      apiKeyFileName: "Plexels-Info-Sample")
+
     XCTAssertEqual(imageSearchStore.searchLoadingState, .noSearch)
     XCTAssertEqual(imageSearchStore.imageResults.count, 0)
     XCTAssertNil(imageSearchStore.totalResults)
@@ -62,17 +64,19 @@ final class ImageSearchTests: XCTestCase {
     XCTAssertNil(imageSearchStore.nextPageURL)
     XCTAssertEqual(imageSearchStore.plexelsAPIAuthKey, "SAMPLE_API_KEY")
   }
-  
+
   func testImageStorePerformNewSearch() throws {
     let mockURLSessionLoader = MockURLSessionLoader(
       mockDataUrl: mockJSONURL,
       mockResponse: HTTPURLResponse(url: mockJSONURL, statusCode: 200, httpVersion: "2.2", headerFields: nil)!,
       mockError: nil)
-    
-    let imageSearchStore = ImageSearchStore(urlSessionLoader: mockURLSessionLoader, apiKeyFileName: "Plexels-Info-Sample")
-        
+
+    let imageSearchStore = ImageSearchStore(
+      urlSessionLoader: mockURLSessionLoader,
+      apiKeyFileName: "Plexels-Info-Sample")
+
     imageSearchStore.performNewSearch(query: "cats")
-    
+
     // Verify that request is formatted properly
     XCTAssertEqual(imageSearchStore.searchLoadingState, .loadingSearch)
     XCTAssertEqual(
@@ -103,16 +107,18 @@ final class ImageSearchTests: XCTestCase {
       mockDataUrl: mockJSONURL,
       mockResponse: HTTPURLResponse(url: mockJSONURL, statusCode: 200, httpVersion: "2.2", headerFields: nil)!,
       mockError: nil)
-    
-    let imageSearchStore = ImageSearchStore(urlSessionLoader: mockURLSessionLoader, apiKeyFileName: "Plexels-Info-Sample")
+
+    let imageSearchStore = ImageSearchStore(
+      urlSessionLoader: mockURLSessionLoader,
+      apiKeyFileName: "Plexels-Info-Sample")
     imageSearchStore.performNewSearch(query: "cats")
     mockURLSessionLoader.resolveCompletionHandler()
 
     // TODO - update w/ next page mock JSON
     imageSearchStore.performNextPageSearch()
-    
+
     XCTAssertEqual(imageSearchStore.searchLoadingState, .loadingSearch)
-    
+
     mockURLSessionLoader.resolveCompletionHandler()
 
     XCTAssertEqual(imageSearchStore.searchLoadingState, .loadedSearch)
@@ -120,5 +126,5 @@ final class ImageSearchTests: XCTestCase {
     XCTAssertEqual(imageSearchStore.totalResults, 10000)
     XCTAssertEqual(imageSearchStore.currentPage, 1)
     XCTAssertEqual(imageSearchStore.nextPageURL, URL(string: "https://api.pexels.com/v1/search/?page=2&per_page=9&query=nature"))
-  }  
+  }
 }

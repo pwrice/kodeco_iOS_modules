@@ -9,9 +9,9 @@ import SwiftUI
 
 @main
 struct ImageSearchApp: App {
-    var body: some Scene {
-        WindowGroup {
-            SearchGridView()
-        }
+  var body: some Scene {
+    WindowGroup {
+      SearchGridView()
     }
+  }
 }

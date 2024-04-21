@@ -14,13 +14,13 @@ struct ImageSearchResponse: Codable {
   let perPage: Int
   let images: [PlexelImage]
   let nextPage: String
-  
+
   enum CodingKeys: String, CodingKey {
     case totalResults = "total_results",
-         page,
-         perPage = "per_page",
-         images = "photos",
-         nextPage = "next_page"
+      page,
+      perPage = "per_page",
+      images = "photos",
+      nextPage = "next_page"
   }
 }
 
@@ -34,17 +34,17 @@ struct PlexelImage: Codable, Identifiable, Hashable {
   let title: String
   let liked: Bool
   let sourceURLs: PlexelImageSourceURLs
-  
+
   enum CodingKeys: String, CodingKey {
     case id,
-         width,
-         height,
-         url,
-         photographer,
-         photographerUrl = "photographer_url",
-         title = "alt",
-         liked,
-         sourceURLs = "src"
+      width,
+      height,
+      url,
+      photographer,
+      photographerUrl = "photographer_url",
+      title = "alt",
+      liked,
+      sourceURLs = "src"
   }
 }
 

@@ -9,12 +9,11 @@ import SwiftUI
 
 struct ImageDetailsView: View {
   let imageResult: PlexelImage
-  
+
   var body: some View {
     VStack {
       AsyncImage(
-        url: URL(string: imageResult.sourceURLs.tiny))
-      { phase in
+        url: URL(string: imageResult.sourceURLs.tiny)) { phase in
         switch phase {
         case .failure:
           Image(systemName: "photo")

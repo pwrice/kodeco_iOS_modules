@@ -8,20 +8,20 @@
 import SwiftUI
 
 struct SearchGridView: View {
-  @StateObject var vm = ImageSearchViewModel(imageStore: ImageSearchStore())
-  
+  @StateObject var viewModel = ImageSearchViewModel(imageStore: ImageSearchStore())
+
   var resultColumns: [GridItem] {
     [
       GridItem(.flexible(minimum: 150)),
       GridItem(.flexible(minimum: 150))
     ]
   }
-  
+
   var body: some View {
     NavigationStack {
       ScrollView {
         LazyVGrid(columns: resultColumns, content: {
-          ForEach(vm.imageResults, id: \.self) { imageResult in
+          ForEach(viewModel.imageResults, id: \.self) { imageResult in
             NavigationLink(value: imageResult) {
               ImageResultView(imageResult: imageResult)
                 .background(.red)
@@ -35,11 +35,11 @@ struct SearchGridView: View {
         ImageDetailsView(imageResult: imageResult)
       }
       .searchable(
-        text: $vm.searchQuery,
+        text: $viewModel.searchQuery,
         placement: .navigationBarDrawer(displayMode: .always),
         prompt: "Search")
       .onSubmit(of: .search) {
-        vm.searchSubmitted()
+        viewModel.searchSubmitted()
       }
     }
   }
@@ -47,22 +47,21 @@ struct SearchGridView: View {
 
 struct ImageResultView: View {
   let imageResult: PlexelImage
-  
+
   var body: some View {
     VStack {
       AsyncImage(
-        url: URL(string: imageResult.sourceURLs.tiny))
-      { phase in
-        switch phase {
-        case .failure:
-          Image(systemName: "photo")
-            .font(.largeTitle)
-        case .success(let image):
-          image
-            .resizable()
-        default:
-          ProgressView()
-        }
+        url: URL(string: imageResult.sourceURLs.tiny)) { phase in
+          switch phase {
+          case .failure:
+            Image(systemName: "photo")
+              .font(.largeTitle)
+          case .success(let image):
+            image
+              .resizable()
+          default:
+            ProgressView()
+          }
       }
       .frame(width: 140, height: 100)
       .clipShape(RoundedRectangle(cornerRadius: 25))
@@ -80,7 +79,7 @@ struct SearchGridView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
       SearchGridView(
-        vm: ImageSearchViewModel(
+        viewModel: ImageSearchViewModel(
           imageStore: ImageSearchStore(
             withMockResults: "MockResponse", query: "cats")
         ))
@@ -91,6 +90,7 @@ struct SearchGridView_Previews: PreviewProvider {
 // TODO
 // [DONE] - setup account and API key on  https://www.pexels.com/
 // - integrate swiftlint into build phases
+// swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml
 // [DONE] - REmove API KEY and put in plist file
 // [DONE]- build out decodable model files based on JSON API
 // [DONE]- implement model store
@@ -106,4 +106,3 @@ struct SearchGridView_Previews: PreviewProvider {
 // - implement background download on details view
 // - hook up loading state on grid view
 // - implement loading progress bar
-
