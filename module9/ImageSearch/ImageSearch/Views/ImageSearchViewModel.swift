@@ -11,25 +11,31 @@ import Combine
 class ImageSearchViewModel: ObservableObject {
   @Published var searchQuery: String
   @Published var imageResults: [PlexelImage] = []
+  @Published var searchLoadingState: SearchLoadingState = .noSearch
 
-  var imageStore: ImageSearchStore
-  var cancellables: [AnyCancellable?] = []
+  private var imageStore: ImageSearchStore?
+  private var cancellables: [AnyCancellable?] = []
 
   convenience init(imageStore: ImageSearchStore) {
-    self.init(imageStore: imageStore, searchQuery: "")
+    self.init(imageStore: imageStore, searchQuery: "", searchLoadingState: .noSearch)
   }
 
-  init(imageStore: ImageSearchStore, searchQuery: String) {
+  init(imageStore: ImageSearchStore?, searchQuery: String, searchLoadingState: SearchLoadingState) {
     self.imageStore = imageStore
     self.searchQuery = searchQuery
+    self.searchLoadingState = searchLoadingState
 
-    cancellables.append(imageStore.$imageResults.sink { [weak self] imageResults in
-      self?.imageResults = imageResults
-    })
+    if let imageStore = self.imageStore {
+      cancellables.append(imageStore.$imageResults.sink { [weak self] imageResults in
+        self?.imageResults = imageResults
+      })
+      cancellables.append(imageStore.$searchLoadingState.sink { [weak self] loadingState in
+        self?.searchLoadingState = loadingState
+      })
+    }
   }
 
   public func searchSubmitted() {
-    print(">> search submitted: \(searchQuery)")
-    imageStore.performNewSearch(query: searchQuery)
+    imageStore?.performNewSearch(query: searchQuery)
   }
 }
