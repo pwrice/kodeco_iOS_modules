@@ -11,7 +11,7 @@ import Combine
 class ImageSearchViewModel: ObservableObject {
   @Published var searchQuery: String
   @Published var imageResults: [PlexelImage] = []
-  
+
   var imageStore: ImageSearchStore
   var cancellables: [AnyCancellable?] = []
 
@@ -22,12 +22,12 @@ class ImageSearchViewModel: ObservableObject {
   init(imageStore: ImageSearchStore, searchQuery: String) {
     self.imageStore = imageStore
     self.searchQuery = searchQuery
-    
+
     cancellables.append(imageStore.$imageResults.sink { [weak self] imageResults in
       self?.imageResults = imageResults
     })
   }
-  
+
   public func searchSubmitted() {
     print(">> search submitted: \(searchQuery)")
     imageStore.performNewSearch(query: searchQuery)
