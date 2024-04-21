@@ -20,14 +20,19 @@ struct SearchGridView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        LazyVGrid(columns: resultColumns, content: {
-          ForEach(viewModel.imageResults, id: \.self) { imageResult in
-            NavigationLink(value: imageResult) {
-              ImageResultView(imageResult: imageResult)
-                .background(.red)
+        ZStack {
+          LazyVGrid(columns: resultColumns) {
+            ForEach(viewModel.imageResults, id: \.self) { imageResult in
+              NavigationLink(value: imageResult) {
+                ImageResultView(imageResult: imageResult)
+                  .background(.red)
+              }
             }
           }
-        })
+          if viewModel.searchLoadingState == .loadingSearch {
+            ProgressView()
+          }
+        }
       }
       .padding()
       .navigationTitle(Text("Plexel Images"))
@@ -77,19 +82,24 @@ struct ImageResultView: View {
 
 struct SearchGridView_Previews: PreviewProvider {
   static var previews: some View {
-    Group {
-      SearchGridView(
-        viewModel: ImageSearchViewModel(
-          imageStore: ImageSearchStore(
-            withMockResults: "MockResponse", query: "cats")
-        ))
+    SearchGridView(
+      viewModel: ImageSearchViewModel(
+        imageStore: ImageSearchStore(
+          withMockResults: "MockResponse", query: "cats")
+      ))
+
+    SearchGridView(
+      viewModel: ImageSearchViewModel(
+        imageStore: nil,
+        searchQuery: "Cats",
+        searchLoadingState: .loadingSearch)
+      )
     }
-  }
 }
 
 // TODO
 // [DONE] - setup account and API key on  https://www.pexels.com/
-// - integrate swiftlint into build phases
+// [DONE]- integrate swiftlint into build phases
 // swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml
 // [DONE] - REmove API KEY and put in plist file
 // [DONE]- build out decodable model files based on JSON API
@@ -103,6 +113,12 @@ struct SearchGridView_Previews: PreviewProvider {
 // [DONE]- hook up search input
 //  [DONE]- tapping enter should do trigger the search
 // [DONE]- test against live API
+// [DONE]- hook up loading indicator on search grid
 // - implement background download on details view
 // - hook up loading state on grid view
 // - implement loading progress bar
+// - visual polish
+//  - fix rounded rect radius on results images
+//  - get rid of red background
+// - add next page button to get next page of results
+// TODO - add test to show that JSON parser gracefully handles missing keys for fields we dont care about

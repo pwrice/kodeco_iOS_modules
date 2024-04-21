@@ -9,15 +9,15 @@ import Foundation
 
 enum SearchLoadingState {
   case noSearch,
-       loadingSearch,
-       loadedSearch,
-       error
+    loadingSearch,
+    loadedSearch,
+    error
 }
 
 enum ImageLoadingState {
   case noImage,
-       loadingImage,
-       error
+    loadingImage,
+    error
 }
 
 enum ImageSearchStoreError: Error, Equatable {
@@ -29,7 +29,7 @@ class ImageSearchStore: ObservableObject {
   let baseSearchURLString = "https://api.pexels.com/v1/search"
   var plexelsAPIAuthKey: String?
 
-  var searchLoadingState = SearchLoadingState.noSearch
+  @Published var searchLoadingState = SearchLoadingState.noSearch
   var currentQuery: String?
   var totalResults: Int?
   var currentPage: Int?
