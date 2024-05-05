@@ -7,26 +7,17 @@
 
 import SwiftUI
 
-struct SearchGridView: View {
+struct SearchResultsView: View {
   @StateObject var viewModel = ImageSearchViewModel(imageStore: ImageSearchStore())
-
-  var resultColumns: [GridItem] {
-    [
-      GridItem(.flexible(minimum: 150)),
-      GridItem(.flexible(minimum: 150))
-    ]
-  }
 
   var body: some View {
     NavigationStack {
       ScrollView {
-        ZStack {
-          LazyVGrid(columns: resultColumns) {
-            ForEach(viewModel.imageResults, id: \.self) { imageResult in
-              NavigationLink(value: imageResult) {
-                ImageResultView(imageResult: imageResult)
-                  .background(.red)
-              }
+        VStack {
+          ResultsGridView(viewModel: viewModel)
+          if viewModel.showMoreImagesButton {
+            Button("More Images") {
+              viewModel.moreImagesTapped()
             }
           }
           if viewModel.searchLoadingState == .loadingSearch {
@@ -37,14 +28,42 @@ struct SearchGridView: View {
       .padding()
       .navigationTitle(Text("Plexel Images"))
       .navigationDestination(for: PlexelImage.self) { imageResult in
-        ImageDetailsView(imageResult: imageResult)
+        ImageDetailsView(viewModel: viewModel, imageResult: imageResult)
       }
       .searchable(
         text: $viewModel.searchQuery,
         placement: .navigationBarDrawer(displayMode: .always),
         prompt: "Search")
       .onSubmit(of: .search) {
-        viewModel.searchSubmitted()
+        viewModel.searchInputSubmitted()
+      }
+    }
+  }
+}
+
+struct ResultsGridView: View {
+  @ObservedObject var viewModel: ImageSearchViewModel
+
+  @Environment(\.isSearching) var isSearching
+
+  var resultColumns: [GridItem] {
+    [
+      GridItem(.flexible(minimum: 150)),
+      GridItem(.flexible(minimum: 150))
+    ]
+  }
+
+  var body: some View {
+    LazyVGrid(columns: resultColumns) {
+      ForEach(viewModel.imageResults, id: \.self) { imageResult in
+        NavigationLink(value: imageResult) {
+          ImageResultView(imageResult: imageResult)
+        }
+      }
+    }
+    .onChange(of: isSearching) {
+      if !isSearching {
+        viewModel.clearSearch()
       }
     }
   }
@@ -69,7 +88,6 @@ struct ImageResultView: View {
           }
       }
       .frame(width: 140, height: 100)
-      .clipShape(RoundedRectangle(cornerRadius: 25))
       Text(imageResult.title)
         .lineLimit(1)
         .truncationMode(.tail)
@@ -80,15 +98,15 @@ struct ImageResultView: View {
 }
 
 
-struct SearchGridView_Previews: PreviewProvider {
+struct SearchResultsView_Previews: PreviewProvider {
   static var previews: some View {
-    SearchGridView(
+    SearchResultsView(
       viewModel: ImageSearchViewModel(
         imageStore: ImageSearchStore(
           withMockResults: "MockResponse", query: "cats")
       ))
 
-    SearchGridView(
+    SearchResultsView(
       viewModel: ImageSearchViewModel(
         imageStore: nil,
         searchQuery: "Cats",
@@ -97,10 +115,12 @@ struct SearchGridView_Previews: PreviewProvider {
     }
 }
 
+// swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml
+// swiftlint --fix --no-cache --config ~/com.raywenderlich.swiftlint.yml
+
 // TODO
 // [DONE] - setup account and API key on  https://www.pexels.com/
 // [DONE]- integrate swiftlint into build phases
-// swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml
 // [DONE] - REmove API KEY and put in plist file
 // [DONE]- build out decodable model files based on JSON API
 // [DONE]- implement model store
@@ -114,11 +134,8 @@ struct SearchGridView_Previews: PreviewProvider {
 //  [DONE]- tapping enter should do trigger the search
 // [DONE]- test against live API
 // [DONE]- hook up loading indicator on search grid
-// - implement background download on details view
-// - hook up loading state on grid view
-// - implement loading progress bar
-// - visual polish
-//  - fix rounded rect radius on results images
-//  - get rid of red background
-// - add next page button to get next page of results
-// TODO - add test to show that JSON parser gracefully handles missing keys for fields we dont care about
+// [DONE]- implement background download in image store
+// [DONE]- trigger background download when navigatng to details screen
+// [DONE]- display progress for downloads
+// [DONE]- add next page button to get next page of results
+// [DONE] - cancel in progress download when navigating to new details screen

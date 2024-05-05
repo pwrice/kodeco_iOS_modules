@@ -8,29 +8,59 @@
 import SwiftUI
 
 struct ImageDetailsView: View {
+  @ObservedObject var viewModel: ImageSearchViewModel
   let imageResult: PlexelImage
 
   var body: some View {
-    VStack {
-      AsyncImage(
-        url: URL(string: imageResult.sourceURLs.tiny)) { phase in
-        switch phase {
-        case .failure:
-          Image(systemName: "photo")
-            .font(.largeTitle)
-        case .success(let image):
-          image
-            .resizable()
-        default:
+    ScrollView {
+      VStack {
+        AsyncImage(
+          url: URL(string: imageResult.sourceURLs.tiny)) { phase in
+            switch phase {
+            case .failure:
+              Image(systemName: "photo")
+                .font(.largeTitle)
+            case .success(let image):
+              image
+                .resizable()
+            default:
+              ProgressView()
+            }
+        }
+          .frame(width: 140, height: 100)
+
+        Text(imageResult.title)
+          .lineLimit(1)
+          .truncationMode(.tail)
+
+        Text("Download Progress \(viewModel.detailImageLoadingDownloadProgress)")
+
+        if viewModel.detailImageLoadingState == .loadedImage {
+          AsyncImage(url: viewModel.detailImageLocalURL) { phase in
+            switch phase {
+            case .failure:
+              Image(systemName: "photo")
+                .font(.largeTitle)
+            case .success(let image):
+              image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+            default:
+              ProgressView()
+            }
+          }
+        } else {
           ProgressView()
         }
+
+        Spacer()
+        Button("Delete Downloaded Image") {
+          viewModel.deleteDownloadedImage(image: imageResult)
+        }
       }
-      .frame(width: 140, height: 100)
-      .clipShape(RoundedRectangle(cornerRadius: 25))
-      Text(imageResult.title)
-        .lineLimit(1)
-        .truncationMode(.tail)
-      Spacer()
+      .onAppear {
+        viewModel.imageDetailsViewOnAppear(image: imageResult)
+      }
     }
   }
 }
@@ -40,6 +70,11 @@ struct ImageDetailsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
       ImageDetailsView(
+        viewModel: ImageSearchViewModel(
+          imageStore: nil,
+          searchQuery: "Cats",
+          searchLoadingState: .loadedSearch
+        ),
         imageResult: PlexelImage(
           id: 1,
           width: 4000,

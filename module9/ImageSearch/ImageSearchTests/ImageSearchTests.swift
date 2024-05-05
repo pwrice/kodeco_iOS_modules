@@ -45,8 +45,6 @@ final class ImageSearchTests: XCTestCase {
     XCTAssertEqual(image.sourceURLs.tiny, "https://images.pexels.com/photos/3573351/pexels-photo-3573351.png?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280")
   }
 
-  // TODO - add test to show that JSON parser gracefully handles missing keys for fields we dont care about
-
   func testImageStoreInitialState() throws {
     let mockURLSessionLoader = MockURLSessionLoader(
       mockDataUrl: mockJSONURL,

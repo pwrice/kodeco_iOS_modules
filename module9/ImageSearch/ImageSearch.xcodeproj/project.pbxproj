@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		C10DE12D2B975653007E1430 /* ImageSearchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE12C2B975653007E1430 /* ImageSearchModels.swift */; };
 		C10DE12E2B975653007E1430 /* ImageSearchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE12C2B975653007E1430 /* ImageSearchModels.swift */; };
+		C11A64952BD9386000F29F07 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11A64942BD9386000F29F07 /* ImageDownloader.swift */; };
+		C11A64962BD9386000F29F07 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11A64942BD9386000F29F07 /* ImageDownloader.swift */; };
 		C19A9FEF2B8F79E4009CD2ED /* ImageSearchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A9FEE2B8F79E4009CD2ED /* ImageSearchApp.swift */; };
-		C19A9FF12B8F79E4009CD2ED /* SearchGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A9FF02B8F79E4009CD2ED /* SearchGridView.swift */; };
+		C19A9FF12B8F79E4009CD2ED /* SearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A9FF02B8F79E4009CD2ED /* SearchResultsView.swift */; };
 		C19A9FF32B8F79E5009CD2ED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19A9FF22B8F79E5009CD2ED /* Assets.xcassets */; };
 		C19A9FF62B8F79E5009CD2ED /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19A9FF52B8F79E5009CD2ED /* Preview Assets.xcassets */; };
 		C19AA0002B8F79E5009CD2ED /* ImageSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A9FFF2B8F79E5009CD2ED /* ImageSearchTests.swift */; };
@@ -46,9 +48,10 @@
 
 /* Begin PBXFileReference section */
 		C10DE12C2B975653007E1430 /* ImageSearchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchModels.swift; sourceTree = "<group>"; };
+		C11A64942BD9386000F29F07 /* ImageDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDownloader.swift; sourceTree = "<group>"; };
 		C19A9FEB2B8F79E4009CD2ED /* ImageSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C19A9FEE2B8F79E4009CD2ED /* ImageSearchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchApp.swift; sourceTree = "<group>"; };
-		C19A9FF02B8F79E4009CD2ED /* SearchGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchGridView.swift; sourceTree = "<group>"; };
+		C19A9FF02B8F79E4009CD2ED /* SearchResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsView.swift; sourceTree = "<group>"; };
 		C19A9FF22B8F79E5009CD2ED /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C19A9FF52B8F79E5009CD2ED /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C19A9FFB2B8F79E5009CD2ED /* ImageSearchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageSearchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,6 +157,7 @@
 			children = (
 				C19AA01F2B9215BE009CD2ED /* ImageSearchStore.swift */,
 				C10DE12C2B975653007E1430 /* ImageSearchModels.swift */,
+				C11A64942BD9386000F29F07 /* ImageDownloader.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -161,7 +165,7 @@
 		C19AA01D2B9213BD009CD2ED /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C19A9FF02B8F79E4009CD2ED /* SearchGridView.swift */,
+				C19A9FF02B8F79E4009CD2ED /* SearchResultsView.swift */,
 				C19AA0222B921675009CD2ED /* ImageSearchViewModel.swift */,
 				C1D765782BA87AA600F3CAC9 /* ImageDetailsView.swift */,
 			);
@@ -341,8 +345,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C19A9FF12B8F79E4009CD2ED /* SearchGridView.swift in Sources */,
+				C19A9FF12B8F79E4009CD2ED /* SearchResultsView.swift in Sources */,
 				C1D765792BA87AA600F3CAC9 /* ImageDetailsView.swift in Sources */,
+				C11A64952BD9386000F29F07 /* ImageDownloader.swift in Sources */,
 				C19A9FEF2B8F79E4009CD2ED /* ImageSearchApp.swift in Sources */,
 				C19AA0232B921675009CD2ED /* ImageSearchViewModel.swift in Sources */,
 				C19AA0202B9215BE009CD2ED /* ImageSearchStore.swift in Sources */,
@@ -355,6 +360,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C19AA0242B921675009CD2ED /* ImageSearchViewModel.swift in Sources */,
+				C11A64962BD9386000F29F07 /* ImageDownloader.swift in Sources */,
 				C19AA0002B8F79E5009CD2ED /* ImageSearchTests.swift in Sources */,
 				C19AA0212B9215BE009CD2ED /* ImageSearchStore.swift in Sources */,
 				C10DE12E2B975653007E1430 /* ImageSearchModels.swift in Sources */,
