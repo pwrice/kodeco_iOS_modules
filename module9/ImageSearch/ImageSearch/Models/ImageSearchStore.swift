@@ -14,12 +14,6 @@ enum SearchLoadingState {
     error
 }
 
-enum ImageLoadingState {
-  case noImage,
-    loadingImage,
-    error
-}
-
 enum ImageSearchStoreError: Error, Equatable {
   case apiKeyError(String)
 }
@@ -130,7 +124,6 @@ class ImageSearchStore: ObservableObject {
 
   func processSearchFetch(data: Data?, response: URLResponse?, error: Error?) {
     if let data = data, let response = response as? HTTPURLResponse {
-      print("processSearchFetch response.statusCode \(response.statusCode)")
       if response.statusCode != 200 {
         self.searchLoadingState = .error // weak referecnce for self?
       }
