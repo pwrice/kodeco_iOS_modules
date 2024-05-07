@@ -44,7 +44,8 @@ struct SearchResultsView: View {
 struct ResultsGridView: View {
   @ObservedObject var viewModel: ImageSearchViewModel
 
-  @Environment(\.isSearching) var isSearching
+  @Environment(\.isSearching)
+  var isSearching
 
   var resultColumns: [GridItem] {
     [

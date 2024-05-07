@@ -75,8 +75,8 @@ class ImageSearchStore: ObservableObject {
 
     do {
       let apiRequest = try getPexelsAPIRequest(for: newSearchURL)
-      self.urlSessionLoader.fetchDataFromURL(urlRequest: apiRequest) { data, response, error in
-        self.processSearchFetch(data: data, response: response, error: error)
+      urlSessionLoader.fetchDataFromURL(urlRequest: apiRequest) { [weak self] data, response, error in
+        self?.processSearchFetch(data: data, response: response, error: error)
       }
     } catch {
       searchLoadingState = .error
@@ -92,8 +92,8 @@ class ImageSearchStore: ObservableObject {
 
     do {
       let apiRequest = try getPexelsAPIRequest(for: nextPageURL)
-      self.urlSessionLoader.fetchDataFromURL(urlRequest: apiRequest) { data, response, error in
-        self.processSearchFetch(data: data, response: response, error: error)
+      urlSessionLoader.fetchDataFromURL(urlRequest: apiRequest) { [weak self] data, response, error in
+        self?.processSearchFetch(data: data, response: response, error: error)
       }
     } catch {
       searchLoadingState = .error
@@ -125,23 +125,22 @@ class ImageSearchStore: ObservableObject {
   func processSearchFetch(data: Data?, response: URLResponse?, error: Error?) {
     if let data = data, let response = response as? HTTPURLResponse {
       if response.statusCode != 200 {
-        self.searchLoadingState = .error // weak referecnce for self?
+        searchLoadingState = .error
       }
 
       do {
         let decoder = JSONDecoder()
         let imageSearchResponse = try decoder.decode(ImageSearchResponse.self, from: data)
-        self.updateLocalStateWithSearchResponse(searchResponse: imageSearchResponse) // weak reference for self?
-
+        updateLocalStateWithSearchResponse(searchResponse: imageSearchResponse)
       } catch let error {
         print("Error decoding response \(String(describing: error))")
-        self.searchLoadingState = .error // weak referecnce for self?
+        searchLoadingState = .error
       }
     } else {
       print(
         "Contents fetch failed: " +
         "\(error?.localizedDescription ?? "Unknown error")")
-      self.searchLoadingState = .error // weak referecnce for self?
+      searchLoadingState = .error
     }
   }
 

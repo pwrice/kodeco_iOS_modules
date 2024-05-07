@@ -47,12 +47,16 @@ class ImageSearchViewModel: ObservableObject {
 
     if let imageStore = self.imageStore {
       cancellables.append(imageStore.$imageResults.sink { [weak self] imageResults in
-        self?.imageResults = imageResults
-        self?.showMoreImagesButton = self?.imageStore?.nextPageURL != nil
+        DispatchQueue.main.async { [weak self] in
+          self?.imageResults = imageResults
+          self?.showMoreImagesButton = self?.imageStore?.nextPageURL != nil
+        }
       })
       cancellables.append(imageStore.$searchLoadingState.sink { [weak self] loadingState in
-        self?.searchLoadingState = loadingState
-        self?.showMoreImagesButton = loadingState == .loadedSearch
+        DispatchQueue.main.async { [weak self] in
+          self?.searchLoadingState = loadingState
+          self?.showMoreImagesButton = loadingState == .loadedSearch
+        }
       })
     }
 
@@ -60,7 +64,8 @@ class ImageSearchViewModel: ObservableObject {
 
     if let detailsImageDownloader = self.detailsImageDownloader {
       cancellables.append(detailsImageDownloader.$state.sink { [weak self] loadingState in
-        switch loadingState {
+        DispatchQueue.main.async { [weak self] in
+          switch loadingState {
           case .paused:
             self?.detailImageLoadingState = .loadingImage
           case .downloading:
@@ -73,9 +78,12 @@ class ImageSearchViewModel: ObservableObject {
           case .waiting:
             self?.detailImageLoadingState = .loadingImage
           }
+        }
       })
       cancellables.append(detailsImageDownloader.$downloadProgress.sink { [weak self] progress in
-        self?.detailImageLoadingDownloadProgress = progress
+        DispatchQueue.main.async { [weak self] in
+          self?.detailImageLoadingDownloadProgress = progress
+        }
       })
     }
   }
