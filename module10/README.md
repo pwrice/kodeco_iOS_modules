@@ -40,7 +40,7 @@ True
 
 j) The ____________ keyword indicates a function contains a suspension point.
 
-await (I assume the question is referring to the keyword used when calling a function)
+async
 
 
 k) True or False: You can design your own custom asynchronous sequences in Swift.
