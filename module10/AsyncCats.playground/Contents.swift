@@ -23,20 +23,25 @@ struct CatFactIterator: AsyncIteratorProtocol {
   var factCount: Int = 0
   let numFacts: Int
 
-  mutating func next() async throws -> CatFact? {
+  mutating func next() async -> CatFact? {
     guard let url = URL(string: "https://catfact.ninja/fact"),
             factCount < numFacts
     else { return nil }
     
     factCount += 1
-    let (data, _) = try await URLSession.shared.data(from: url)
-    return try JSONDecoder().decode(CatFact.self, from: data)
+    do {
+      let (data, _) = try await URLSession.shared.data(from: url)
+      return try JSONDecoder().decode(CatFact.self, from: data)
+    } catch {
+      print("Thre was an error getting the cat fact \(error)")
+      return nil
+    }
   }
 }
 
 func fetchCatFacts(numFacts: Int) async throws {
   print("Fetching Cats")
-  for try await catFact in CatFactSequence(numFacts: numFacts) {
+  for await catFact in CatFactSequence(numFacts: numFacts) {
     print(catFact)
   }
   print("Done")
