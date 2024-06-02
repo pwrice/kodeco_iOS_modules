@@ -1,0 +1,656 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85482C08AE5900477545 /* LoopCanvasApp.swift */; };
+		C19D854B2C08AE5900477545 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D854A2C08AE5900477545 /* ContentView.swift */; };
+		C19D854D2C08AE6500477545 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19D854C2C08AE6500477545 /* Assets.xcassets */; };
+		C19D85502C08AE6500477545 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19D854F2C08AE6500477545 /* Preview Assets.xcassets */; };
+		C19D855A2C08AE6500477545 /* LoopCanvasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85592C08AE6500477545 /* LoopCanvasTests.swift */; };
+		C19D85642C08AE6500477545 /* LoopCanvasUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */; };
+		C19D85662C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */; };
+		C19D85772C08B00C00477545 /* CanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85762C08B00C00477545 /* CanvasView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C19D85562C08AE6500477545 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C19D853D2C08AE5900477545 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C19D85442C08AE5900477545;
+			remoteInfo = LoopCanvas;
+		};
+		C19D85602C08AE6500477545 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C19D853D2C08AE5900477545 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C19D85442C08AE5900477545;
+			remoteInfo = LoopCanvas;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C19D85452C08AE5900477545 /* LoopCanvas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoopCanvas.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C19D85482C08AE5900477545 /* LoopCanvasApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasApp.swift; sourceTree = "<group>"; };
+		C19D854A2C08AE5900477545 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C19D854C2C08AE6500477545 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C19D854F2C08AE6500477545 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C19D85552C08AE6500477545 /* LoopCanvasTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopCanvasTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C19D85592C08AE6500477545 /* LoopCanvasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasTests.swift; sourceTree = "<group>"; };
+		C19D855F2C08AE6500477545 /* LoopCanvasUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopCanvasUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasUITests.swift; sourceTree = "<group>"; };
+		C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C19D85762C08B00C00477545 /* CanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasView.swift; sourceTree = "<group>"; };
+		C1B564C22C0CC77A002FDDD4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C19D85422C08AE5900477545 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D85522C08AE6500477545 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D855C2C08AE6500477545 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C19D853C2C08AE5900477545 = {
+			isa = PBXGroup;
+			children = (
+				C19D85472C08AE5900477545 /* LoopCanvas */,
+				C19D85582C08AE6500477545 /* LoopCanvasTests */,
+				C19D85622C08AE6500477545 /* LoopCanvasUITests */,
+				C19D85462C08AE5900477545 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C19D85462C08AE5900477545 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C19D85452C08AE5900477545 /* LoopCanvas.app */,
+				C19D85552C08AE6500477545 /* LoopCanvasTests.xctest */,
+				C19D855F2C08AE6500477545 /* LoopCanvasUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C19D85472C08AE5900477545 /* LoopCanvas */ = {
+			isa = PBXGroup;
+			children = (
+				C1B564C22C0CC77A002FDDD4 /* Info.plist */,
+				C19D85752C08AF2B00477545 /* App */,
+				C19D85742C08AF2400477545 /* Views */,
+				C19D85732C08AF1A00477545 /* Models */,
+				C19D85722C08AEEE00477545 /* Resources */,
+				C19D854C2C08AE6500477545 /* Assets.xcassets */,
+				C19D854E2C08AE6500477545 /* Preview Content */,
+			);
+			path = LoopCanvas;
+			sourceTree = "<group>";
+		};
+		C19D854E2C08AE6500477545 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C19D854F2C08AE6500477545 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C19D85582C08AE6500477545 /* LoopCanvasTests */ = {
+			isa = PBXGroup;
+			children = (
+				C19D85592C08AE6500477545 /* LoopCanvasTests.swift */,
+			);
+			path = LoopCanvasTests;
+			sourceTree = "<group>";
+		};
+		C19D85622C08AE6500477545 /* LoopCanvasUITests */ = {
+			isa = PBXGroup;
+			children = (
+				C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */,
+				C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */,
+			);
+			path = LoopCanvasUITests;
+			sourceTree = "<group>";
+		};
+		C19D85722C08AEEE00477545 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C19D85732C08AF1A00477545 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C19D85742C08AF2400477545 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C19D854A2C08AE5900477545 /* ContentView.swift */,
+				C19D85762C08B00C00477545 /* CanvasView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C19D85752C08AF2B00477545 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C19D85482C08AE5900477545 /* LoopCanvasApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C19D85442C08AE5900477545 /* LoopCanvas */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C19D85692C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvas" */;
+			buildPhases = (
+				C1B564C32C0CC9AC002FDDD4 /* SwiftLint */,
+				C19D85412C08AE5900477545 /* Sources */,
+				C19D85422C08AE5900477545 /* Frameworks */,
+				C19D85432C08AE5900477545 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LoopCanvas;
+			productName = LoopCanvas;
+			productReference = C19D85452C08AE5900477545 /* LoopCanvas.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C19D85542C08AE6500477545 /* LoopCanvasTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C19D856C2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasTests" */;
+			buildPhases = (
+				C19D85512C08AE6500477545 /* Sources */,
+				C19D85522C08AE6500477545 /* Frameworks */,
+				C19D85532C08AE6500477545 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C19D85572C08AE6500477545 /* PBXTargetDependency */,
+			);
+			name = LoopCanvasTests;
+			productName = LoopCanvasTests;
+			productReference = C19D85552C08AE6500477545 /* LoopCanvasTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C19D855E2C08AE6500477545 /* LoopCanvasUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C19D856F2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasUITests" */;
+			buildPhases = (
+				C19D855B2C08AE6500477545 /* Sources */,
+				C19D855C2C08AE6500477545 /* Frameworks */,
+				C19D855D2C08AE6500477545 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C19D85612C08AE6500477545 /* PBXTargetDependency */,
+			);
+			name = LoopCanvasUITests;
+			productName = LoopCanvasUITests;
+			productReference = C19D855F2C08AE6500477545 /* LoopCanvasUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C19D853D2C08AE5900477545 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					C19D85442C08AE5900477545 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					C19D85542C08AE6500477545 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = C19D85442C08AE5900477545;
+					};
+					C19D855E2C08AE6500477545 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = C19D85442C08AE5900477545;
+					};
+				};
+			};
+			buildConfigurationList = C19D85402C08AE5900477545 /* Build configuration list for PBXProject "LoopCanvas" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C19D853C2C08AE5900477545;
+			productRefGroup = C19D85462C08AE5900477545 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C19D85442C08AE5900477545 /* LoopCanvas */,
+				C19D85542C08AE6500477545 /* LoopCanvasTests */,
+				C19D855E2C08AE6500477545 /* LoopCanvasUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C19D85432C08AE5900477545 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C19D85502C08AE6500477545 /* Preview Assets.xcassets in Resources */,
+				C19D854D2C08AE6500477545 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D85532C08AE6500477545 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D855D2C08AE6500477545 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C1B564C32C0CC9AC002FDDD4 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif [ -f ~/com.raywenderlich.swiftlint.yml ]; then\n  if which swiftlint >/dev/null; then\n    swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml\n  fi\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C19D85412C08AE5900477545 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C19D854B2C08AE5900477545 /* ContentView.swift in Sources */,
+				C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */,
+				C19D85772C08B00C00477545 /* CanvasView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D85512C08AE6500477545 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C19D855A2C08AE6500477545 /* LoopCanvasTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D855B2C08AE6500477545 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C19D85662C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift in Sources */,
+				C19D85642C08AE6500477545 /* LoopCanvasUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C19D85572C08AE6500477545 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C19D85442C08AE5900477545 /* LoopCanvas */;
+			targetProxy = C19D85562C08AE6500477545 /* PBXContainerItemProxy */;
+		};
+		C19D85612C08AE6500477545 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C19D85442C08AE5900477545 /* LoopCanvas */;
+			targetProxy = C19D85602C08AE6500477545 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		C19D85672C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C19D85682C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C19D856A2C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LoopCanvas/Preview Content\"";
+				DEVELOPMENT_TEAM = C583XJY628;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LoopCanvas/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvas;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C19D856B2C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LoopCanvas/Preview Content\"";
+				DEVELOPMENT_TEAM = C583XJY628;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LoopCanvas/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvas;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C19D856D2C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoopCanvas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LoopCanvas";
+			};
+			name = Debug;
+		};
+		C19D856E2C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoopCanvas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LoopCanvas";
+			};
+			name = Release;
+		};
+		C19D85702C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LoopCanvas;
+			};
+			name = Debug;
+		};
+		C19D85712C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LoopCanvas;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C19D85402C08AE5900477545 /* Build configuration list for PBXProject "LoopCanvas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D85672C08AE6500477545 /* Debug */,
+				C19D85682C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C19D85692C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D856A2C08AE6500477545 /* Debug */,
+				C19D856B2C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C19D856C2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D856D2C08AE6500477545 /* Debug */,
+				C19D856E2C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C19D856F2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D85702C08AE6500477545 /* Debug */,
+				C19D85712C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C19D853D2C08AE5900477545 /* Project object */;
+}
