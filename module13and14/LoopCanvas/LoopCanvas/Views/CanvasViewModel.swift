@@ -18,6 +18,8 @@ class CanvasViewModel: ObservableObject {
   }
 
   func dropBlockOnCanvas(block: Block) {
+    // TODO - break this function up and refator logic into Canvas Model
+
     // Check all slots around all blocks to see if there is a connection
     let allCanvasBlocks = canvasModel.blocksGroups.flatMap { $0.allBlocks }
     var blockAddedToGroup = false
@@ -37,14 +39,22 @@ class CanvasViewModel: ObservableObject {
             x: otherBlock.location.x - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize,
             y: otherBlock.location.y)
         ]
+        let slotGridPosOffsets: [(Int, Int)] = [
+          (0, -1),
+          (1, 0),
+          (0, 1),
+          (-1, 0)
+        ]
+        var intersectingSlotGridPosOffset: (Int, Int)?
         var intersectingSlot: CGPoint?
         var minDist: CGFloat = 100000000.0
-        for slotLocation in slotLocations {
+        for (slotLocation, gridPosOffset) in zip(slotLocations, slotGridPosOffsets) {
           let diffX = block.location.x - slotLocation.x
           let diffY = block.location.y - slotLocation.y
           let dist = diffX * diffX + diffY * diffY
           if abs(diffX) < CanvasViewModel.blockSize && abs(diffY) < CanvasViewModel.blockSize && dist < minDist {
             intersectingSlot = slotLocation
+            intersectingSlotGridPosOffset = gridPosOffset
             minDist = dist
             break
           }
@@ -59,9 +69,14 @@ class CanvasViewModel: ObservableObject {
         }
 
         // if slot is available, snap block there
-        if let availableSlot = availableSlot {
+        if let availableSlot = availableSlot, let gridPosOffset = intersectingSlotGridPosOffset {
           block.location = availableSlot
-          blockGroup.addBlock(block: block, gridPosX: 0, gridPosY: 0) // TODO - calculate correct grid position
+          let otherBlockGridPosX = otherBlock.blockGroupGridPosX ?? 0
+          let otherBlockGridPosY = otherBlock.blockGroupGridPosY ?? 0
+          blockGroup.addBlock(
+            block: block,
+            gridPosX: otherBlockGridPosX + gridPosOffset.0,
+            gridPosY: otherBlockGridPosY + gridPosOffset.1)
           blockAddedToGroup = true
           break
         }
