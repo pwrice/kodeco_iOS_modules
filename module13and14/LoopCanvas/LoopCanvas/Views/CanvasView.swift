@@ -7,89 +7,58 @@
 
 import SwiftUI
 
-let blockSize: CGFloat = 70.0
-let blockSpacing: CGFloat = 10.0
-
-struct BlockModel: Identifiable {
-  let id: Int
-  let index: Int
-  var location: CGPoint
-  var isDragging: Bool
-  let color: Color
-    var visible = false
-}
-
 
 struct CanvasView: View {
+  @StateObject var viewModel: CanvasViewModel
   @GestureState private var fingerLocation: CGPoint?
+
+  // TODO - make work w multi-touch (this assumes just a single drag)
   @GestureState private var dragStartLocation: CGPoint?
 
-  @State private var blockModels = [
-    BlockModel(
-      id: 0,
-      index: 0,
-      location: CGPoint(x: 50, y: 50),
-      isDragging: false,
-      color: .pink),
-    BlockModel(
-      id: 1,
-      index: 1,
-      location: CGPoint(x: 50, y: 50),
-      isDragging: false,
-      color: .purple),
-    BlockModel(
-      id: 2,
-      index: 2,
-      location: CGPoint(x: 50, y: 50),
-      isDragging: false,
-      color: .indigo),
-    BlockModel(
-      id: 3,
-      index: 3,
-      location: CGPoint(x: 50, y: 50),
-      isDragging: false,
-      color: .yellow)
-  ]
-
-  @State private var librarySlotLocations: [CGPoint] = [
-    CGPoint(x: 50, y: 150),
-    CGPoint(x: 150, y: 150),
-    CGPoint(x: 250, y: 150),
-    CGPoint(x: 350, y: 150)
-  ]
-
-  var fingerDrag: some Gesture {
+  var fingerDragGesture: some Gesture {
     DragGesture()
       .updating($fingerLocation) { value, fingerLocation, _ in
         fingerLocation = value.location
       }
   }
 
-  func updateBlockLocationFromDragGuesture(blockIndex: Int, value: DragGesture.Value) {
+  func blockDragGesture(block: Block) -> some Gesture {
+    DragGesture()
+      .updating($dragStartLocation) { _, startLocation, _ in
+        // Called before onChanged
+        startLocation = startLocation ?? block.location
+      }
+      .onChanged { value in
+        var newLocation = dragStartLocation ?? block.location
+        newLocation.x += value.translation.width
+        newLocation.y += value.translation.height
+        block.location = newLocation
+      }
+      .onEnded { _ in
+        viewModel.dropBlockOnCanvas(block: block)
+      }
   }
 
   var body: some View {
     ZStack {
-      BackgroundView(librarySlotLocations: $librarySlotLocations)
-      ForEach(blockModels) { blockModel in
-        BlockView(model: blockModel)
-          .gesture(
-            DragGesture()
-              .updating($dragStartLocation) { _, startLocation, _ in
-                // Called before onChanged
-                startLocation = startLocation ?? blockModels[blockModel.index].location
-              }
-              .onChanged { value in
-                var newLocation = dragStartLocation ?? blockModels[blockModel.index].location
-                newLocation.x += value.translation.width
-                newLocation.y += value.translation.height
-                blockModels[blockModel.index].location = newLocation
-              }
-              .onEnded { _ in
-                detectBlockConnections(block: blockModel)
-              }
-              .simultaneously(with: fingerDrag)
-          )
+      BackgroundView(viewModel: viewModel)
+      ZStack {
+        ForEach(viewModel.canvasModel.library.blocks) { blockModel in
+          BlockView(model: blockModel)
+            .gesture(
+              blockDragGesture(block: blockModel)
+                .simultaneously(with: fingerDragGesture)
+            )
+        }
+        ForEach(viewModel.canvasModel.blocksGroups) { blockGroup in
+          ForEach(blockGroup.allBlocks) { blockModel in
+            BlockView(model: blockModel)
+              .gesture(
+                blockDragGesture(block: blockModel)
+                  .simultaneously(with: fingerDragGesture)
+              )
+          }
+        }
       }
       if let fingerLocation = fingerLocation {
         Circle()
@@ -102,95 +71,26 @@ struct CanvasView: View {
     .onAppear {
       // Defer setting block location till layout pass updates librarySlotLocations
       Task {
-        for (index, location) in librarySlotLocations.enumerated() {
-          blockModels[index].location = location
-          blockModels[index].visible = true
-        }
-      }
-    }
-  }
-
-  func detectBlockConnections(block: BlockModel) {
-    // Check all slots around all blocks to see if there is a connection
-    for otherBlock in blockModels where otherBlock.id != block.id {
-      // Find closest intersecting slot for otherBlock
-      let slotLocations = [
-        CGPoint( // top
-          x: otherBlock.location.x,
-          y: otherBlock.location.y - blockSpacing - blockSize),
-        CGPoint( // right
-          x: otherBlock.location.x + blockSpacing + blockSize,
-          y: otherBlock.location.y),
-        CGPoint( // bottom
-          x: otherBlock.location.x,
-          y: otherBlock.location.y + blockSpacing + blockSize),
-        CGPoint( // left
-          x: otherBlock.location.x - blockSpacing - blockSize,
-          y: otherBlock.location.y)
-      ]
-      var intersectingSlot: CGPoint?
-      var minDist: CGFloat = 100000000.0
-      for slotLocation in slotLocations {
-        let diffX = block.location.x - slotLocation.x
-        let diffY = block.location.y - slotLocation.y
-        let dist = diffX * diffX + diffY * diffY
-        if abs(diffX) < blockSize && abs(diffY) < blockSize && dist < minDist {
-          intersectingSlot = slotLocation
-          minDist = dist
-          break
-        }
-      }
-
-      // make sure slot is not already occupied
-      var availableSlot: CGPoint? = intersectingSlot
-      for otherBlock in blockModels where otherBlock.id != block.id {
-        if otherBlock.location == availableSlot {
-          availableSlot = nil
-        }
-      }
-
-      // if slot is available, snap block there
-      if let availableSlot = availableSlot {
-        blockModels[block.index].location = availableSlot
-        break
-      }
-    }
-
-    // regardless, add a new block to the open library slot
-    for librarySlotLocation in librarySlotLocations {
-      let blockInLibarySlot = blockModels.first { maybeBlock in
-        maybeBlock.id != block.id && maybeBlock.location == librarySlotLocation
-      }
-      if blockInLibarySlot == nil {
-        blockModels.append(
-          BlockModel(
-            id: blockModels.count,
-            index: blockModels.count,
-            location: librarySlotLocation,
-            isDragging: false,
-            color: block.color,
-            visible: true
-          ))
-        break
+        viewModel.canvasModel.library.syncBlockLocationsWithSlots()
       }
     }
   }
 }
 
 struct BlockView: View {
-  let model: BlockModel
+  @ObservedObject var model: Block
 
   var body: some View {
     RoundedRectangle(cornerRadius: 10)
       .foregroundColor(model.color)
-      .frame(width: blockSize, height: blockSize)
+      .frame(width: CanvasViewModel.blockSize, height: CanvasViewModel.blockSize)
       .position(model.location)
       .opacity(model.visible ? 1 : 0)
   }
 }
 
 struct BackgroundView: View {
-  @Binding var librarySlotLocations: [CGPoint]
+  @ObservedObject var viewModel: CanvasViewModel
 
   var body: some View {
     VStack {
@@ -200,13 +100,13 @@ struct BackgroundView: View {
       }
       .padding()
       Spacer()
-      LibraryView(librarySlotLocations: $librarySlotLocations)
+      LibraryView(viewModel: viewModel)
     }
   }
 }
 
 struct LibraryView: View {
-  @Binding var librarySlotLocations: [CGPoint]
+  @ObservedObject var viewModel: CanvasViewModel
 
   var body: some View {
     VStack {
@@ -214,12 +114,12 @@ struct LibraryView: View {
         Text("Library")
         Spacer()
       }
-      HStack(spacing: blockSpacing) {
+      HStack(spacing: CanvasViewModel.blockSpacing) {
         Spacer()
-        LibrarySlotView(librarySlotLocations: $librarySlotLocations, index: 0)
-        LibrarySlotView(librarySlotLocations: $librarySlotLocations, index: 1)
-        LibrarySlotView(librarySlotLocations: $librarySlotLocations, index: 2)
-        LibrarySlotView(librarySlotLocations: $librarySlotLocations, index: 3)
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 0)
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 1)
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 2)
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 3)
         Spacer()
       }
     }
@@ -243,14 +143,16 @@ struct LibrarySlotView: View {
           )
         }
     }
-    .frame(width: blockSize, height: blockSize)
+    .frame(width: CanvasViewModel.blockSize, height: CanvasViewModel.blockSize)
   }
 }
 
 
 struct CanvasView_Previews: PreviewProvider {
   static var previews: some View {
-    CanvasView()
+    CanvasView(
+    viewModel: CanvasViewModel(
+      canvasModel: CanvasModel()))
   }
 }
 

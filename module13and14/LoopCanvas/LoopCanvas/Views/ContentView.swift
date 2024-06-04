@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
+  @StateObject var canvasViewModel = CanvasViewModel(
+    canvasModel: CanvasModel())
   var body: some View {
-    CanvasView()
+    CanvasView(viewModel: canvasViewModel)
   }
 }
 

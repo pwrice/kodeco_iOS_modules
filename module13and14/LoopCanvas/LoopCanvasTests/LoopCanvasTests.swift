@@ -10,25 +10,38 @@ import XCTest
 
 final class LoopCanvasTests: XCTestCase {
   override func setUpWithError() throws {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
   }
 
-  override func tearDownWithError() throws {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  func testDropFirstBlockOnCanvas() throws {
+    let canvasViewModel = CanvasViewModel(canvasModel: CanvasModel())
+    canvasViewModel.canvasModel.library.syncBlockLocationsWithSlots()
+
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 0)
+    XCTAssertEqual(canvasViewModel.canvasModel.library.blocks.count, 4)
+    let blockToDrag = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks.first)
+
+    XCTAssertTrue(canvasViewModel.canvasModel.library.blocks.contains(blockToDrag))
+    XCTAssertNil(blockToDrag.blockGroupGridPosX)
+    XCTAssertNil(blockToDrag.blockGroupGridPosY)
+
+    blockToDrag.location = CGPoint(x: 200, y: 400)
+
+    canvasViewModel.dropBlockOnCanvas(block: blockToDrag)
+
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertEqual(newBlockGroup.allBlocks.count, 1)
+    XCTAssertTrue(newBlockGroup.allBlocks.contains(blockToDrag))
+    XCTAssertEqual(blockToDrag.blockGroupGridPosX, 0)
+    XCTAssertEqual(blockToDrag.blockGroupGridPosY, 0)
+
+    XCTAssertEqual(canvasViewModel.canvasModel.library.blocks.count, 4)
+    XCTAssertFalse(canvasViewModel.canvasModel.library.blocks.contains(blockToDrag))
   }
 
-  func testExample() throws {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
-    // Any test you write for XCTest can be annotated as throws and async.
-    // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-    // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+  func testDropSecondBlockOnCanvasToConnect() throws {
   }
 
-  func testPerformanceExample() throws {
-    // This is an example of a performance test case.
-    self.measure {
-      // Put the code you want to measure the time of here.
-    }
+  func testDropSecondBlockOnCanvasToCreateNewGroup() throws {
   }
 }
