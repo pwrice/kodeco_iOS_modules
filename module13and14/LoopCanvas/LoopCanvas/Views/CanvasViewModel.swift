@@ -9,16 +9,51 @@ import Foundation
 
 class CanvasViewModel: ObservableObject {
   @Published var canvasModel: CanvasModel
+  @Published var allBlocks: [Block]
+
+  var draggingBlock: Block?
 
   static let blockSize: CGFloat = 70.0
   static let blockSpacing: CGFloat = 10.0
 
   init(canvasModel: CanvasModel) {
     self.canvasModel = canvasModel
+    self.allBlocks = []
+    self.updateAllBlocksList()
+  }
+
+  private func updateAllBlocksList() {
+    var newAllBlocksList = canvasModel.blocksGroups.flatMap { $0.allBlocks }
+    + canvasModel.library.blocks
+    + [draggingBlock].compactMap { $0 }
+    // TODO - use set to make this unique by block id
+
+    // Need to keep them consistantly sorted so SwiftUI views have continuity
+    newAllBlocksList.sort { $0.id > $1.id }
+    allBlocks = newAllBlocksList
+  }
+
+  func updateBlockDragLocation(block: Block, location: CGPoint) {
+    if !block.dragging {
+      startBlockDrag(block: block)
+    }
+    block.location = location
+  }
+
+  func startBlockDrag(block: Block) {
+    block.dragging = true
+    if let blockGroup = block.blockGroup {
+      blockGroup.removeBlock(block: block)
+    }
+    draggingBlock = block
+    updateAllBlocksList()
   }
 
   func dropBlockOnCanvas(block: Block) {
     // TODO - break this function up and refator logic into Canvas Model
+
+    block.dragging = false
+    draggingBlock = nil
 
     // Check all slots around all blocks to see if there is a connection
     let allCanvasBlocks = canvasModel.blocksGroups.flatMap { $0.allBlocks }
@@ -86,7 +121,6 @@ class CanvasViewModel: ObservableObject {
     if !blockAddedToGroup {
       canvasModel.addBlockGroup(initialBlock: block)
     }
-
     canvasModel.library.blocks.removeAll { $0.id == block.id }
 
     // regardless, add a new block to the open library slot
@@ -106,5 +140,7 @@ class CanvasViewModel: ObservableObject {
         break
       }
     }
+
+    updateAllBlocksList()
   }
 }

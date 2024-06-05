@@ -29,7 +29,8 @@ final class LoopCanvasTests: XCTestCase {
     let blockToDrag = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks.first)
 
     // Drag the block to 200, 400 on the canvas
-    blockToDrag.location = CGPoint(x: 200, y: 400)
+    canvasViewModel.updateBlockDragLocation(
+      block: blockToDrag, location: CGPoint(x: 200, y: 400))
 
     // Drop It
     canvasViewModel.dropBlockOnCanvas(block: blockToDrag)
@@ -54,22 +55,17 @@ final class LoopCanvasTests: XCTestCase {
 
   func testDropSecondBlockOnCanvasToConnect() throws {
     // Drop the first block on the canvas
-    let firstBlock = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks.first)
-    firstBlock.location = CGPoint(x: 200, y: 400)
-    canvasViewModel.dropBlockOnCanvas(block: firstBlock)
+    let firstBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
     // A block group is created
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
 
-    // Validate that the second block is distinct from the first block
-    let secondBlock = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks[1])
-    XCTAssertNotEqual(firstBlock.id, secondBlock.id)
-
     // Drop second block below and to the right of the first block,
     // within the slot connecting distance
-    secondBlock.location = CGPoint(
-      x: firstBlock.location.x + 20,
-      y: firstBlock.location.y + CanvasViewModel.blockSize + 20)
-    canvasViewModel.dropBlockOnCanvas(block: secondBlock)
+    let secondBlock = try dropLibraryBlockOnCanvas(
+      libraryBlockIndex: 1,
+      location: CGPoint(
+        x: firstBlock.location.x + 20,
+        y: firstBlock.location.y + CanvasViewModel.blockSize + 20))
 
     // We still only have 1 block group
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
@@ -93,19 +89,15 @@ final class LoopCanvasTests: XCTestCase {
 
   func testDropSecondBlockOnCanvasToCreateNewGroup() throws {
     // Drop the first block on the canvas
-    let firstBlock = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks.first)
-    firstBlock.location = CGPoint(x: 200, y: 400)
-    canvasViewModel.dropBlockOnCanvas(block: firstBlock)
+    let firstBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
     // A block group is created
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
 
     // Drop second block far to the right of the first block
-    let secondBlock = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks[1])
     let newLocation = CGPoint(
       x: firstBlock.location.x + (3 * CanvasViewModel.blockSize),
       y: firstBlock.location.y - 20)
-    secondBlock.location = newLocation
-    canvasViewModel.dropBlockOnCanvas(block: secondBlock)
+    let secondBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 1, location: newLocation)
 
     // We now have 2 block groups
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
@@ -130,16 +122,12 @@ final class LoopCanvasTests: XCTestCase {
 
   func testDropOnOccupiedSlotDoesNotConnect() throws {
     // Drop the first block on the canvas
-    let firstBlock = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks.first)
-    firstBlock.location = CGPoint(x: 200, y: 400)
-    canvasViewModel.dropBlockOnCanvas(block: firstBlock)
+    let firstBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
 
     // Drop second block to connect to the first
-    let secondBlock = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks[1])
-    secondBlock.location = CGPoint(
-      x: firstBlock.location.x + 20,
-      y: firstBlock.location.y + CanvasViewModel.blockSize + 20)
-    canvasViewModel.dropBlockOnCanvas(block: secondBlock)
+    let secondBlock = try dropLibraryBlockOnCanvas(
+      libraryBlockIndex: 1,
+      location: CGPoint(x: firstBlock.location.x + 20, y: firstBlock.location.y + CanvasViewModel.blockSize + 20))
 
     // We still only have 1 block group
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
@@ -150,12 +138,8 @@ final class LoopCanvasTests: XCTestCase {
       firstBlock.location.y + CanvasViewModel.blockSize + CanvasViewModel.blockSpacing)
 
     // Drop third block just below the current first block, overlapping the second block slot
-    let thirdBlock = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks[2])
-    let thirdBlockLocation = CGPoint(
-      x: firstBlock.location.x,
-      y: firstBlock.location.y + 20)
-    thirdBlock.location = thirdBlockLocation
-    canvasViewModel.dropBlockOnCanvas(block: thirdBlock)
+    let thirdBlockLocation = CGPoint(x: firstBlock.location.x, y: firstBlock.location.y + 20)
+    let thirdBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 2, location: thirdBlockLocation)
 
     // We now have 2 block groups b/c the slot below the first block was occupied
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
@@ -173,23 +157,100 @@ final class LoopCanvasTests: XCTestCase {
     XCTAssertTrue(newBlockGroup.allBlocks.contains(thirdBlock))
 
     // The third block retains its original location and its gridPos is set
-    // TODO - perhaps we should animate the block to a clear area on the canvas?
+    // TODO - perhaps we should animate the block to a location away from the originalBlock group?
     XCTAssertEqual(thirdBlock.location.x, thirdBlockLocation.x)
     XCTAssertEqual(thirdBlock.location.y, thirdBlockLocation.y)
     XCTAssertEqual(thirdBlock.blockGroupGridPosX, 0)
     XCTAssertEqual(thirdBlock.blockGroupGridPosY, 0)
   }
 
-
   func testDisconnectBlockOnCanvasToCreateNewGroup() throws {
+    // Drop the first block on the canvas
+    let firstBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    // A block group is created
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+
+    // Drop second block below and to the right of the first block,
+    // within the slot connecting distance
+    let secondBlock = try dropLibraryBlockOnCanvas(
+      libraryBlockIndex: 1,
+      location: CGPoint(
+        x: firstBlock.location.x + 20,
+        y: firstBlock.location.y + CanvasViewModel.blockSize + 20))
+
+    // We still only have 1 block group
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+
+    // Drag second block away from first block
+    canvasViewModel.updateBlockDragLocation(
+      block: secondBlock,
+      location: CGPoint(
+        x: secondBlock.location.x + CanvasViewModel.blockSize * 3,
+        y: secondBlock.location.y))
+    canvasViewModel.dropBlockOnCanvas(block: secondBlock)
+
+    // We now have 2 block groups
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
+
+    // The second block is nolonger a member of the original block group
+    let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertEqual(origBlockGroup.allBlocks.count, 1)
+    XCTAssertTrue(origBlockGroup.allBlocks.contains(firstBlock))
+    XCTAssertFalse(origBlockGroup.allBlocks.contains(secondBlock))
+
+    // The second block has been added to a new block group
+    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[1])
+    XCTAssertEqual(newBlockGroup.allBlocks.count, 1)
+    XCTAssertTrue(newBlockGroup.allBlocks.contains(secondBlock))
   }
 
   func testDisconnectBlockOnCanvasToAddToExistingGroup() throws {
+    // Drop two blocks on different areas of the canvas
+    let firstBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 0, location: CGPoint(x: 100, y: 100))
+    let secondBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 1, location: CGPoint(x: 300, y: 500))
+
+    // We now have 2 block groups
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
+
+    // Drop third block just below the current first block, overlapping the second block slot
+    let thirdBlockLocation = CGPoint(x: firstBlock.location.x, y: firstBlock.location.y + 20)
+    let thirdBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 2, location: thirdBlockLocation)
+
+    // We still have 2 block groups
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
+    let firstBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[0])
+    let secondBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[1])
+
+    // The first and third block are in the first group, the second block is in its own group
+    XCTAssertTrue(firstBlockGroup.allBlocks.contains(firstBlock))
+    XCTAssertTrue(firstBlockGroup.allBlocks.contains(thirdBlock))
+    XCTAssertTrue(secondBlockGroup.allBlocks.contains(secondBlock))
+    XCTAssertFalse(secondBlockGroup.allBlocks.contains(thirdBlock))
+
+    // Drag the third block next to the second block
+    canvasViewModel.updateBlockDragLocation(
+      block: thirdBlock,
+      location: CGPoint(x: secondBlock.location.x + 20, y: secondBlock.location.y))
+    canvasViewModel.dropBlockOnCanvas(block: thirdBlock)
+
+    // Now the only the first block is in the first group,
+    // and the second block and third blocks are in the second group
+    XCTAssertTrue(firstBlockGroup.allBlocks.contains(firstBlock))
+    XCTAssertFalse(firstBlockGroup.allBlocks.contains(thirdBlock))
+    XCTAssertTrue(secondBlockGroup.allBlocks.contains(secondBlock))
+    XCTAssertTrue(secondBlockGroup.allBlocks.contains(thirdBlock))
   }
 
   func testDeleteBlockFromExistingGroup() throws {
   }
 
   func testDeleteGroup() throws {
+  }
+
+  func dropLibraryBlockOnCanvas(libraryBlockIndex: Int, location: CGPoint) throws -> Block {
+    let block = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks[libraryBlockIndex])
+    canvasViewModel.updateBlockDragLocation(block: block, location: location)
+    canvasViewModel.dropBlockOnCanvas(block: block)
+    return block
   }
 }

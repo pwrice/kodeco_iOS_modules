@@ -32,7 +32,7 @@ struct CanvasView: View {
         var newLocation = dragStartLocation ?? block.location
         newLocation.x += value.translation.width
         newLocation.y += value.translation.height
-        block.location = newLocation
+        viewModel.updateBlockDragLocation(block: block, location: newLocation)
       }
       .onEnded { _ in
         viewModel.dropBlockOnCanvas(block: block)
@@ -43,21 +43,12 @@ struct CanvasView: View {
     ZStack {
       BackgroundView(viewModel: viewModel)
       ZStack {
-        ForEach(viewModel.canvasModel.library.blocks) { blockModel in
+        ForEach(viewModel.allBlocks) { blockModel in
           BlockView(model: blockModel)
             .gesture(
               blockDragGesture(block: blockModel)
                 .simultaneously(with: fingerDragGesture)
             )
-        }
-        ForEach(viewModel.canvasModel.blocksGroups) { blockGroup in
-          ForEach(blockGroup.allBlocks) { blockModel in
-            BlockView(model: blockModel)
-              .gesture(
-                blockDragGesture(block: blockModel)
-                  .simultaneously(with: fingerDragGesture)
-              )
-          }
         }
       }
       if let fingerLocation = fingerLocation {
