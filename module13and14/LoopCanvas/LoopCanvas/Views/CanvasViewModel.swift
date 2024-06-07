@@ -44,8 +44,12 @@ class CanvasViewModel: ObservableObject {
     block.dragging = true
     if let blockGroup = block.blockGroup {
       blockGroup.removeBlock(block: block)
+      if blockGroup.allBlocks.isEmpty {
+        canvasModel.blocksGroups.removeAll(where: { $0.id == blockGroup.id })
+      }
     }
     draggingBlock = block
+    canvasModel.library.blocks.removeAll { $0.id == block.id }
     updateAllBlocksList()
   }
 
@@ -119,9 +123,16 @@ class CanvasViewModel: ObservableObject {
     }
 
     if !blockAddedToGroup {
-      canvasModel.addBlockGroup(initialBlock: block)
+      if block.location.y > canvasModel.library.libaryFrame.minY + CanvasViewModel.blockSize / 2 {
+        // If the block is re-dropped on the library, delete it.
+        // Right now we dont need to do anything as the block is
+        // not a member of a group and has been removed from the library,
+        // and draggingBlock = nil so the block should simply disappear.
+      } else {
+        canvasModel.addBlockGroup(initialBlock: block)
+      }
     }
-    canvasModel.library.blocks.removeAll { $0.id == block.id }
+
 
     // regardless, add a new block to the open library slot
     for librarySlotLocation in canvasModel.library.librarySlotLocations {

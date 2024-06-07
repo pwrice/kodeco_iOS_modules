@@ -242,9 +242,56 @@ final class LoopCanvasTests: XCTestCase {
   }
 
   func testDeleteBlockFromExistingGroup() throws {
+    // Drop two blocks on canvas to connect them
+    let firstBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    let secondBlock = try dropLibraryBlockOnCanvas(
+      libraryBlockIndex: 1,
+      location: CGPoint(
+        x: firstBlock.location.x + 20,
+        y: firstBlock.location.y + CanvasViewModel.blockSize + 20))
+
+    // We have 1 block group and both blocks are members
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let blockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertEqual(blockGroup.allBlocks.count, 2)
+    XCTAssertTrue(blockGroup.allBlocks.contains(firstBlock))
+    XCTAssertTrue(blockGroup.allBlocks.contains(secondBlock))
+
+    // Drag the second block down over the library
+    canvasViewModel.updateBlockDragLocation(
+      block: secondBlock,
+      location: CGPoint(
+        x: secondBlock.location.x,
+        y: canvasViewModel.canvasModel.library.libaryFrame.minY + CanvasViewModel.blockSize + 20))
+    canvasViewModel.dropBlockOnCanvas(block: secondBlock)
+
+    // Now the only the first block is in the first group,
+    // and the second block is gone
+    XCTAssertTrue(blockGroup.allBlocks.contains(firstBlock))
+    XCTAssertFalse(blockGroup.allBlocks.contains(secondBlock))
+    XCTAssertFalse(canvasViewModel.allBlocks.contains(secondBlock))
   }
 
   func testDeleteGroup() throws {
+    let firstBlock = try dropLibraryBlockOnCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+
+    // We have 1 block group and both blocks are members
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let blockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertEqual(blockGroup.allBlocks.count, 1)
+    XCTAssertTrue(blockGroup.allBlocks.contains(firstBlock))
+
+    // Drag the second block down over the library
+    canvasViewModel.updateBlockDragLocation(
+      block: firstBlock,
+      location: CGPoint(
+        x: firstBlock.location.x,
+        y: canvasViewModel.canvasModel.library.libaryFrame.minY + CanvasViewModel.blockSize + 20))
+    canvasViewModel.dropBlockOnCanvas(block: firstBlock)
+
+    // Now the block group is gone and the firstBlock nolonger appears on the canvas
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 0)
+    XCTAssertFalse(canvasViewModel.allBlocks.contains(firstBlock))
   }
 
   func dropLibraryBlockOnCanvas(libraryBlockIndex: Int, location: CGPoint) throws -> Block {

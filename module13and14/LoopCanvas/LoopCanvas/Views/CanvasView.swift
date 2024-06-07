@@ -116,6 +116,15 @@ struct LibraryView: View {
     }
     .padding()
     .background(Color.mint)
+    .overlay(GeometryReader { metrics in
+      ZStack {
+        Spacer()
+      }
+      .onAppear {
+        viewModel.canvasModel.library.libaryFrame = metrics.frame(in: .named("CanvasViewCoorindateSpace"))
+      }
+    }
+    )
   }
 }
 
@@ -142,8 +151,8 @@ struct LibrarySlotView: View {
 struct CanvasView_Previews: PreviewProvider {
   static var previews: some View {
     CanvasView(
-    viewModel: CanvasViewModel(
-      canvasModel: CanvasModel()))
+      viewModel: CanvasViewModel(
+        canvasModel: CanvasModel()))
   }
 }
 

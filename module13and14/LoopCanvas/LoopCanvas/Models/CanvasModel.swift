@@ -49,6 +49,16 @@ class BlockGroup: ObservableObject, Identifiable {
   @Published var id: Int
   var allBlocks: [Block] = []
   var currentBlockGridXIndex = 0
+  var isEmpty: Bool {
+    allBlocks.isEmpty
+  }
+
+  static var blockGroupIdCounter: Int = 0
+  static func getNextBlockGroupId() -> Int {
+    let id = blockGroupIdCounter
+    blockGroupIdCounter += 1
+    return id
+  }
 
   init() {
     id = 0
@@ -58,6 +68,7 @@ class BlockGroup: ObservableObject, Identifiable {
     self.id = id
     block.blockGroupGridPosX = 0
     block.blockGroupGridPosY = 0
+    block.blockGroup = self
     allBlocks.append(block)
   }
 
@@ -79,6 +90,7 @@ class BlockGroup: ObservableObject, Identifiable {
 class BlockLibrary: ObservableObject {
   @Published var blocks: [Block]
   @Published var librarySlotLocations: [CGPoint]
+  @Published var libaryFrame: CGRect
 
 
   init() {
@@ -111,11 +123,15 @@ class BlockLibrary: ObservableObject {
       CGPoint(x: 250, y: 150),
       CGPoint(x: 350, y: 150)
     ]
+    // this will be reset by the geometry reader
+    self.libaryFrame = CGRect(x: 0, y: 800, width: 400, height: 200)
   }
 
   init(blocks: [Block]) {
     self.blocks = blocks
     self.librarySlotLocations = blocks.map { $0.location }
+    // this will be reset by the geometry reader
+    self.libaryFrame = CGRect(x: 0, y: 800, width: 400, height: 200)
   }
 
   func syncBlockLocationsWithSlots() {
@@ -135,6 +151,9 @@ class CanvasModel: ObservableObject {
   }
 
   func addBlockGroup(initialBlock: Block) {
-    blocksGroups.append(BlockGroup(id: blocksGroups.count, block: initialBlock))
+    blocksGroups.append(BlockGroup(id: BlockGroup.getNextBlockGroupId(), block: initialBlock))
+  }
+  func removeBlockGroup(blockGroup: BlockGroup) {
+    blocksGroups.removeAll(where: { $0.id == blockGroup.id })
   }
 }
