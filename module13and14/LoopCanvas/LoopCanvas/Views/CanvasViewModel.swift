@@ -24,7 +24,7 @@ class CanvasViewModel: ObservableObject {
 
   private func updateAllBlocksList() {
     var newAllBlocksList = canvasModel.blocksGroups.flatMap { $0.allBlocks }
-    + canvasModel.library.blocks
+    + canvasModel.library.allBlocks
     + [draggingBlock].compactMap { $0 }
     // TODO - use set to make this unique by block id
 
@@ -45,11 +45,11 @@ class CanvasViewModel: ObservableObject {
     if let blockGroup = block.blockGroup {
       blockGroup.removeBlock(block: block)
       if blockGroup.allBlocks.isEmpty {
-        canvasModel.blocksGroups.removeAll(where: { $0.id == blockGroup.id })
+        canvasModel.blocksGroups.removeAll { $0.id == blockGroup.id }
       }
     }
     draggingBlock = block
-    canvasModel.library.blocks.removeAll { $0.id == block.id }
+    canvasModel.library.allBlocks.removeAll { $0.id == block.id }
     updateAllBlocksList()
   }
 
@@ -136,14 +136,13 @@ class CanvasViewModel: ObservableObject {
 
     // regardless, add a new block to the open library slot
     for librarySlotLocation in canvasModel.library.librarySlotLocations {
-      let blockInLibarySlot = canvasModel.library.blocks.first { maybeBlock in
+      let blockInLibarySlot = canvasModel.library.allBlocks.first { maybeBlock in
         maybeBlock.id != block.id && maybeBlock.location == librarySlotLocation
       }
       if blockInLibarySlot == nil {
-        canvasModel.library.blocks.append(
+        canvasModel.library.allBlocks.append(
           Block(
             id: Block.getNextBlockId(),
-            index: 0,
             location: librarySlotLocation,
             color: block.color,
             visible: true

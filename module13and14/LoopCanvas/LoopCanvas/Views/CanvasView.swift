@@ -62,6 +62,7 @@ struct CanvasView: View {
     .onAppear {
       // Defer setting block location till layout pass updates librarySlotLocations
       Task {
+        viewModel.canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
         viewModel.canvasModel.library.syncBlockLocationsWithSlots()
       }
     }

@@ -13,20 +13,33 @@ final class LoopCanvasTests: XCTestCase {
 
   override func setUpWithError() throws {
     canvasViewModel = CanvasViewModel(canvasModel: CanvasModel())
+    canvasViewModel.canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
     canvasViewModel.canvasModel.library.syncBlockLocationsWithSlots()
   }
 
-  func testEmptyState() throws {
+  func testEmptyCanvasState() throws {
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 0)
-    XCTAssertEqual(canvasViewModel.canvasModel.library.blocks.count, 4)
-    for libraryBlock in canvasViewModel.canvasModel.library.blocks {
+    XCTAssertEqual(canvasViewModel.allBlocks.count, 0)
+    XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 4)
+  }
+
+  func testLibraryInitialState() throws {
+    XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 4)
+    for libraryBlock in canvasViewModel.canvasModel.library.allBlocks {
       XCTAssertNil(libraryBlock.blockGroupGridPosX)
       XCTAssertNil(libraryBlock.blockGroupGridPosY)
+      XCTAssertNotNil(libraryBlock.loopURL)
     }
+
+    XCTAssertEqual(canvasViewModel.canvasModel.library.categories.count, 5)
+    let firstCategory = try! XCTUnwrap(canvasViewModel.canvasModel.library.categories.first)
+    XCTAssertEqual(firstCategory.name, "Perc")
+    XCTAssertEqual(firstCategory.blocks.count, 6)
+    XCTAssertEqual(firstCategory.color, .pink)
   }
 
   func testDropFirstBlockOnCanvas() throws {
-    let blockToDrag = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks.first)
+    let blockToDrag = try XCTUnwrap(canvasViewModel.canvasModel.library.allBlocks.first)
 
     // Drag the block to 200, 400 on the canvas
     canvasViewModel.updateBlockDragLocation(
@@ -49,8 +62,8 @@ final class LoopCanvasTests: XCTestCase {
 
     // The library is replenished w/ another block in the empty slot,
     // which does not contain the dropped block
-    XCTAssertEqual(canvasViewModel.canvasModel.library.blocks.count, 4)
-    XCTAssertFalse(canvasViewModel.canvasModel.library.blocks.contains(blockToDrag))
+    XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 4)
+    XCTAssertFalse(canvasViewModel.canvasModel.library.allBlocks.contains(blockToDrag))
   }
 
   func testDropSecondBlockOnCanvasToConnect() throws {
@@ -295,7 +308,7 @@ final class LoopCanvasTests: XCTestCase {
   }
 
   func dropLibraryBlockOnCanvas(libraryBlockIndex: Int, location: CGPoint) throws -> Block {
-    let block = try XCTUnwrap(canvasViewModel.canvasModel.library.blocks[libraryBlockIndex])
+    let block = try XCTUnwrap(canvasViewModel.canvasModel.library.allBlocks[libraryBlockIndex])
     canvasViewModel.updateBlockDragLocation(block: block, location: location)
     canvasViewModel.dropBlockOnCanvas(block: block)
     return block
