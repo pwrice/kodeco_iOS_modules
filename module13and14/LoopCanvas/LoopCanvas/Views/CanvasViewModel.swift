@@ -22,15 +22,10 @@ class CanvasViewModel: ObservableObject {
     self.updateAllBlocksList()
   }
 
-  private func updateAllBlocksList() {
-    var newAllBlocksList = canvasModel.blocksGroups.flatMap { $0.allBlocks }
-    + canvasModel.library.allBlocks
-    + [draggingBlock].compactMap { $0 }
-    // TODO - use set to make this unique by block id
-
-    // Need to keep them consistantly sorted so SwiftUI views have continuity
-    newAllBlocksList.sort { $0.id > $1.id }
-    allBlocks = newAllBlocksList
+  func onViewAppear() {
+    canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
+    canvasModel.library.syncBlockLocationsWithSlots()
+    updateAllBlocksList()
   }
 
   func updateBlockDragLocation(block: Block, location: CGPoint) {
@@ -152,5 +147,16 @@ class CanvasViewModel: ObservableObject {
     }
 
     updateAllBlocksList()
+  }
+
+  func updateAllBlocksList() {
+    var newAllBlocksList = canvasModel.blocksGroups.flatMap { $0.allBlocks }
+    + canvasModel.library.allBlocks
+    + [draggingBlock].compactMap { $0 }
+    // TODO - use set to make this unique by block id
+
+    // Need to keep them consistantly sorted so SwiftUI views have continuity
+    newAllBlocksList.sort { $0.id > $1.id }
+    allBlocks = newAllBlocksList
   }
 }

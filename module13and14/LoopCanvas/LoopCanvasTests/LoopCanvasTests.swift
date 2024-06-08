@@ -15,11 +15,12 @@ final class LoopCanvasTests: XCTestCase {
     canvasViewModel = CanvasViewModel(canvasModel: CanvasModel())
     canvasViewModel.canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
     canvasViewModel.canvasModel.library.syncBlockLocationsWithSlots()
+    canvasViewModel.updateAllBlocksList()
   }
 
   func testEmptyCanvasState() throws {
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 0)
-    XCTAssertEqual(canvasViewModel.allBlocks.count, 0)
+    XCTAssertEqual(canvasViewModel.allBlocks.count, 4)
     XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 4)
   }
 
@@ -32,7 +33,7 @@ final class LoopCanvasTests: XCTestCase {
     }
 
     XCTAssertEqual(canvasViewModel.canvasModel.library.categories.count, 5)
-    let firstCategory = try! XCTUnwrap(canvasViewModel.canvasModel.library.categories.first)
+    let firstCategory = try XCTUnwrap(canvasViewModel.canvasModel.library.categories.first)
     XCTAssertEqual(firstCategory.name, "Perc")
     XCTAssertEqual(firstCategory.blocks.count, 6)
     XCTAssertEqual(firstCategory.color, .pink)
