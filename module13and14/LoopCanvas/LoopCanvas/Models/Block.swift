@@ -15,10 +15,17 @@ class Block: ObservableObject, Identifiable {
   @Published var visible = true
   @Published var dragging = false
 
+  let normalColor: Color
+  let highlightColor: Color = .yellow
+
+  var isPlaying = false
+
   var blockGroupGridPosX: Int?
   var blockGroupGridPosY: Int?
+
   weak var blockGroup: BlockGroup?
 
+  var loopPlayer: LoopPlayer?
   var loopURL: URL?
 
   static var blockIdCounter: Int = 0
@@ -28,12 +35,21 @@ class Block: ObservableObject, Identifiable {
     return blockId
   }
 
-  init(id: Int, location: CGPoint, color: Color, visible: Bool = false, loopFile: URL? = nil) {
+  init(id: Int, location: CGPoint, color: Color, visible: Bool = false, loopURL: URL? = nil) {
     self.id = id
     self.location = location
     self.color = color
+    self.normalColor = color
     self.visible = visible
-    self.loopURL = loopFile
+    self.loopURL = loopURL
+  }
+
+  func tick(step16: Int) {
+    if step16 % 4 == 0 && isPlaying {
+      color = highlightColor
+    } else if color != normalColor {
+      color = normalColor
+    }
   }
 }
 

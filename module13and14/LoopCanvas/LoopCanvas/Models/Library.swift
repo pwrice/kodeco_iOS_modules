@@ -12,7 +12,7 @@ import SwiftUI
 class Category: ObservableObject {
   let name: String
 
-  static var colorRange: [Color] = [.pink, .purple, .indigo, .yellow, .orange, .blue, .cyan, .green]
+  static var colorRange: [Color] = [.pink, .purple, .indigo, .orange, .blue, .cyan, .green]
   var color: Color
 
   var blocks: [Block]
@@ -30,7 +30,7 @@ class Library: ObservableObject {
   @Published var libaryFrame: CGRect
 
   var categories: [Category] = []
-  let maxCategories = 4
+  let maxCategories = 7
 
   let samplesDirectory = "Samples/"
 
@@ -97,25 +97,29 @@ class Library: ObservableObject {
             id: Block.getNextBlockId(),
             location: CGPoint(x: 0, y: 0),
             color: categoryColor,
-            loopFile: URL(fileURLWithPath: sampleFile, relativeTo: categoryDirectoryURL)
+            loopURL: URL(fileURLWithPath: sampleFile, relativeTo: categoryDirectoryURL)
           )
           blocks.append(block)
         }
-
         let category = Category(name: categoryFolderName, color: categoryColor, blocks: blocks)
         categories.append(category)
       }
 
       // for now just loading the first block of a few categories
       var categoryBlocksToShow: [Block] = []
-      for category in categories {
-        if categoryBlocksToShow.count >= maxCategories {
-          break
-        }
-        if let firstCategoryBlock = category.blocks.first {
-          categoryBlocksToShow.append(firstCategoryBlock)
-        }
+      if let drumsCategory = categories.first(where: { $0.name == "Drums" }) {
+        categoryBlocksToShow.append(drumsCategory.blocks[0])
       }
+      if let keysCategory = categories.first(where: { $0.name == "Bass" }) {
+        categoryBlocksToShow.append(keysCategory.blocks[1])
+      }
+      if let guitarsCategory = categories.first(where: { $0.name == "Guitars" }) {
+        categoryBlocksToShow.append(guitarsCategory.blocks[5])
+      }
+      if let percCategory = categories.first(where: { $0.name == "Perc" }) {
+        categoryBlocksToShow.append(percCategory.blocks[0])
+      }
+
       allBlocks = categoryBlocksToShow
     } catch {
       print(error)

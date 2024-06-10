@@ -20,6 +20,7 @@ MVP Features:
 - the blocks animate into place when connected
 - individual blocks can be selected and deleted (or muted) with popup contextual menu
 
+
   Block Group Operations
     - groups of blocks can be moved, cloned, muted, or deleted 
     - need some sort of contextual block group handle

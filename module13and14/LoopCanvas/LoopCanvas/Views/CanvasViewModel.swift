@@ -8,6 +8,8 @@
 import Foundation
 
 class CanvasViewModel: ObservableObject {
+  let musicEngine: MusicEngine
+
   @Published var canvasModel: CanvasModel
   @Published var allBlocks: [Block]
 
@@ -16,9 +18,14 @@ class CanvasViewModel: ObservableObject {
   static let blockSize: CGFloat = 70.0
   static let blockSpacing: CGFloat = 10.0
 
+
   init(canvasModel: CanvasModel) {
+    musicEngine = MusicEngine()
     self.canvasModel = canvasModel
     self.allBlocks = []
+    self.canvasModel.musicEngine = musicEngine
+    musicEngine.delegate = canvasModel
+
     self.updateAllBlocksList()
   }
 
@@ -26,6 +33,9 @@ class CanvasViewModel: ObservableObject {
     canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
     canvasModel.library.syncBlockLocationsWithSlots()
     updateAllBlocksList()
+
+    musicEngine.initializeEngine()
+    musicEngine.play()
   }
 
   func updateBlockDragLocation(block: Block, location: CGPoint) {
@@ -140,7 +150,8 @@ class CanvasViewModel: ObservableObject {
             id: Block.getNextBlockId(),
             location: librarySlotLocation,
             color: block.color,
-            visible: true
+            visible: true,
+            loopURL: block.loopURL
           ))
         break
       }

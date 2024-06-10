@@ -60,8 +60,8 @@ struct CanvasView: View {
     }
     .coordinateSpace(name: "CanvasViewCoorindateSpace")
     .onAppear {
-      // Defer setting block location till layout pass updates librarySlotLocations
       Task {
+        // Defer setting block location till layout pass updates librarySlotLocations
         viewModel.onViewAppear()
       }
     }

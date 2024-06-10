@@ -19,6 +19,7 @@
 		C1B564C62C0D243E002FDDD4 /* CanvasModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B564C42C0D243E002FDDD4 /* CanvasModel.swift */; };
 		C1B564C82C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */; };
 		C1B564C92C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */; };
+		C1B9BD0B2C14CA2C0030B733 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = C1B9BD0A2C14CA2C0030B733 /* AudioKit */; };
 		C1F5EEA22C133A4900298B00 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEA12C133A4900298B00 /* Library.swift */; };
 		C1F5EEA32C133AAE00298B00 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEA12C133A4900298B00 /* Library.swift */; };
 		C1F5EEE22C13446300298B00 /* Samples in Resources */ = {isa = PBXBuildFile; fileRef = C1F5EEE12C13446300298B00 /* Samples */; };
@@ -27,6 +28,8 @@
 		C1F5EEE62C14AE6F00298B00 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEE42C14AE6F00298B00 /* Block.swift */; };
 		C1F5EEE82C14AE9400298B00 /* BlockGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEE72C14AE9400298B00 /* BlockGroup.swift */; };
 		C1F5EEE92C14AE9400298B00 /* BlockGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEE72C14AE9400298B00 /* BlockGroup.swift */; };
+		C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */; };
+		C1F5EEED2C14C64100298B00 /* MusicEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +116,7 @@
 		C1F5EEE12C13446300298B00 /* Samples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Samples; sourceTree = "<group>"; };
 		C1F5EEE42C14AE6F00298B00 /* Block.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
 		C1F5EEE72C14AE9400298B00 /* BlockGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroup.swift; sourceTree = "<group>"; };
+		C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicEngine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +124,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1B9BD0B2C14CA2C0030B733 /* AudioKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,6 +169,7 @@
 		C19D85472C08AE5900477545 /* LoopCanvas */ = {
 			isa = PBXGroup;
 			children = (
+				C1F5EEEA2C14C62500298B00 /* Music */,
 				C1F5EE372C1337BE00298B00 /* Resources */,
 				C1B564C22C0CC77A002FDDD4 /* Info.plist */,
 				C19D85752C08AF2B00477545 /* App */,
@@ -357,6 +363,14 @@
 			path = LoopCanvas/Resources/Samples;
 			sourceTree = "<group>";
 		};
+		C1F5EEEA2C14C62500298B00 /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */,
+			);
+			path = Music;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -374,6 +388,9 @@
 			dependencies = (
 			);
 			name = LoopCanvas;
+			packageProductDependencies = (
+				C1B9BD0A2C14CA2C0030B733 /* AudioKit */,
+			);
 			productName = LoopCanvas;
 			productReference = C19D85452C08AE5900477545 /* LoopCanvas.app */;
 			productType = "com.apple.product-type.application";
@@ -446,6 +463,9 @@
 				Base,
 			);
 			mainGroup = C19D853C2C08AE5900477545;
+			packageReferences = (
+				C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */,
+			);
 			productRefGroup = C19D85462C08AE5900477545 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -519,6 +539,7 @@
 				C1B564C52C0D243E002FDDD4 /* CanvasModel.swift in Sources */,
 				C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */,
 				C19D85772C08B00C00477545 /* CanvasView.swift in Sources */,
+				C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */,
 				C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -533,6 +554,7 @@
 				C1B564C92C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */,
 				C1F5EEA32C133AAE00298B00 /* Library.swift in Sources */,
 				C1F5EEE92C14AE9400298B00 /* BlockGroup.swift in Sources */,
+				C1F5EEED2C14C64100298B00 /* MusicEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -856,6 +878,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C1B9BD0A2C14CA2C0030B733 /* AudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */;
+			productName = AudioKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C19D853D2C08AE5900477545 /* Project object */;
 }
