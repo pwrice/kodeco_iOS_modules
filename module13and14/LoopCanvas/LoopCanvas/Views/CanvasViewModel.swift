@@ -19,8 +19,8 @@ class CanvasViewModel: ObservableObject {
   static let blockSpacing: CGFloat = 10.0
 
 
-  init(canvasModel: CanvasModel) {
-    musicEngine = MusicEngine()
+  init(canvasModel: CanvasModel, musicEngine: MusicEngine) {
+    self.musicEngine = musicEngine // AudioKitMusicEngine()
     self.canvasModel = canvasModel
     self.allBlocks = []
     self.canvasModel.musicEngine = musicEngine

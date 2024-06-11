@@ -10,9 +10,11 @@ import XCTest
 
 final class LoopCanvasTests: XCTestCase {
   var canvasViewModel: CanvasViewModel!
+  var musicEngine: MockMusicEngine!
 
   override func setUpWithError() throws {
-    canvasViewModel = CanvasViewModel(canvasModel: CanvasModel())
+    musicEngine = MockMusicEngine()
+    canvasViewModel = CanvasViewModel(canvasModel: CanvasModel(), musicEngine: musicEngine)
     canvasViewModel.canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
     canvasViewModel.canvasModel.library.syncBlockLocationsWithSlots()
     canvasViewModel.updateAllBlocksList()
@@ -32,7 +34,7 @@ final class LoopCanvasTests: XCTestCase {
       XCTAssertNotNil(libraryBlock.loopURL)
     }
 
-    XCTAssertEqual(canvasViewModel.canvasModel.library.categories.count, 5)
+    XCTAssertEqual(canvasViewModel.canvasModel.library.categories.count, 7)
     let firstCategory = try XCTUnwrap(canvasViewModel.canvasModel.library.categories.first)
     XCTAssertEqual(firstCategory.name, "Perc")
     XCTAssertEqual(firstCategory.blocks.count, 6)

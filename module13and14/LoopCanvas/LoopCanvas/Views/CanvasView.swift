@@ -152,7 +152,9 @@ struct CanvasView_Previews: PreviewProvider {
   static var previews: some View {
     CanvasView(
       viewModel: CanvasViewModel(
-        canvasModel: CanvasModel()))
+        canvasModel: CanvasModel(),
+        musicEngine: MockMusicEngine()
+      ))
   }
 }
 

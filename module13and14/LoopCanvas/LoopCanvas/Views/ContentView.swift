@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
   @StateObject var canvasViewModel = CanvasViewModel(
-    canvasModel: CanvasModel())
+    canvasModel: CanvasModel(), musicEngine: AudioKitMusicEngine())
   var body: some View {
     CanvasView(viewModel: canvasViewModel)
   }
