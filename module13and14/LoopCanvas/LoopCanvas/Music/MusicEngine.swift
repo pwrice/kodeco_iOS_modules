@@ -66,6 +66,39 @@ class BaseMusicEngine {
   let numLoopPlayers = 16
   weak var delegate: MusicEngineDelegate?
 
+  func processClickTrackNote(clickTrackPosition: Duration) {
+    let current16thNote = clickTrackPosition.beats * 4
+    let current16thNoteInOneBar = Int(current16thNote) % 16
+
+    if let delegate = delegate {
+      delegate.tick(step16: current16thNoteInOneBar)
+    }
+
+    if current16thNoteInOneBar == nextBarLogicTick {
+        // TODO - figure out how to handle start / stop / looping more gracefully
+        for loopPlayer in loopPlayers where loopPlayer.loopPlaying {
+          if let audioPlayer = loopPlayer.audioPlayer, audioPlayer.isPlaying != true {
+            let lastBarBeat0 = Int(floor(clickTrackPosition.beats / 4)) * 4
+            let nextBarBeat0 = lastBarBeat0 + 4
+            scheduleAudioPlaybackOnClickTrack(audioPlayer: audioPlayer, beat: Double(nextBarBeat0))
+          }
+        }
+    }
+
+    if Int(current16thNoteInOneBar) % 16 == 0 {
+      // TODO - figure out how to handle start / stop / looping more gracefully
+      for loopPlayer in loopPlayers where !loopPlayer.loopPlaying {
+        if let audioPlayer = loopPlayer.audioPlayer, audioPlayer.isPlaying == true {
+          audioPlayer.stop()
+        }
+      }
+    }
+  }
+
+  func scheduleAudioPlaybackOnClickTrack(audioPlayer: AudioPlayer, beat: Double) {
+    print("error - need to override scheduleAudioPlaybackOnClickTrack")
+  }
+
   required init() {
   }
 
@@ -138,42 +171,19 @@ class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
         if let musicEngine = self {
           var relativeDuration = musicEngine.sequencer.currentRelativePosition
           relativeDuration.tempo = musicEngine.tempo
-          let current16thNote = relativeDuration.beats * 4
-          let current16thNoteInOneBar = Int(current16thNote) % 16
-
-          if let delegate = musicEngine.delegate {
-            delegate.tick(step16: current16thNoteInOneBar)
-          }
-
-          if current16thNoteInOneBar == musicEngine.nextBarLogicTick {
-            do {
-              // TODO - figure out how to handle start / stop / looping more gracefully
-              for loopPlayer in musicEngine.loopPlayers where loopPlayer.loopPlaying {
-                if let audioPlayer = loopPlayer.audioPlayer, audioPlayer.isPlaying != true {
-                  var currentPosition = musicEngine.sequencer.currentPosition
-                  currentPosition.tempo = musicEngine.tempo
-                  let lastBarBeat0 = Int(floor(currentPosition.beats / 4)) * 4
-                  let nextBarBeat0 = lastBarBeat0 + 4
-                  let hostTime = try musicEngine.sequencer.hostTime(forBeats: Double(nextBarBeat0))
-                  let avTime = AVAudioTime(hostTime: hostTime)
-                  audioPlayer.play(at: avTime)
-                }
-              }
-            } catch let error {
-              print("clickTrackMidiCallback.callback error: \(error)")
-            }
-          }
-
-          if Int(current16thNoteInOneBar) % 16 == 0 {
-            // TODO - figure out how to handle start / stop / looping more gracefully
-            for loopPlayer in musicEngine.loopPlayers where !loopPlayer.loopPlaying {
-              if let audioPlayer = loopPlayer.audioPlayer, audioPlayer.isPlaying == true {
-                audioPlayer.stop()
-              }
-            }
-          }
+          musicEngine.processClickTrackNote(clickTrackPosition: relativeDuration)
         }
       }
+    }
+  }
+
+  override func scheduleAudioPlaybackOnClickTrack(audioPlayer: AudioPlayer, beat: Double) {
+    do {
+        let hostTime = try sequencer.hostTime(forBeats: Double(beat))
+        let avTime = AVAudioTime(hostTime: hostTime)
+        audioPlayer.play(at: avTime)
+    } catch let error {
+      print("clickTrackMidiCallback.callback error: \(error)")
     }
   }
 
@@ -211,5 +221,8 @@ class MockMusicEngine: BaseMusicEngine, MusicEngine {
   }
 
   func stopEngine() {
+  }
+
+  override func scheduleAudioPlaybackOnClickTrack(audioPlayer: AudioPlayer, beat: Double) {
   }
 }

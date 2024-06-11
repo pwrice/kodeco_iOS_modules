@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C1498E392C18881900118C38 /* CanvasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E382C18881900118C38 /* CanvasModelTests.swift */; };
+		C1498E3B2C18884A00118C38 /* MusicEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E3A2C18884A00118C38 /* MusicEngineTests.swift */; };
 		C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85482C08AE5900477545 /* LoopCanvasApp.swift */; };
 		C19D854B2C08AE5900477545 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D854A2C08AE5900477545 /* ContentView.swift */; };
 		C19D854D2C08AE6500477545 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19D854C2C08AE6500477545 /* Assets.xcassets */; };
 		C19D85502C08AE6500477545 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19D854F2C08AE6500477545 /* Preview Assets.xcassets */; };
-		C19D855A2C08AE6500477545 /* LoopCanvasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85592C08AE6500477545 /* LoopCanvasTests.swift */; };
+		C19D855A2C08AE6500477545 /* CanvasViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85592C08AE6500477545 /* CanvasViewModelTests.swift */; };
 		C19D85642C08AE6500477545 /* LoopCanvasUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */; };
 		C19D85662C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */; };
 		C19D85772C08B00C00477545 /* CanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85762C08B00C00477545 /* CanvasView.swift */; };
@@ -50,13 +52,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C1498E382C18881900118C38 /* CanvasModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasModelTests.swift; sourceTree = "<group>"; };
+		C1498E3A2C18884A00118C38 /* MusicEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicEngineTests.swift; sourceTree = "<group>"; };
 		C19D85452C08AE5900477545 /* LoopCanvas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoopCanvas.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C19D85482C08AE5900477545 /* LoopCanvasApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasApp.swift; sourceTree = "<group>"; };
 		C19D854A2C08AE5900477545 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C19D854C2C08AE6500477545 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C19D854F2C08AE6500477545 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C19D85552C08AE6500477545 /* LoopCanvasTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopCanvasTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C19D85592C08AE6500477545 /* LoopCanvasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasTests.swift; sourceTree = "<group>"; };
+		C19D85592C08AE6500477545 /* CanvasViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasViewModelTests.swift; sourceTree = "<group>"; };
 		C19D855F2C08AE6500477545 /* LoopCanvasUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopCanvasUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasUITests.swift; sourceTree = "<group>"; };
 		C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -192,7 +196,9 @@
 		C19D85582C08AE6500477545 /* LoopCanvasTests */ = {
 			isa = PBXGroup;
 			children = (
-				C19D85592C08AE6500477545 /* LoopCanvasTests.swift */,
+				C19D85592C08AE6500477545 /* CanvasViewModelTests.swift */,
+				C1498E382C18881900118C38 /* CanvasModelTests.swift */,
+				C1498E3A2C18884A00118C38 /* MusicEngineTests.swift */,
 			);
 			path = LoopCanvasTests;
 			sourceTree = "<group>";
@@ -549,8 +555,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1F5EEE62C14AE6F00298B00 /* Block.swift in Sources */,
-				C19D855A2C08AE6500477545 /* LoopCanvasTests.swift in Sources */,
+				C19D855A2C08AE6500477545 /* CanvasViewModelTests.swift in Sources */,
 				C1B564C62C0D243E002FDDD4 /* CanvasModel.swift in Sources */,
+				C1498E392C18881900118C38 /* CanvasModelTests.swift in Sources */,
+				C1498E3B2C18884A00118C38 /* MusicEngineTests.swift in Sources */,
 				C1B564C92C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */,
 				C1F5EEA32C133AAE00298B00 /* Library.swift in Sources */,
 				C1F5EEE92C14AE9400298B00 /* BlockGroup.swift in Sources */,

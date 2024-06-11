@@ -48,13 +48,10 @@ class CanvasViewModel: ObservableObject {
   func startBlockDrag(block: Block) {
     block.dragging = true
     if let blockGroup = block.blockGroup {
-      blockGroup.removeBlock(block: block)
-      if blockGroup.allBlocks.isEmpty {
-        canvasModel.blocksGroups.removeAll { $0.id == blockGroup.id }
-      }
+      canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
     }
     draggingBlock = block
-    canvasModel.library.allBlocks.removeAll { $0.id == block.id }
+    canvasModel.library.removeBlock(block: block)
     updateAllBlocksList()
   }
 
@@ -64,68 +61,7 @@ class CanvasViewModel: ObservableObject {
     block.dragging = false
     draggingBlock = nil
 
-    // Check all slots around all blocks to see if there is a connection
-    let allCanvasBlocks = canvasModel.blocksGroups.flatMap { $0.allBlocks }
-    var blockAddedToGroup = false
-    for blockGroup in canvasModel.blocksGroups {
-      for otherBlock in blockGroup.allBlocks where otherBlock.id != block.id {
-        let slotLocations = [
-          CGPoint( // top
-            x: otherBlock.location.x,
-            y: otherBlock.location.y - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize),
-          CGPoint( // right
-            x: otherBlock.location.x + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
-            y: otherBlock.location.y),
-          CGPoint( // bottom
-            x: otherBlock.location.x,
-            y: otherBlock.location.y + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize),
-          CGPoint( // left
-            x: otherBlock.location.x - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize,
-            y: otherBlock.location.y)
-        ]
-        let slotGridPosOffsets: [(Int, Int)] = [
-          (0, -1),
-          (1, 0),
-          (0, 1),
-          (-1, 0)
-        ]
-        var intersectingSlotGridPosOffset: (Int, Int)?
-        var intersectingSlot: CGPoint?
-        var minDist: CGFloat = 100000000.0
-        for (slotLocation, gridPosOffset) in zip(slotLocations, slotGridPosOffsets) {
-          let diffX = block.location.x - slotLocation.x
-          let diffY = block.location.y - slotLocation.y
-          let dist = diffX * diffX + diffY * diffY
-          if abs(diffX) < CanvasViewModel.blockSize && abs(diffY) < CanvasViewModel.blockSize && dist < minDist {
-            intersectingSlot = slotLocation
-            intersectingSlotGridPosOffset = gridPosOffset
-            minDist = dist
-            break
-          }
-        }
-
-        var availableSlot: CGPoint? = intersectingSlot
-        for otherBlock in allCanvasBlocks where otherBlock.id != block.id {
-          if otherBlock.location == availableSlot {
-            availableSlot = nil
-            break
-          }
-        }
-
-        // if slot is available, snap block there
-        if let availableSlot = availableSlot, let gridPosOffset = intersectingSlotGridPosOffset {
-          block.location = availableSlot
-          let otherBlockGridPosX = otherBlock.blockGroupGridPosX ?? 0
-          let otherBlockGridPosY = otherBlock.blockGroupGridPosY ?? 0
-          blockGroup.addBlock(
-            block: block,
-            gridPosX: otherBlockGridPosX + gridPosOffset.0,
-            gridPosY: otherBlockGridPosY + gridPosOffset.1)
-          blockAddedToGroup = true
-          break
-        }
-      }
-    }
+    let blockAddedToGroup = canvasModel.checkBlockPositionAndAddToAvailableGroup(block: block)
 
     if !blockAddedToGroup {
       if block.location.y > canvasModel.library.libaryFrame.minY + CanvasViewModel.blockSize / 2 {

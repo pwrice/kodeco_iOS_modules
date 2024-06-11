@@ -1,6 +1,6 @@
 //
-//  LoopCanvasTests.swift
-//  LoopCanvasTests
+//  CanvasViewModelTests.swift
+//  CanvasViewModel
 //
 //  Created by Peter Rice on 5/30/24.
 //
@@ -8,7 +8,7 @@
 import XCTest
 @testable import LoopCanvas
 
-final class LoopCanvasTests: XCTestCase {
+final class CanvasViewModelTests: XCTestCase {
   var canvasViewModel: CanvasViewModel!
   var musicEngine: MockMusicEngine!
 

@@ -125,4 +125,8 @@ class Library: ObservableObject {
       print(error)
     }
   }
+
+  func removeBlock(block: Block) {
+    allBlocks.removeAll { $0.id == block.id }
+  }
 }
