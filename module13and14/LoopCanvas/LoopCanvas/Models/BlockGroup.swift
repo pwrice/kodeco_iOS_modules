@@ -7,6 +7,12 @@
 
 import Foundation
 
+struct BlockGroupSlot {
+  let gridPosX: Int
+  let gridPosY: Int
+  let location: CGPoint
+}
+
 class BlockGroup: ObservableObject, Identifiable {
   var musicEngine: MusicEngine?
 

@@ -75,14 +75,14 @@ class BaseMusicEngine {
     }
 
     if current16thNoteInOneBar == nextBarLogicTick {
-        // TODO - figure out how to handle start / stop / looping more gracefully
-        for loopPlayer in loopPlayers where loopPlayer.loopPlaying {
-          if let audioPlayer = loopPlayer.audioPlayer, audioPlayer.isPlaying != true {
-            let lastBarBeat0 = Int(floor(clickTrackPosition.beats / 4)) * 4
-            let nextBarBeat0 = lastBarBeat0 + 4
-            scheduleAudioPlaybackOnClickTrack(audioPlayer: audioPlayer, beat: Double(nextBarBeat0))
-          }
+      // TODO - figure out how to handle start / stop / looping more gracefully
+      for loopPlayer in loopPlayers where loopPlayer.loopPlaying {
+        if let audioPlayer = loopPlayer.audioPlayer, audioPlayer.isPlaying != true {
+          let lastBarBeat0 = Int(floor(clickTrackPosition.beats / 4)) * 4
+          let nextBarBeat0 = lastBarBeat0 + 4
+          scheduleAudioPlaybackOnClickTrack(audioPlayer: audioPlayer, beat: Double(nextBarBeat0))
         }
+      }
     }
 
     if Int(current16thNoteInOneBar) % 16 == 0 {
@@ -179,9 +179,9 @@ class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
 
   override func scheduleAudioPlaybackOnClickTrack(audioPlayer: AudioPlayer, beat: Double) {
     do {
-        let hostTime = try sequencer.hostTime(forBeats: Double(beat))
-        let avTime = AVAudioTime(hostTime: hostTime)
-        audioPlayer.play(at: avTime)
+      let hostTime = try sequencer.hostTime(forBeats: Double(beat))
+      let avTime = AVAudioTime(hostTime: hostTime)
+      audioPlayer.play(at: avTime)
     } catch let error {
       print("clickTrackMidiCallback.callback error: \(error)")
     }
