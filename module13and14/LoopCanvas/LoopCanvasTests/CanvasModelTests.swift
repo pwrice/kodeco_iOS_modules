@@ -40,13 +40,12 @@ final class CanvasModelTests: XCTestCase {
 
     let nextBlock = getSecondTestBlock()
 
-    let slot = BlockGroupSlot(
-      gridPosX: 1,
-      gridPosY: 0,
-      location: CGPoint(
-        x: firstBlock.location.x + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
-        y: firstBlock.location.y)
-    )
+    let slot = SlotPostion.right.getSlot(relativeTo: firstBlock.location)
+    XCTAssertEqual(slot.gridPosX, 1)
+    XCTAssertEqual(slot.gridPosY, 0)
+    XCTAssertEqual(slot.location, CGPoint(
+      x: firstBlock.location.x + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
+      y: firstBlock.location.y))
 
     canvasModel.addBlockToExistingBlockGroup(blockGroup: blockGroup, block: nextBlock, slot: slot)
 
@@ -76,9 +75,8 @@ final class CanvasModelTests: XCTestCase {
     let blockGroup = try XCTUnwrap(canvasModel.blocksGroups.first)
 
     let nextBlock = getSecondTestBlock()
-    nextBlock.location = CGPoint(
-      x: firstBlock.location.x + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
-      y: firstBlock.location.y)
+    let slot = SlotPostion.right.getSlot(relativeTo: firstBlock.location)
+    nextBlock.location = slot.location
 
     let (foundGroup, foundSlot) = try XCTUnwrap(canvasModel.findEligibleSlotForBlock(block: nextBlock))
     XCTAssertEqual(foundGroup.id, blockGroup.id)

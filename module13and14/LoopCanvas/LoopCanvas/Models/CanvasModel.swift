@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 
-
 class CanvasModel: ObservableObject {
   var musicEngine: MusicEngine?
 
@@ -55,57 +54,41 @@ class CanvasModel: ObservableObject {
     let allCanvasBlocks = blocksGroups.flatMap { $0.allBlocks }
     for blockGroup in blocksGroups {
       for otherBlock in blockGroup.allBlocks where otherBlock.id != block.id {
-        let slotLocations = [
-          CGPoint( // top
-            x: otherBlock.location.x,
-            y: otherBlock.location.y - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize),
-          CGPoint( // right
-            x: otherBlock.location.x + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
-            y: otherBlock.location.y),
-          CGPoint( // bottom
-            x: otherBlock.location.x,
-            y: otherBlock.location.y + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize),
-          CGPoint( // left
-            x: otherBlock.location.x - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize,
-            y: otherBlock.location.y)
+        let relativeSlots: [BlockGroupSlot] = [
+          SlotPostion.top.getSlot(relativeTo: otherBlock.location),
+          SlotPostion.right.getSlot(relativeTo: otherBlock.location),
+          SlotPostion.bottom.getSlot(relativeTo: otherBlock.location),
+          SlotPostion.left.getSlot(relativeTo: otherBlock.location)
         ]
-        let slotGridPosOffsets: [(Int, Int)] = [
-          (0, -1),
-          (1, 0),
-          (0, 1),
-          (-1, 0)
-        ]
-        var intersectingSlotGridPosOffset: (Int, Int)?
-        var intersectingSlotLocation: CGPoint?
+        var intersectingSlot: BlockGroupSlot?
         var minDist: CGFloat = 100000000.0
-        for (slotLocation, gridPosOffset) in zip(slotLocations, slotGridPosOffsets) {
-          let diffX = block.location.x - slotLocation.x
-          let diffY = block.location.y - slotLocation.y
+        for slot in relativeSlots {
+          let diffX = block.location.x - slot.location.x
+          let diffY = block.location.y - slot.location.y
           let dist = diffX * diffX + diffY * diffY
           if abs(diffX) < CanvasViewModel.blockSize && abs(diffY) < CanvasViewModel.blockSize && dist < minDist {
-            intersectingSlotLocation = slotLocation
-            intersectingSlotGridPosOffset = gridPosOffset
+            intersectingSlot = slot
             minDist = dist
             break
           }
         }
 
-        var availableSlotLocation: CGPoint? = intersectingSlotLocation
+        var availableSlot: BlockGroupSlot? = intersectingSlot
         for otherBlock in allCanvasBlocks where otherBlock.id != block.id {
-          if otherBlock.location == availableSlotLocation {
-            availableSlotLocation = nil
+          if otherBlock.location == availableSlot?.location {
+            availableSlot = nil
             break
           }
         }
 
         // if slot is available, snap block there
-        if let availableSlot = availableSlotLocation, let gridPosOffset = intersectingSlotGridPosOffset {
+        if let availableSlot = availableSlot {
           let otherBlockGridPosX = otherBlock.blockGroupGridPosX ?? 0
           let otherBlockGridPosY = otherBlock.blockGroupGridPosY ?? 0
-          let newGridPosX = otherBlockGridPosX + gridPosOffset.0
-          let newGridPosY = otherBlockGridPosY + gridPosOffset.1
+          let newGridPosX = otherBlockGridPosX + availableSlot.gridPosX
+          let newGridPosY = otherBlockGridPosY + availableSlot.gridPosY
 
-          return (blockGroup, BlockGroupSlot(gridPosX: newGridPosX, gridPosY: newGridPosY, location: availableSlot))
+          return (blockGroup, BlockGroupSlot(gridPosX: newGridPosX, gridPosY: newGridPosY, location: availableSlot.location))
         }
       }
     }

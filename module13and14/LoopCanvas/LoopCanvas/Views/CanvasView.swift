@@ -40,6 +40,8 @@ struct CanvasView: View {
   }
 
   var body: some View {
+    // Trying to figure out how to scroll the canvas
+    //    ScrollView([.horizontal, .vertical]) {
     ZStack {
       BackgroundView(viewModel: viewModel)
       ZStack {
@@ -58,13 +60,15 @@ struct CanvasView: View {
           .position(fingerLocation)
       }
     }
+    //      .frame(width: 1000, height: 1000)
     .coordinateSpace(name: "CanvasViewCoorindateSpace")
     .onAppear {
       Task {
-        // Defer setting block location till layout pass updates librarySlotLocations
         viewModel.onViewAppear()
       }
     }
+    //    }
+
   }
 }
 

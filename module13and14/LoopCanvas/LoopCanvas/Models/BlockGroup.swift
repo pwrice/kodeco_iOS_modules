@@ -7,6 +7,50 @@
 
 import Foundation
 
+enum SlotPostion {
+  case top
+  case right
+  case bottom
+  case left
+
+  func getSlot(relativeTo block: Block) -> BlockGroupSlot {
+    return getSlot(relativeTo: block.location)
+  }
+
+  func getSlot(relativeTo location: CGPoint) -> BlockGroupSlot {
+    switch self {
+    case .top:
+      return BlockGroupSlot(
+        gridPosX: 0,
+        gridPosY: -1,
+        location: CGPoint(
+          x: location.x,
+          y: location.y - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize))
+    case .right:
+      return BlockGroupSlot(
+        gridPosX: 1,
+        gridPosY: 0,
+        location: CGPoint(
+          x: location.x + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
+          y: location.y))
+    case .bottom:
+      return BlockGroupSlot(
+        gridPosX: 0,
+        gridPosY: 1,
+        location: CGPoint(
+          x: location.x,
+          y: location.y + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize))
+    case .left:
+      return BlockGroupSlot(
+        gridPosX: -1,
+        gridPosY: 0,
+        location: CGPoint(
+          x: location.x - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize,
+          y: location.y))
+    }
+  }
+}
+
 struct BlockGroupSlot {
   let gridPosX: Int
   let gridPosY: Int
@@ -18,7 +62,6 @@ class BlockGroup: ObservableObject, Identifiable {
 
   let id: Int
   var allBlocks: [Block] = []
-  var currentBlockGridXIndex = 0
 
   var currentPlayPosX = 0
 
@@ -45,7 +88,7 @@ class BlockGroup: ObservableObject, Identifiable {
     block.blockGroupGridPosX = 0
     block.blockGroupGridPosY = 0
     block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL)
-    block.isPlaying = true
+    block.isPlaying = false
 
     allBlocks.append(block)
   }
