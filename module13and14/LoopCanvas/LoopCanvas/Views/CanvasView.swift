@@ -10,21 +10,12 @@ import SwiftUI
 
 struct CanvasView: View {
   @StateObject var viewModel: CanvasViewModel
-  @GestureState private var fingerLocation: CGPoint?
 
   // TODO - make work w multi-touch (this assumes just a single drag)
   @GestureState private var dragStartLocation: CGPoint?
 
-  var fingerDragGesture: some Gesture {
-    // Setting minimumDistance: 2 allows the drag gesture to override the scroll behavior for the canvas
-    DragGesture(minimumDistance: 2)
-      .updating($fingerLocation) { value, fingerLocation, _ in
-        fingerLocation = value.location
-      }
-  }
-
   func blockDragGesture(block: Block) -> some Gesture {
-    DragGesture()
+    DragGesture(minimumDistance: 2)
       .updating($dragStartLocation) { _, startLocation, _ in
         // Called before onChanged
         startLocation = startLocation ?? block.location
@@ -50,19 +41,12 @@ struct CanvasView: View {
               BlockView(model: blockModel)
                 .gesture(
                   blockDragGesture(block: blockModel)
-                    .simultaneously(with: fingerDragGesture)
                 )
             }
           }
-          if let fingerLocation = fingerLocation {
-            Circle()
-              .stroke(Color.green, lineWidth: 2)
-              .frame(width: 44, height: 44)
-              .position(fingerLocation)
-          }
           GeometryReader { proxy in
-            let xOffset = proxy.frame(in: .named("scroll")).minX
-            let yOffset = proxy.frame(in: .named("scroll")).minY
+            let xOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minX
+            let yOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minY
             // This prefernces method to calculate the scroll offset
             // seems a bit hacky. Is there a better way?
             Color.clear.preference(
@@ -72,24 +56,23 @@ struct CanvasView: View {
         }
         .frame(width: 1000, height: 1000)
       }
-      .coordinateSpace(name: "scroll")
+      .coordinateSpace(name: "CanvasCoordinateSpace")
       .onPreferenceChange(ViewOffsetKey.self) {
         viewModel.canvasScrollOffset = $0
       }
+      // This view is where the library blocks live
+      // It is not scrollable and coorindates roughly match
+      // global / screen coorindates
       ZStack {
-        // This view is where the library blocks live
-        // It is not scrollable and coorindates roughly match
-        // global / screen coorindates
         ForEach(viewModel.libraryBlocks) { blockModel in
           BlockView(model: blockModel)
             .gesture(
               blockDragGesture(block: blockModel)
-                .simultaneously(with: fingerDragGesture)
             )
         }
       }
     }
-    .coordinateSpace(name: "CanvasViewCoorindateSpace")
+    .coordinateSpace(name: "ViewportCoorindateSpace")
     .onAppear {
       Task {
         viewModel.onViewAppear()
@@ -160,7 +143,7 @@ struct LibraryView: View {
         Spacer()
       }
       .onAppear {
-        viewModel.canvasModel.library.libaryFrame = metrics.frame(in: .named("CanvasViewCoorindateSpace"))
+        viewModel.canvasModel.library.libaryFrame = metrics.frame(in: .named("ViewportCoorindateSpace"))
       }
     }
     )
@@ -177,8 +160,8 @@ struct LibrarySlotView: View {
         .foregroundColor(.gray)
         .onAppear {
           self.librarySlotLocations[index] = CGPoint(
-            x: metrics.frame(in: .named("CanvasViewCoorindateSpace")).midX,
-            y: metrics.frame(in: .named("CanvasViewCoorindateSpace")).midY
+            x: metrics.frame(in: .named("ViewportCoorindateSpace")).midX,
+            y: metrics.frame(in: .named("ViewportCoorindateSpace")).midY
           )
         }
     }
