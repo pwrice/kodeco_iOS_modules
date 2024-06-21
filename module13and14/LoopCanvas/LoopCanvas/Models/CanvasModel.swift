@@ -88,7 +88,10 @@ class CanvasModel: ObservableObject {
           let newGridPosX = otherBlockGridPosX + availableSlot.gridPosX
           let newGridPosY = otherBlockGridPosY + availableSlot.gridPosY
 
-          return (blockGroup, BlockGroupSlot(gridPosX: newGridPosX, gridPosY: newGridPosY, location: availableSlot.location))
+          return (blockGroup, BlockGroupSlot(
+            gridPosX: newGridPosX,
+            gridPosY: newGridPosY,
+            location: availableSlot.location))
         }
       }
     }

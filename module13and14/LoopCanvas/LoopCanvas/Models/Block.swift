@@ -17,14 +17,12 @@ class Block: ObservableObject, Identifiable {
 
   let normalColor: Color
   let highlightColor: Color = .yellow
-
-  var isPlaying = false
-
-  var blockGroupGridPosX: Int?
-  var blockGroupGridPosY: Int?
+  let isLibraryBlock: Bool
 
   weak var blockGroup: BlockGroup?
-
+  var isPlaying = false
+  var blockGroupGridPosX: Int?
+  var blockGroupGridPosY: Int?
   var loopPlayer: LoopPlayer?
   var loopURL: URL?
 
@@ -35,13 +33,14 @@ class Block: ObservableObject, Identifiable {
     return blockId
   }
 
-  init(id: Int, location: CGPoint, color: Color, visible: Bool = false, loopURL: URL? = nil) {
+  init(id: Int, location: CGPoint, color: Color, visible: Bool = false, loopURL: URL? = nil, isLibraryBlock: Bool = false) {
     self.id = id
     self.location = location
     self.color = color
     self.normalColor = color
     self.visible = visible
     self.loopURL = loopURL
+    self.isLibraryBlock = isLibraryBlock
   }
 
   func tick(step16: Int) {

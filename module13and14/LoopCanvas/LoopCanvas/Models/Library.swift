@@ -97,7 +97,8 @@ class Library: ObservableObject {
             id: Block.getNextBlockId(),
             location: CGPoint(x: 0, y: 0),
             color: categoryColor,
-            loopURL: URL(fileURLWithPath: sampleFile, relativeTo: categoryDirectoryURL)
+            loopURL: URL(fileURLWithPath: sampleFile, relativeTo: categoryDirectoryURL),
+            isLibraryBlock: true
           )
           blocks.append(block)
         }

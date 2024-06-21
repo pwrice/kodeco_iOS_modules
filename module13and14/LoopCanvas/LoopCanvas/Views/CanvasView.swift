@@ -16,7 +16,8 @@ struct CanvasView: View {
   @GestureState private var dragStartLocation: CGPoint?
 
   var fingerDragGesture: some Gesture {
-    DragGesture()
+    // Setting minimumDistance: 2 allows the drag gesture to override the scroll behavior for the canvas
+    DragGesture(minimumDistance: 2)
       .updating($fingerLocation) { value, fingerLocation, _ in
         fingerLocation = value.location
       }
@@ -35,17 +36,51 @@ struct CanvasView: View {
         viewModel.updateBlockDragLocation(block: block, location: newLocation)
       }
       .onEnded { _ in
-        viewModel.dropBlockOnCanvas(block: block)
+        _ = viewModel.dropBlockOnCanvas(block: block)
       }
   }
 
   var body: some View {
-    // Trying to figure out how to scroll the canvas
-    //    ScrollView([.horizontal, .vertical]) {
     ZStack {
       BackgroundView(viewModel: viewModel)
+      ScrollView([.horizontal, .vertical]) {
+        ZStack { // This is the full canvas
+          ZStack { // This is just the blocks
+            ForEach(viewModel.allBlocks) { blockModel in
+              BlockView(model: blockModel)
+                .gesture(
+                  blockDragGesture(block: blockModel)
+                    .simultaneously(with: fingerDragGesture)
+                )
+            }
+          }
+          if let fingerLocation = fingerLocation {
+            Circle()
+              .stroke(Color.green, lineWidth: 2)
+              .frame(width: 44, height: 44)
+              .position(fingerLocation)
+          }
+          GeometryReader { proxy in
+            let xOffset = proxy.frame(in: .named("scroll")).minX
+            let yOffset = proxy.frame(in: .named("scroll")).minY
+            // This prefernces method to calculate the scroll offset
+            // seems a bit hacky. Is there a better way?
+            Color.clear.preference(
+              key: ViewOffsetKey.self,
+              value: CGPoint(x: xOffset, y: yOffset))
+          }
+        }
+        .frame(width: 1000, height: 1000)
+      }
+      .coordinateSpace(name: "scroll")
+      .onPreferenceChange(ViewOffsetKey.self) {
+        viewModel.canvasScrollOffset = $0
+      }
       ZStack {
-        ForEach(viewModel.allBlocks) { blockModel in
+        // This view is where the library blocks live
+        // It is not scrollable and coorindates roughly match
+        // global / screen coorindates
+        ForEach(viewModel.libraryBlocks) { blockModel in
           BlockView(model: blockModel)
             .gesture(
               blockDragGesture(block: blockModel)
@@ -53,22 +88,22 @@ struct CanvasView: View {
             )
         }
       }
-      if let fingerLocation = fingerLocation {
-        Circle()
-          .stroke(Color.green, lineWidth: 2)
-          .frame(width: 44, height: 44)
-          .position(fingerLocation)
-      }
     }
-    //      .frame(width: 1000, height: 1000)
     .coordinateSpace(name: "CanvasViewCoorindateSpace")
     .onAppear {
       Task {
         viewModel.onViewAppear()
       }
     }
-    //    }
+  }
+}
 
+struct ViewOffsetKey: PreferenceKey {
+  typealias Value = CGPoint
+  static var defaultValue = CGPoint(x: CGFloat.zero, y: CGFloat.zero)
+  static func reduce(value: inout Value, nextValue: () -> Value) {
+    let next = nextValue()
+    value = CGPoint(x: value.x + next.x, y: value.y + next.y)  // value += nextValue()
   }
 }
 
