@@ -13,15 +13,19 @@ class CanvasViewModel: ObservableObject {
   @Published var canvasModel: CanvasModel
   @Published var allBlocks: [Block]
   @Published var libraryBlocks: [Block]
+  @Published var selectedCategoryName: String = ""
 
   var draggingBlock: Block?
   var canvasScrollOffset = CGPoint(x: 0, y: 0)
 
   static let blockSize: CGFloat = 70.0
   static let blockSpacing: CGFloat = 10.0
+  static let canvasWidth: CGFloat = 1000.0
+  static let canvasHeight: CGFloat = 1000.0
+
 
   init(canvasModel: CanvasModel, musicEngine: MusicEngine) {
-    self.musicEngine = musicEngine // AudioKitMusicEngine()
+    self.musicEngine = musicEngine
     self.canvasModel = canvasModel
     self.allBlocks = []
     self.libraryBlocks = []
@@ -34,6 +38,7 @@ class CanvasViewModel: ObservableObject {
   func onViewAppear() {
     canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
     canvasModel.library.syncBlockLocationsWithSlots()
+    selectedCategoryName = canvasModel.library.currentCategory?.name ?? ""
     updateAllBlocksList()
 
     musicEngine.initializeEngine()
@@ -70,6 +75,7 @@ class CanvasViewModel: ObservableObject {
         id: Block.getNextBlockId(),
         location: CGPoint(x: block.location.x - canvasScrollOffset.x, y: block.location.y - canvasScrollOffset.y),
         color: block.color,
+        icon: block.icon,
         visible: true,
         loopURL: block.loopURL
       )
@@ -94,6 +100,12 @@ class CanvasViewModel: ObservableObject {
     updateAllBlocksList()
 
     return blockDroppedOnCanvas
+  }
+
+  func selectLoopCategory(categoryName: String) {
+    canvasModel.library.setLoopCategory(categoryName: categoryName)
+    updateAllBlocksList()
+    canvasModel.library.syncBlockLocationsWithSlots()
   }
 
   func updateAllBlocksList() {

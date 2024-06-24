@@ -23,12 +23,12 @@ final class CanvasViewModelTests: XCTestCase {
   func testEmptyCanvasState() throws {
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 0)
     XCTAssertEqual(canvasViewModel.allBlocks.count, 0)
-    XCTAssertEqual(canvasViewModel.libraryBlocks.count, 4)
-    XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 4)
+    XCTAssertEqual(canvasViewModel.libraryBlocks.count, 7)
+    XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 7)
   }
 
   func testLibraryInitialState() throws {
-    XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 4)
+    XCTAssertEqual(canvasViewModel.canvasModel.library.allBlocks.count, 7)
     for libraryBlock in canvasViewModel.canvasModel.library.allBlocks {
       XCTAssertNil(libraryBlock.blockGroupGridPosX)
       XCTAssertNil(libraryBlock.blockGroupGridPosY)

@@ -4,7 +4,7 @@
 //
 //  Created by Peter Rice on 6/11/24.
 //
-
+import SwiftUI
 import XCTest
 
 final class BlockGroupTests: XCTestCase {
@@ -85,6 +85,7 @@ final class BlockGroupTests: XCTestCase {
       id: id,
       location: CGPoint(x: 0, y: 0),
       color: .pink,
+      icon: "circle",
       loopURL: URL(fileURLWithPath: "TEST_FILE.wav", relativeTo: Bundle.main.bundleURL)
     )
   }

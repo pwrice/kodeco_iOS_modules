@@ -14,6 +14,7 @@ class Block: ObservableObject, Identifiable {
   @Published var color: Color
   @Published var visible = true
   @Published var dragging = false
+  let icon: String
 
   let normalColor: Color
   let highlightColor: Color = .yellow
@@ -33,10 +34,11 @@ class Block: ObservableObject, Identifiable {
     return blockId
   }
 
-  init(id: Int, location: CGPoint, color: Color, visible: Bool = false, loopURL: URL? = nil, isLibraryBlock: Bool = false) {
+  init(id: Int, location: CGPoint, color: Color, icon: String, visible: Bool = false, loopURL: URL? = nil, isLibraryBlock: Bool = false) {
     self.id = id
     self.location = location
     self.color = color
+    self.icon = icon
     self.normalColor = color
     self.visible = visible
     self.loopURL = loopURL

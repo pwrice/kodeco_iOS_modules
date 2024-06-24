@@ -33,9 +33,10 @@ struct CanvasView: View {
 
   var body: some View {
     ZStack {
-      BackgroundView(viewModel: viewModel)
       ScrollView([.horizontal, .vertical]) {
         ZStack { // This is the full canvas
+          BackgroundDots()
+
           ZStack { // This is just the blocks
             ForEach(viewModel.allBlocks) { blockModel in
               BlockView(model: blockModel)
@@ -44,6 +45,7 @@ struct CanvasView: View {
                 )
             }
           }
+
           GeometryReader { proxy in
             let xOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minX
             let yOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minY
@@ -54,12 +56,16 @@ struct CanvasView: View {
               value: CGPoint(x: xOffset, y: yOffset))
           }
         }
-        .frame(width: 1000, height: 1000)
+        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
       }
+      .defaultScrollAnchor(.center)
       .coordinateSpace(name: "CanvasCoordinateSpace")
       .onPreferenceChange(ViewOffsetKey.self) {
         viewModel.canvasScrollOffset = $0
       }
+
+      UIOverlayView(viewModel: viewModel)
+
       // This view is where the library blocks live
       // It is not scrollable and coorindates roughly match
       // global / screen coorindates
@@ -96,13 +102,40 @@ struct BlockView: View {
   var body: some View {
     RoundedRectangle(cornerRadius: 10)
       .foregroundColor(model.color)
-      .frame(width: CanvasViewModel.blockSize, height: CanvasViewModel.blockSize)
+      .frame(
+        width: CanvasViewModel.blockSize,
+        height: CanvasViewModel.blockSize)
       .position(model.location)
       .opacity(model.visible ? 1 : 0)
+      .overlay {
+        Image(systemName: model.icon)
+          .position(model.location)
+          .foregroundColor(.white)
+      }
   }
 }
 
-struct BackgroundView: View {
+struct BackgroundDots: View {
+  var body: some View {
+    ZStack { // Background dots
+      let dotSpacing = CanvasViewModel.blockSize + CanvasViewModel.blockSpacing
+      let numCols = Int(CanvasViewModel.canvasWidth / dotSpacing)
+      let numRows = Int(CanvasViewModel.canvasHeight / dotSpacing)
+      ForEach(0..<numCols, id: \.self) { hInd in
+        ForEach(0..<numRows, id: \.self) { vInd in
+          Rectangle()
+            .foregroundColor(.gray)
+            .frame(width: 2, height: 2)
+            .position(CGPoint(
+              x: CGFloat(hInd) * dotSpacing,
+              y: CGFloat(vInd) * dotSpacing))
+        }
+      }
+    }
+  }
+}
+
+struct UIOverlayView: View {
   @ObservedObject var viewModel: CanvasViewModel
 
   var body: some View {
@@ -124,7 +157,22 @@ struct LibraryView: View {
   var body: some View {
     VStack {
       HStack {
-        Text("Library")
+        Text("Loops")
+        Picker(
+          "Category",
+          selection: $viewModel.selectedCategoryName) {
+            ForEach(
+              viewModel.canvasModel.library.categories.map { $0.name },
+              id: \.self) {
+              Text($0)
+            }
+        }.pickerStyle(.menu)
+          .onChange(
+            of: viewModel.selectedCategoryName,
+            initial: false) { _, _ in
+              viewModel.selectLoopCategory(
+                categoryName: viewModel.selectedCategoryName)
+          }
         Spacer()
       }
       HStack(spacing: CanvasViewModel.blockSpacing) {
@@ -133,6 +181,14 @@ struct LibraryView: View {
         LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 1)
         LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 2)
         LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 3)
+        Spacer()
+      }
+      HStack(spacing: CanvasViewModel.blockSpacing) {
+        Spacer()
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 4)
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 5)
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 6)
+        LibrarySlotView(librarySlotLocations: $viewModel.canvasModel.library.librarySlotLocations, index: 7)
         Spacer()
       }
     }
@@ -183,3 +239,27 @@ struct CanvasView_Previews: PreviewProvider {
 
 // swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml
 // swiftlint --fix --no-cache --config ~/com.raywenderlich.swiftlint.yml
+
+
+// Library TODO
+// [DONE] Add symbols to blocks to differentiate w/in a category
+// [DONE] Add picker to library to allow switching between categories
+// [DONE] - add picker UI
+// [DONE] - swap out blocks when picker choice is made
+// [DONE] - add dot grid background to canvas (so it is easier to see scrolling)
+
+// context tap to select block
+// block contextual menu
+// add delete block
+
+// context tab to select block group
+// - tap near group
+// group context menu
+// delete group etc..
+
+// add navigation tabs below (per freeform)
+// - loops
+// - sample triggers / effects (add search here)
+//   - hook up the api search here
+
+// How to make the library work with different phone sizes?

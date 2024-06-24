@@ -4,6 +4,7 @@
 //
 //  Created by Peter Rice on 6/11/24.
 //
+import SwiftUI
 
 import XCTest
 
@@ -125,6 +126,7 @@ final class CanvasModelTests: XCTestCase {
       id: 0,
       location: CGPoint(x: 0, y: 0),
       color: .pink,
+      icon: "square",
       loopURL: URL(fileURLWithPath: "TEST_FILE.wav", relativeTo: Bundle.main.bundleURL)
     )
   }
@@ -134,6 +136,7 @@ final class CanvasModelTests: XCTestCase {
       id: 1,
       location: CGPoint(x: 100, y: 100),
       color: .blue,
+      icon: "circle",
       loopURL: URL(fileURLWithPath: "TEST_FILE_1.wav", relativeTo: Bundle.main.bundleURL)
     )
   }
