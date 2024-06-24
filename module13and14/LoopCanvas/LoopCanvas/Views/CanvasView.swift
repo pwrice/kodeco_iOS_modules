@@ -11,6 +11,92 @@ import SwiftUI
 struct CanvasView: View {
   @StateObject var viewModel: CanvasViewModel
 
+  var body: some View {
+    ZStack {
+      ScrollView([.horizontal, .vertical]) {
+        ZStack {
+          BackgroundDots()
+
+          CanvasBlocksView(viewModel: viewModel)
+
+          GeometryReader { proxy in
+            let xOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minX
+            let yOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minY
+            // This prefernces method to calculate the scroll offset
+            // seems a bit hacky. Is there a better way?
+            Color.clear.preference(
+              key: ViewOffsetKey.self,
+              value: CGPoint(x: xOffset, y: yOffset))
+          }
+        }
+        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
+      }
+      .defaultScrollAnchor(.center)
+      .coordinateSpace(name: "CanvasCoordinateSpace")
+      .onPreferenceChange(ViewOffsetKey.self) {
+        viewModel.canvasScrollOffset = $0
+      }
+
+      UIOverlayView(viewModel: viewModel)
+
+      LibraryBlocksView(viewModel: viewModel)
+    }
+    .coordinateSpace(name: "ViewportCoorindateSpace")
+    .onAppear {
+      Task {
+        viewModel.onViewAppear()
+      }
+    }
+  }
+}
+
+struct ViewOffsetKey: PreferenceKey {
+  typealias Value = CGPoint
+  static var defaultValue = CGPoint(x: CGFloat.zero, y: CGFloat.zero)
+  static func reduce(value: inout Value, nextValue: () -> Value) {
+    let next = nextValue()
+    value = CGPoint(x: value.x + next.x, y: value.y + next.y)  // value += nextValue()
+  }
+}
+
+struct CanvasBlocksView: View {
+  @ObservedObject var viewModel: CanvasViewModel
+
+  // TODO - make work w multi-touch (this assumes just a single drag)
+  @GestureState private var dragStartLocation: CGPoint?
+
+  func blockDragGesture(block: Block) -> some Gesture {
+    DragGesture(minimumDistance: 2)
+      .updating($dragStartLocation) { _, startLocation, _ in
+        // Called before onChanged
+        startLocation = startLocation ?? block.location
+      }
+      .onChanged { value in
+        var newLocation = dragStartLocation ?? block.location
+        newLocation.x += value.translation.width
+        newLocation.y += value.translation.height
+        viewModel.updateBlockDragLocation(block: block, location: newLocation)
+      }
+      .onEnded { _ in
+        _ = viewModel.dropBlockOnCanvas(block: block)
+      }
+  }
+
+  var body: some View {
+    ZStack { // This is just the blocks
+      ForEach(viewModel.allBlocks) { blockModel in
+        BlockView(model: blockModel)
+          .gesture(
+            blockDragGesture(block: blockModel)
+          )
+      }
+    }
+  }
+}
+
+struct LibraryBlocksView: View {
+  @ObservedObject var viewModel: CanvasViewModel
+
   // TODO - make work w multi-touch (this assumes just a single drag)
   @GestureState private var dragStartLocation: CGPoint?
 
@@ -33,66 +119,13 @@ struct CanvasView: View {
 
   var body: some View {
     ZStack {
-      ScrollView([.horizontal, .vertical]) {
-        ZStack { // This is the full canvas
-          BackgroundDots()
-
-          ZStack { // This is just the blocks
-            ForEach(viewModel.allBlocks) { blockModel in
-              BlockView(model: blockModel)
-                .gesture(
-                  blockDragGesture(block: blockModel)
-                )
-            }
-          }
-
-          GeometryReader { proxy in
-            let xOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minX
-            let yOffset = proxy.frame(in: .named("CanvasCoordinateSpace")).minY
-            // This prefernces method to calculate the scroll offset
-            // seems a bit hacky. Is there a better way?
-            Color.clear.preference(
-              key: ViewOffsetKey.self,
-              value: CGPoint(x: xOffset, y: yOffset))
-          }
-        }
-        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
-      }
-      .defaultScrollAnchor(.center)
-      .coordinateSpace(name: "CanvasCoordinateSpace")
-      .onPreferenceChange(ViewOffsetKey.self) {
-        viewModel.canvasScrollOffset = $0
-      }
-
-      UIOverlayView(viewModel: viewModel)
-
-      // This view is where the library blocks live
-      // It is not scrollable and coorindates roughly match
-      // global / screen coorindates
-      ZStack {
-        ForEach(viewModel.libraryBlocks) { blockModel in
-          BlockView(model: blockModel)
-            .gesture(
-              blockDragGesture(block: blockModel)
-            )
-        }
+      ForEach(viewModel.libraryBlocks) { blockModel in
+        BlockView(model: blockModel)
+          .gesture(
+            blockDragGesture(block: blockModel)
+          )
       }
     }
-    .coordinateSpace(name: "ViewportCoorindateSpace")
-    .onAppear {
-      Task {
-        viewModel.onViewAppear()
-      }
-    }
-  }
-}
-
-struct ViewOffsetKey: PreferenceKey {
-  typealias Value = CGPoint
-  static var defaultValue = CGPoint(x: CGFloat.zero, y: CGFloat.zero)
-  static func reduce(value: inout Value, nextValue: () -> Value) {
-    let next = nextValue()
-    value = CGPoint(x: value.x + next.x, y: value.y + next.y)  // value += nextValue()
   }
 }
 
@@ -164,7 +197,7 @@ struct LibraryView: View {
             ForEach(
               viewModel.canvasModel.library.categories.map { $0.name },
               id: \.self) {
-              Text($0)
+                Text($0)
             }
         }.pickerStyle(.menu)
           .onChange(
@@ -247,7 +280,9 @@ struct CanvasView_Previews: PreviewProvider {
 // [DONE] - add picker UI
 // [DONE] - swap out blocks when picker choice is made
 // [DONE] - add dot grid background to canvas (so it is easier to see scrolling)
+// [DONE] Refactor views into smaller subviews
 
+// Update tests for library behavior
 // context tap to select block
 // block contextual menu
 // add delete block
