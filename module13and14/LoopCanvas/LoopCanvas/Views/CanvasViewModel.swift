@@ -37,12 +37,22 @@ class CanvasViewModel: ObservableObject {
 
   func onViewAppear() {
     canvasModel.library.loadLibraryFrom(libraryFolderName: "DubSet")
-    canvasModel.library.syncBlockLocationsWithSlots()
     selectedCategoryName = canvasModel.library.currentCategory?.name ?? ""
+    for libraryBlock in canvasModel.library.allBlocks {
+      libraryBlock.visible = false
+    }
     updateAllBlocksList()
 
     musicEngine.initializeEngine()
     musicEngine.play()
+  }
+
+  func libraryBlockLocationsUpdated() {
+    canvasModel.library.syncBlockLocationsWithSlots()
+    for libraryBlock in canvasModel.library.allBlocks {
+      libraryBlock.visible = true
+    }
+    updateAllBlocksList()
   }
 
   func updateBlockDragLocation(block: Block, location: CGPoint) {

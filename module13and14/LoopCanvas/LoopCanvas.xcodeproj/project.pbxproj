@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C12C6E872C2AF29500B01C58 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E862C2AF29500B01C58 /* LibraryView.swift */; };
+		C12C6E892C2AF2E200B01C58 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E882C2AF2E200B01C58 /* BlockView.swift */; };
+		C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8A2C2AF39300B01C58 /* HomeView.swift */; };
+		C12C6E8D2C2AFA7700B01C58 /* PlaceHolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */; };
 		C1498E392C18881900118C38 /* CanvasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E382C18881900118C38 /* CanvasModelTests.swift */; };
 		C1498E3B2C18884A00118C38 /* BlockGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E3A2C18884A00118C38 /* BlockGroupTests.swift */; };
 		C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85482C08AE5900477545 /* LoopCanvasApp.swift */; };
@@ -52,6 +56,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C12C6E862C2AF29500B01C58 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		C12C6E882C2AF2E200B01C58 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
+		C12C6E8A2C2AF39300B01C58 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceHolderView.swift; sourceTree = "<group>"; };
 		C1498E382C18881900118C38 /* CanvasModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasModelTests.swift; sourceTree = "<group>"; };
 		C1498E3A2C18884A00118C38 /* BlockGroupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroupTests.swift; sourceTree = "<group>"; };
 		C19D85452C08AE5900477545 /* LoopCanvas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoopCanvas.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -229,6 +237,10 @@
 				C19D854A2C08AE5900477545 /* ContentView.swift */,
 				C19D85762C08B00C00477545 /* CanvasView.swift */,
 				C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */,
+				C12C6E862C2AF29500B01C58 /* LibraryView.swift */,
+				C12C6E882C2AF2E200B01C58 /* BlockView.swift */,
+				C12C6E8A2C2AF39300B01C58 /* HomeView.swift */,
+				C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -540,12 +552,16 @@
 			files = (
 				C1B564C82C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */,
 				C1F5EEE82C14AE9400298B00 /* BlockGroup.swift in Sources */,
+				C12C6E892C2AF2E200B01C58 /* BlockView.swift in Sources */,
 				C1F5EEA22C133A4900298B00 /* Library.swift in Sources */,
 				C19D854B2C08AE5900477545 /* ContentView.swift in Sources */,
 				C1B564C52C0D243E002FDDD4 /* CanvasModel.swift in Sources */,
 				C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */,
 				C19D85772C08B00C00477545 /* CanvasView.swift in Sources */,
+				C12C6E8D2C2AFA7700B01C58 /* PlaceHolderView.swift in Sources */,
 				C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */,
+				C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */,
+				C12C6E872C2AF29500B01C58 /* LibraryView.swift in Sources */,
 				C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
