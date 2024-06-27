@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct PlaceHolderView: View {
-    var body: some View {
-        Text("View Not Implemented Yet!")
-    }
+  var body: some View {
+    Text("View Not Implemented Yet!")
+  }
 }
 
 #Preview {
-    PlaceHolderView()
+  PlaceHolderView()
 }

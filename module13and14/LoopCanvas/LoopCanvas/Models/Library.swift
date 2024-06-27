@@ -58,7 +58,6 @@ class Library: ObservableObject {
   func syncBlockLocationsWithSlots() {
     for (index, location) in librarySlotLocations.enumerated() where index < allBlocks.count {
       allBlocks[index].location = location
-      allBlocks[index].visible = true
     }
   }
 

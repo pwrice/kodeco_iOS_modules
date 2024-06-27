@@ -154,11 +154,6 @@ struct UIOverlayView: View {
 
   var body: some View {
     VStack {
-      HStack {
-        Text("Loop Canvas")
-        Spacer()
-      }
-      .padding()
       Spacer()
       LibraryView(viewModel: viewModel)
     }
