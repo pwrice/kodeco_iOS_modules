@@ -30,6 +30,13 @@ class DownloadableSampleSet: ObservableObject, Identifiable {
   @Published var loadingState: DownloadableSampleSetLoadingState
   @Published var downloadProgress: Double = 0.0
 
+  /// Initializes a `DownloadableSampleSet` instance with URLs and a remote sample set.
+  ///
+  /// - Parameters:
+  ///   - remoteSampleSet: The metadata and structure of the remote sample set.
+  ///   - loadingState: The initial loading state of the sample set.
+  ///   - baseSampleSetsRemoteURL: The base URL for downloading sample files.
+  ///   - baseSampleSetsLocalURL: The base local directory for storing sample files.
   init(
     remoteSampleSet: RemoteSampleSet,
     loadingState: DownloadableSampleSetLoadingState,
@@ -43,11 +50,22 @@ class DownloadableSampleSet: ObservableObject, Identifiable {
     self.baseSampleSetLocalURL = baseSampleSetsLocalURL.appendingPathComponent(remoteSampleSet.name, isDirectory: true)
   }
 
+  /// Removes the downloaded sample set from the local directory.
+  ///
+  /// This method clears all locally stored files and resets the loading state to `.notLoaded`.
   public func removeSampleSetDownload() {
     deleteLocalSampleSetDirectory()
     loadingState = .notLoaded
   }
 
+  /// Asynchronously downloads the sample set from the remote server.
+  ///
+  /// This method clears any existing local sample set directory, creates new directories,
+  /// and begins downloading files using `FileDownloadManager`.
+  ///
+  /// - Note: This method updates the `loadingState` and `downloadProgress` properties.
+  ///
+  /// - Throws: An error if the download process fails.
   public func downloadSampleSet() async {
     Task { @MainActor in
       loadingState = .loading
@@ -97,7 +115,14 @@ class DownloadableSampleSet: ObservableObject, Identifiable {
   }
 }
 
+
 extension DownloadableSampleSet {
+  /// Generates pairs of remote and local URLs for sample set files.
+  ///
+  /// - Returns: An array of tuples containing remote and local file URLs.
+  ///
+  /// - Example Output:
+  ///   `[("remote/file1", "local/file1"), ("remote/file2", "local/file2")]`
   func getRemoteAndLocalURLPairs() -> [(URL, URL)] {
     var urls: [(URL, URL)] = []
 
@@ -118,6 +143,11 @@ extension DownloadableSampleSet {
     return urls
   }
 
+  /// Creates local directories for downloaded sample files.
+  ///
+  /// - Parameter destinationFolders: An array of local directory URLs to create.
+  ///
+  /// - Throws: An error if any directory creation fails.
   private func createLocalDirectories(destinationFolders: [URL]) {
     do {
       let fileManager = FileManager.default
@@ -131,6 +161,9 @@ extension DownloadableSampleSet {
     }
   }
 
+  /// Deletes the local directory containing the downloaded sample set.
+  ///
+  /// - Throws: An error if the directory cannot be deleted.
   private func deleteLocalSampleSetDirectory() {
     // Remove existing local sample set directory
     Self.logger.debug("removing directory  \(self.baseSampleSetLocalURL)")

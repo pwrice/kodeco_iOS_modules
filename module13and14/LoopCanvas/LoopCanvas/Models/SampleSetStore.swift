@@ -69,10 +69,18 @@ class SampleSetStore: ObservableObject {
 
   private var cancellables = Set<AnyCancellable>()
 
+  // MARK: - Initializers
+
+  /// Default initializer using a standard URLSession loader.
   convenience init () {
     self.init(urlSessionLoader: URLSessionLoader())
   }
 
+  /// Mock initializer for testing with predefined JSON and error states.
+  /// - Parameters:
+  ///   - fileName: The name of the mock JSON file.
+  ///   - mockErrorState: Optional mock error state.
+  ///   - mockErrorDownloadingSampleSets: Optional mock download error flag.
   convenience init(
     withMockResults fileName: String,
     mockErrorState: RemoteSampleSetIndexLoadingState? = nil,
@@ -96,7 +104,8 @@ class SampleSetStore: ObservableObject {
     self.mockErrorDownloadingSampleSets = mockErrorDownloadingSampleSets
   }
 
-
+  /// Designated initializer with a URL session loader.
+  /// - Parameter urlSessionLoader: A loader for network requests.
   init (urlSessionLoader: URLSessionLoading) {
     baseSampleSetsRemoteURL = URL(string: remoteSampleSetS3Path)
     baseSampleSetsLocalURL = URL(
@@ -105,7 +114,9 @@ class SampleSetStore: ObservableObject {
     self.urlSessionLoader = urlSessionLoader
   }
 
-  func loadRemoteSampleSetIndex() {
+  /// Loads the remote sample set index.
+  /// Sets up downloadableSampleSets published property.
+  public func loadRemoteSampleSetIndex() {
     if usingMockResults {
       // When using mock results, ignore calls to reload sampleset index
       if let mockErrorState = mockErrorState {
@@ -133,7 +144,8 @@ class SampleSetStore: ObservableObject {
     }
   }
 
-  func loadLocalSampleSets() {
+  /// Loads local sample sets from the filesystem.
+  public func loadLocalSampleSets() {
     let fileManager = FileManager.default
     var localSampleSets: [LocalSampleSet] = []
     do {
@@ -159,13 +171,15 @@ class SampleSetStore: ObservableObject {
     self.localSampleSets = localSampleSets
   }
 
-  func downloadRemoteSampleSet(_ remoteSampleSet: DownloadableSampleSet) {
+  /// Downloads a remote sample set.
+  public func downloadRemoteSampleSet(_ remoteSampleSet: DownloadableSampleSet) {
     Task {
       await remoteSampleSet.downloadSampleSet()
     }
   }
 
-  func removeLocalSampleSet(_ remoteSampleSet: DownloadableSampleSet) {
+  /// Removes a locally stored sample set and directory in local filesystem
+  public func removeLocalSampleSet(_ remoteSampleSet: DownloadableSampleSet) {
     remoteSampleSet.removeSampleSetDownload()
     loadLocalSampleSets()
   }

@@ -46,7 +46,7 @@ class MockURLSessionProgressDataLoader: URLSessionProgressDataLoading {
 
   func data(for request: URLRequest, progressHandler: ((Double) -> Void)) async throws -> (Data, URLResponse) {
     if let error = simulateError {
-        throw error
+      throw error
     }
 
     guard let urlString = request.url?.absoluteString,
