@@ -55,9 +55,6 @@ class Library: ObservableObject {
     category: String(describing: Library.self)
   )
 
-  @Published var allBlocks: [Block]
-  @Published var libaryFrame: CGRect
-  @Published var currentCategory: Category?
   @Published var categories: [Category] = []
 
   var name: String
@@ -74,56 +71,11 @@ class Library: ObservableObject {
   init(sampleSetStore: SampleSetStore) {
     name = ""
     self.sampleSetStore = sampleSetStore
-    self.allBlocks = []
-
-    // this will be reset by the geometry reader
-    self.libaryFrame = CGRect(x: 0, y: 800, width: 400, height: 200)
   }
 
   init(libraryData: LibraryData, sampleSetStore: SampleSetStore) {
     name = libraryData.name
     self.sampleSetStore = sampleSetStore
-    self.allBlocks = []
-    self.libaryFrame = CGRect.zero
-  }
-
-  func syncBlockLocationsWithSlots(librarySlotLocations: [CGPoint]) {
-    for (index, location) in librarySlotLocations.enumerated() where index < allBlocks.count {
-      allBlocks[index].location = location
-    }
-  }
-
-  func loadTestData() {
-    self.categories = []
-    self.allBlocks = [
-      Block(
-        id: Block.getNextBlockId(),
-        location: CGPoint(x: 50, y: 150),
-        color: .pink,
-        icon: "circle"),
-      Block(
-        id: Block.getNextBlockId(),
-        location: CGPoint(x: 150, y: 150),
-        color: .purple,
-        icon: "square"),
-      Block(
-        id: Block.getNextBlockId(),
-        location: CGPoint(x: 250, y: 150),
-        color: .indigo,
-        icon: "cross"),
-      Block(
-        id: Block.getNextBlockId(),
-        location: CGPoint(x: 350, y: 150),
-        color: .yellow,
-        icon: "diamond")
-    ]
-  }
-
-  func setLoopCategory(categoryName: String) {
-    if let category = categories.first(where: { $0.name == categoryName }) {
-      currentCategory = category
-      allBlocks = category.blocks
-    }
   }
 
   func loadLibraryFrom(libraryFolderName: String) {
@@ -173,13 +125,8 @@ class Library: ObservableObject {
         let category = Category(id: categoryInd, name: categoryFolderName, color: categoryColor, blocks: blocks)
         categories.append(category)
       }
-      setLoopCategory(categoryName: "Drums")
     } catch {
       Self.logger.error("Error loading library \(libraryFolderName) \(error)")
     }
-  }
-
-  func removeBlock(block: Block) {
-    allBlocks.removeAll { $0.id == block.id }
   }
 }

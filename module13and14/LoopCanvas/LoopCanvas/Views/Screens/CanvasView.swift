@@ -53,8 +53,6 @@ struct CanvasView: View {
       }
 
       UIOverlayView(viewModel: viewModel)
-
-      LibraryBlocksView(viewModel: viewModel)
     }
     .coordinateSpace(name: "ViewportCoorindateSpace")
     .onAppear {
@@ -167,42 +165,6 @@ struct ViewOffsetKey: PreferenceKey {
   }
 }
 
-struct LibraryBlocksView: View {
-  @ObservedObject var viewModel: CanvasViewModel
-
-  // TODO - make work w multi-touch (this assumes just a single drag)
-  @GestureState private var dragStartLocation: CGPoint?
-
-  func blockDragGesture(block: Block) -> some Gesture {
-    DragGesture(minimumDistance: 2)
-      .updating($dragStartLocation) { _, startLocation, _ in
-        // Called before onChanged
-        startLocation = startLocation ?? block.location
-      }
-      .onChanged { value in
-        var newLocation = dragStartLocation ?? block.location
-        newLocation.x += value.translation.width
-        newLocation.y += value.translation.height
-        viewModel.updateBlockDragLocation(block: block, location: newLocation)
-      }
-      .onEnded { _ in
-        _ = viewModel.dropBlockOnCanvas(block: block)
-      }
-  }
-
-  var body: some View {
-    ZStack {
-      ForEach(viewModel.libraryBlocks) { blockModel in
-        PositionedBlockView(model: blockModel)
-          .gesture(
-            blockDragGesture(block: blockModel)
-          )
-      }
-    }
-  }
-}
-
-
 struct CanvasBlocksView: View {
   @ObservedObject var viewModel: CanvasViewModel
 
@@ -282,9 +244,6 @@ struct UIOverlayView: View {
   var body: some View {
     VStack {
       Spacer()
-      LibraryView(
-        viewModel: viewModel,
-        sampleSetStore: viewModel.sampleSetStore)
     }
   }
 }
@@ -333,6 +292,7 @@ struct CanvasView_Previews: PreviewProvider {
 // UPDATED TODO - Nov 2025
 // - remove library view and related functionality
 //   - add way in pulldown menu to switch genres
+//   - fix tests to exercise adding / removing blocks
 // - add context menu for tapping on block
 //   - delete loop
 //   - mute loop
@@ -344,6 +304,7 @@ struct CanvasView_Previews: PreviewProvider {
 // - add animation for block after it is dropped till the next bar when playback starts
 // - add ability to import your own samples from documents folder
 //   - how to deal with tempo adjustment and loop length?
+// - figure out how to select a group and set group properties (mute etc...)
 
 // MULTI-USER
 // hook up shareplay so multiple users can edit a canvas at the same time

@@ -22,10 +22,7 @@ class CanvasViewModel: ObservableObject {
 
   @Published var canvasModel: CanvasModel
   @Published var allBlocks: [Block]
-  @Published var libraryBlocks: [Block]
-  @Published var selectedCategoryName: String = ""
   @Published var selectedSampleSetName: String = ""
-  @Published var librarySlotLocations: [CGPoint]
   @Published var canvasSnapshot: UIImage?
   @Published var addBlockTapGridPosition: CGPoint?
 
@@ -90,24 +87,13 @@ class CanvasViewModel: ObservableObject {
     sampleSetStore: SampleSetStore,
     songNameToLoad: String? = nil
   ) {
-    self.librarySlotLocations = [
-      CGPoint(x: 50, y: 150),
-      CGPoint(x: 150, y: 150),
-      CGPoint(x: 250, y: 150),
-      CGPoint(x: 350, y: 150),
-      CGPoint(x: 50, y: 250),
-      CGPoint(x: 150, y: 250),
-      CGPoint(x: 250, y: 250),
-      CGPoint(x: 350, y: 250)
-    ]
-
     self.musicEngine = musicEngine
     self.canvasModel = canvasModel
     self.canvasStore = canvasStore
     self.sampleSetStore = sampleSetStore
 
     self.allBlocks = []
-    self.libraryBlocks = []
+//    self.libraryBlocks = []
     self.canvasModel.musicEngine = musicEngine
     musicEngine.delegate = canvasModel
 
@@ -115,8 +101,6 @@ class CanvasViewModel: ObservableObject {
       .publisher(for: UIDevice.orientationDidChangeNotification)
       .sink { _ in
         self.isLandscapeOrientation = UIDevice.current.orientation.isLandscape
-//        self.libraryBlockLocationsUpdated()
-//        Self.logger.debug("orientation change libraryBlockLocationsUpdated()")
       }
 
     self.updateAllBlocksList()
@@ -133,15 +117,9 @@ class CanvasViewModel: ObservableObject {
     canvasModel.library.loadLibraryFrom(libraryFolderName: canvasModel.library.name)
     musicEngine.tempo = canvasModel.library.tempo
     Self.logger.debug("Setting music engine tempo to: \(self.musicEngine.tempo)")
-    canvasModel.library.syncBlockLocationsWithSlots(librarySlotLocations: librarySlotLocations)
-    for libraryBlock in canvasModel.library.allBlocks {
-      libraryBlock.visible = true
-    }
-    selectedCategoryName = canvasModel.library.currentCategory?.name ?? ""
     selectedSampleSetName = canvasModel.library.name
 
     allBlocks = []
-    libraryBlocks = []
     updateAllBlocksList()
     canvasModel.setMusicEngineAfterLoad(musicEngine: musicEngine)
     musicEngine.reset()
@@ -156,11 +134,7 @@ extension CanvasViewModel {
     if songNameToLoad == nil {
       canvasModel.library.loadLibraryFrom(libraryFolderName: "Funk")
       musicEngine.tempo = canvasModel.library.tempo
-      selectedCategoryName = canvasModel.library.currentCategory?.name ?? ""
       selectedSampleSetName = canvasModel.library.name
-      for libraryBlock in canvasModel.library.allBlocks {
-        libraryBlock.visible = false
-      }
       sampleSetStore.loadLocalSampleSets()
       updateAllBlocksList()
     }
@@ -174,18 +148,6 @@ extension CanvasViewModel {
         songNameToLoad = nil
       }
     }
-  }
-
-  func libraryBlockLocationsUpdated() {
-    syncBlockLocationsWithSlots()
-    for libraryBlock in canvasModel.library.allBlocks {
-      libraryBlock.visible = true
-    }
-    updateAllBlocksList()
-  }
-
-  func syncBlockLocationsWithSlots() {
-    canvasModel.library.syncBlockLocationsWithSlots(librarySlotLocations: librarySlotLocations)
   }
 
   func updateBlockDragLocation(block: Block, location: CGPoint) {
@@ -215,6 +177,13 @@ extension CanvasViewModel {
     return dropBlockOnCanvas(block: block)
   }
 
+  func deleteBlockFromCanvas(block: Block) {
+    if let blockGroup = block.blockGroup {
+      canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
+    }
+    updateAllBlocksList()
+  }
+
   func dropBlockOnCanvas(block: Block) -> Block {
     // TODO - break this function up and refator logic into Canvas Model
 
@@ -232,40 +201,17 @@ extension CanvasViewModel {
         loopURL: block.loopURL,
         relativePath: block.relativePath
       )
-
-      syncBlockLocationsWithSlots() // reset library block location
     }
 
     let blockAddedToGroup = canvasModel.checkBlockPositionAndAddToAvailableGroup(block: blockDroppedOnCanvas)
 
     if !blockAddedToGroup {
-      if blockDroppedOnCanvas.location.y >
-          canvasModel.library.libaryFrame.minY + (CanvasViewModel.blockSize / 2) {
-        // If the block is re-dropped on the library, delete it.
-        // Right now we dont need to do anything as the block is
-        // not a member of a group and has been removed from the library,
-        // and draggingBlock = nil so the block should simply disappear.
-      } else {
-        canvasModel.addBlockGroup(initialBlock: blockDroppedOnCanvas)
-      }
+      canvasModel.addBlockGroup(initialBlock: blockDroppedOnCanvas)
     }
 
     updateAllBlocksList()
 
     return blockDroppedOnCanvas
-  }
-
-  func selectLoopCategory(categoryName: String) {
-    guard let currentCategoryName = canvasModel.library.currentCategory?.name, categoryName != currentCategoryName else {
-      return
-    }
-
-    canvasModel.library.setLoopCategory(categoryName: categoryName)
-    updateAllBlocksList()
-    syncBlockLocationsWithSlots()
-    for libraryBlock in canvasModel.library.allBlocks {
-      libraryBlock.visible = true
-    }
   }
 
   func loadSampleSetAndResetCanvas(sampleSetName: String) {
@@ -404,8 +350,8 @@ extension CanvasViewModel {
     newAllBlocksList.sort { $0.id > $1.id }
     allBlocks = newAllBlocksList
 
-    var newLibraryBlocksList = canvasModel.library.allBlocks
-    newLibraryBlocksList.sort { $0.id > $1.id }
-    libraryBlocks = newLibraryBlocksList
+//    var newLibraryBlocksList = canvasModel.library.allBlocks
+//    newLibraryBlocksList.sort { $0.id > $1.id }
+//    libraryBlocks = newLibraryBlocksList
   }
 }
