@@ -60,6 +60,11 @@ struct CanvasView: View {
     .onAppear {
       viewModel.onViewAppear()
     }
+    .onChange(of: showingLibraryPickerView) { _, newValue in
+      if newValue == false {
+        viewModel.addBlockTapGridPosition = nil
+      }
+    }
     .navigationBarItems(
       trailing: Menu {
         Button("Rename ...") {
@@ -82,6 +87,37 @@ struct CanvasView: View {
         }
         Button("Reload") {
           viewModel.loadSong()
+        }
+        Menu {
+          // Current selection shown as a disabled item
+          Button(action: {}, label: {
+            HStack {
+              Text("Current: \(viewModel.selectedSampleSetName)")
+              Spacer()
+              Image(systemName: "checkmark")
+            }
+          })
+          .disabled(true)
+
+          // List all local sample sets as selectable items
+          ForEach(viewModel.sampleSetStore.localSampleSets.map { $0.name }, id: \.self) { name in
+            Button(action: {
+              if name != viewModel.selectedSampleSetName {
+                viewModel.selectedSampleSetName = name
+                viewModel.loadSampleSetAndResetCanvas(sampleSetName: name)
+              }
+            }, label: {
+              HStack {
+                Text(name)
+                if name == viewModel.selectedSampleSetName {
+                  Spacer()
+                  Image(systemName: "checkmark")
+                }
+              }
+            })
+          }
+        } label: {
+          Label("Sample Set", systemImage: "music.note.list")
         }
         Button("Clear Canvas") {
           viewModel.clearCanvas()
@@ -293,6 +329,27 @@ struct CanvasView_Previews: PreviewProvider {
 
 // swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml
 // swiftlint --fix --no-cache --config ~/com.raywenderlich.swiftlint.yml
+
+// UPDATED TODO - Nov 2025
+// - remove library view and related functionality
+//   - add way in pulldown menu to switch genres
+// - add context menu for tapping on block
+//   - delete loop
+//   - mute loop
+//   - add selection state for block
+//   - add extend loop to multiple bars (or shorten)
+// - add multi-bar support for loops
+//   - extended rectangle renderer
+//   - incorporate length into model
+// - add animation for block after it is dropped till the next bar when playback starts
+// - add ability to import your own samples from documents folder
+//   - how to deal with tempo adjustment and loop length?
+
+// MULTI-USER
+// hook up shareplay so multiple users can edit a canvas at the same time
+
+// AUv3
+// make AUv3 plugin so you can record into loops from other audio apps
 
 
 // Library TODO
