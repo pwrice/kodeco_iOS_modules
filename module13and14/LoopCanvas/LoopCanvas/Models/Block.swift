@@ -66,6 +66,19 @@ class Block: ObservableObject, Identifiable, Codable {
     self.isLibraryBlock = isLibraryBlock
   }
 
+  func instantiateCopyWith(location: CGPoint, isLibraryBlock: Bool) -> Block {
+    return Block(
+      id: Block.getNextBlockId(),
+      location: location,
+      color: self.color,
+      icon: self.icon,
+      visible: self.visible,
+      loopURL: self.loopURL,
+      relativePath: self.relativePath,
+      isLibraryBlock: isLibraryBlock
+    )
+  }
+
   func tick(step16: Int) {
     if step16 % 4 == 0 && isPlaying {
       color = highlightColor

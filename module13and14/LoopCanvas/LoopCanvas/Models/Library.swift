@@ -146,7 +146,7 @@ class Library: ObservableObject {
 
     do {
       // Every top level folder is a different category
-      let categoryFolders = try fileManager.contentsOfDirectory(atPath: libraryDirectoryURL.path)
+      let categoryFolders = try fileManager.contentsOfDirectory(atPath: libraryDirectoryURL.path).sorted()
       for (categoryInd, categoryFolderName) in categoryFolders.enumerated()
         where !categoryFolderName.hasSuffix(".json") {
         if categoryInd > maxCategories {
@@ -157,7 +157,7 @@ class Library: ObservableObject {
         let cateogryIcons = ["circle", "square", "diamond", "star", "cross", "sun.min", "cloud", "moon"]
 
         var blocks: [Block] = []
-        let sampleFiles = try fileManager.contentsOfDirectory(atPath: categoryDirectoryURL.path)
+        let sampleFiles = try fileManager.contentsOfDirectory(atPath: categoryDirectoryURL.path).sorted()
         for (sampleInd, sampleFile) in sampleFiles.enumerated() where sampleFile.hasSuffix(".wav") {
           let block = Block(
             id: Block.getNextBlockId(),

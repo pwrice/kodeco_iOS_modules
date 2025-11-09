@@ -18,7 +18,11 @@ final class CanvasViewModelTests: XCTestCase {
     musicEngine = MockMusicEngine()
     sampleSetStore = SampleSetStore()
     canvasStore = CanvasStore(sampleSetStore: sampleSetStore)
-    canvasViewModel = CanvasViewModel(canvasModel: CanvasModel(sampleSetStore: sampleSetStore), musicEngine: musicEngine, canvasStore: canvasStore, sampleSetStore: sampleSetStore)
+    canvasViewModel = CanvasViewModel(
+      canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
+      musicEngine: musicEngine,
+      canvasStore: canvasStore,
+      sampleSetStore: sampleSetStore)
     canvasViewModel.canvasModel.library.loadLibraryFrom(libraryFolderName: "Dub")
     canvasViewModel.syncBlockLocationsWithSlots()
     canvasViewModel.updateAllBlocksList()
@@ -42,7 +46,7 @@ final class CanvasViewModelTests: XCTestCase {
 
     XCTAssertEqual(canvasViewModel.canvasModel.library.categories.count, 7)
     let firstCategory = try XCTUnwrap(canvasViewModel.canvasModel.library.categories.first)
-    XCTAssertEqual(firstCategory.name, "Perc")
+    XCTAssertEqual(firstCategory.name, "Bass")
     XCTAssertEqual(firstCategory.blocks.count, 6)
     XCTAssertEqual(firstCategory.color, .pink)
   }
@@ -415,6 +419,55 @@ final class CanvasViewModelTests: XCTestCase {
 
   func testLoadSampleSetAndResetCanvas() throws {
     // TODO
+  }
+
+  func testGridDimensions_returnsCorrectRowsAndColumns() {
+    // Given
+    let dotSpacing = CanvasViewModel.blockSize + CanvasViewModel.blockSpacing
+    let expectedCols = Int(CanvasViewModel.canvasWidth / dotSpacing)
+    let expectedRows = Int(CanvasViewModel.canvasHeight / dotSpacing)
+
+      // When
+      let (cols, rows) = CanvasViewModel.gridDimensions()
+
+      // Then
+      XCTAssertEqual(cols, expectedCols, "Columns count should match expected calculation")
+      XCTAssertEqual(rows, expectedRows, "Rows count should match expected calculation")
+  }
+
+  func testGridSpacingIsSumOfBlockSizeAndBlockSpacing() {
+    let expected = CanvasViewModel.blockSize + CanvasViewModel.blockSpacing
+    XCTAssertEqual(CanvasViewModel.gridSpacing(), expected)
+  }
+
+
+  func testQuantizedPoint() {
+    // Given
+    // Assume the grid spacing is based on blockSize and blockSpacing.
+    // If CanvasViewModel.gridSpacing() = blockSize + blockSpacing,
+    // then spacing = 80.0 (70 + 10).
+    let spacing = CanvasViewModel.blockSize + CanvasViewModel.blockSpacing
+    let halfBlock = (CanvasViewModel.blockSize + CanvasViewModel.blockSpacing) / 2.0
+
+    // When
+    let input = CGPoint(x: 123.0, y: 77.0)
+    let result = CanvasViewModel.quantizedPoint(for: input)
+
+    // Then
+    let expectedCol = floor(input.x / spacing)
+    let expectedRow = floor(input.y / spacing)
+    let expectedX = (expectedCol * spacing) + halfBlock
+    let expectedY = (expectedRow * spacing) + halfBlock
+    let expected = CGPoint(x: expectedX, y: expectedY)
+
+    XCTAssertEqual(result.x, expected.x, accuracy: 0.001, "Quantized X should match expected grid center")
+    XCTAssertEqual(result.y, expected.y, accuracy: 0.001, "Quantized Y should match expected grid center")
+  }
+
+  func testQuantizedPointOrigin() {
+    let result = CanvasViewModel.quantizedPoint(for: .zero)
+    let halfBlock = (CanvasViewModel.blockSize + CanvasViewModel.blockSpacing) / 2.0
+    XCTAssertEqual(result, CGPoint(x: halfBlock, y: halfBlock), "Origin should quantize to first grid center")
   }
 }
 

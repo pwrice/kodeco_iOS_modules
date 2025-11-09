@@ -13,6 +13,8 @@ struct CanvasView: View {
   @StateObject var viewModel: CanvasViewModel
   @State var showingRenameSongView = false
   @State var showingDownloadGenresView = false
+  @State var showingLibraryPickerView = false
+  @State var addBlockTapPosition: CGPoint?
 
   var canvasBlocksView: some View {
     CanvasBlocksView(viewModel: viewModel)
@@ -38,10 +40,15 @@ struct CanvasView: View {
         .background(Color("CanvasBackgroundColor"))
         .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
       }
-      .defaultScrollAnchor(.center)
+      .defaultScrollAnchor(.zero) // TODO - when setting this to 0, the initial scroll
+                                  // view offset is incorrect until the user interacts
       .coordinateSpace(name: "CanvasCoordinateSpace")
       .onPreferenceChange(ViewOffsetKey.self) {
         viewModel.canvasScrollOffset = $0
+      }
+      .onTapGesture(coordinateSpace: .local) { location in
+        addBlockTapPosition = location
+        showingLibraryPickerView = true
       }
 
       UIOverlayView(viewModel: viewModel)
@@ -93,6 +100,13 @@ struct CanvasView: View {
         store: viewModel.sampleSetStore,
         showingDownloadGenresView: $showingDownloadGenresView)
     })
+    .sheet(isPresented: $showingLibraryPickerView, content: {
+      LibraryPickerSheet(
+        library: viewModel.canvasModel.library,
+        viewModel: viewModel,
+        addBlockTapPosition: $addBlockTapPosition,
+        showingLibraryPickerView: $showingLibraryPickerView)
+    })
   }
 
   func snapshot(snapshotView: some View) -> UIImage? {
@@ -141,7 +155,7 @@ struct LibraryBlocksView: View {
   var body: some View {
     ZStack {
       ForEach(viewModel.libraryBlocks) { blockModel in
-        BlockView(model: blockModel)
+        PositionedBlockView(model: blockModel)
           .gesture(
             blockDragGesture(block: blockModel)
           )
@@ -176,8 +190,9 @@ struct CanvasBlocksView: View {
 
   var body: some View {
     ZStack { // This is just the blocks
+      Spacer()
       ForEach(viewModel.allBlocks) { blockModel in
-        BlockView(model: blockModel)
+        PositionedBlockView(model: blockModel)
           .gesture(
             blockDragGesture(block: blockModel)
           )
@@ -189,9 +204,8 @@ struct CanvasBlocksView: View {
 struct BackgroundDots: View {
   var body: some View {
     ZStack { // Background dots
-      let dotSpacing = CanvasViewModel.blockSize + CanvasViewModel.blockSpacing
-      let numCols = Int(CanvasViewModel.canvasWidth / dotSpacing)
-      let numRows = Int(CanvasViewModel.canvasHeight / dotSpacing)
+      let dotSpacing = CanvasViewModel.gridSpacing()
+      let (numCols, numRows) = CanvasViewModel.gridDimensions()
       ForEach(0..<numCols, id: \.self) { hInd in
         ForEach(0..<numRows, id: \.self) { vInd in
           Rectangle()

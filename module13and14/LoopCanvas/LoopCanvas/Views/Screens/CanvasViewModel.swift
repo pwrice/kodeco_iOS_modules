@@ -37,6 +37,39 @@ class CanvasViewModel: ObservableObject {
   static let canvasWidth: CGFloat = 1000.0
   static let canvasHeight: CGFloat = 1000.0
 
+  /// Calculates the number of dot columns and rows for the canvas background grid.
+  /// - Returns: A tuple (cols, rows) representing the number of columns and rows.
+  static func gridDimensions() -> (cols: Int, rows: Int) {
+    let dotSpacing = blockSize + blockSpacing
+    let cols = Int(canvasWidth / dotSpacing)
+    let rows = Int(canvasHeight / dotSpacing)
+    return (cols, rows)
+  }
+
+  /// Calculates the grid spacing used for the background dots and block layout.
+  /// - Returns: The spacing between grid points (dot to dot) in points.
+  static func gridSpacing() -> CGFloat {
+    return blockSize + blockSpacing
+  }
+
+  /// Quantizes a given point to the center of the nearest grid square on the canvas.
+  /// - Parameter location: The original point in canvas coordinates.
+  /// - Returns: A new point snapped to the center of the nearest grid cell.
+  static func quantizedPoint(for location: CGPoint) -> CGPoint {
+    let spacing = gridSpacing()
+    let halfBlock = (blockSize + blockSpacing) / 2.0
+
+    // Compute grid cell indices
+    let col = floor(location.x / spacing)
+    let row = floor(location.y / spacing)
+
+    // Convert back to actual canvas coordinates (center of the grid square)
+    let quantizedX = (col * spacing) + halfBlock
+    let quantizedY = (row * spacing) + halfBlock
+
+    return CGPoint(x: quantizedX, y: quantizedY)
+  }
+
   private var orienttationCancellable: AnyCancellable?
   @Published var isLandscapeOrientation: Bool = UIDevice.current.orientation.isLandscape
 
@@ -163,6 +196,14 @@ extension CanvasViewModel {
     updateAllBlocksList()
   }
 
+  func addBlockToCanvasOnGrid(block: Block) -> Block {
+    block.location = CanvasViewModel.quantizedPoint(for: CGPoint(
+      x: block.location.x - canvasScrollOffset.x,
+      y: block.location.y - canvasScrollOffset.y))
+    block.visible = true
+    return dropBlockOnCanvas(block: block)
+  }
+
   func dropBlockOnCanvas(block: Block) -> Block {
     // TODO - break this function up and refator logic into Canvas Model
 
@@ -187,7 +228,8 @@ extension CanvasViewModel {
     let blockAddedToGroup = canvasModel.checkBlockPositionAndAddToAvailableGroup(block: blockDroppedOnCanvas)
 
     if !blockAddedToGroup {
-      if blockDroppedOnCanvas.location.y > canvasModel.library.libaryFrame.minY + CanvasViewModel.blockSize / 2 {
+      if blockDroppedOnCanvas.location.y >
+          canvasModel.library.libaryFrame.minY + (CanvasViewModel.blockSize / 2) {
         // If the block is re-dropped on the library, delete it.
         // Right now we dont need to do anything as the block is
         // not a member of a group and has been removed from the library,

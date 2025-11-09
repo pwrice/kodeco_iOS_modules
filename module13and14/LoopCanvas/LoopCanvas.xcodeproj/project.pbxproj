@@ -18,6 +18,7 @@
 		C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8A2C2AF39300B01C58 /* HomeView.swift */; };
 		C12C6E8D2C2AFA7700B01C58 /* PlaceHolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */; };
 		C13BCD9B2C4C12380037AEF4 /* RenameSongSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */; };
+		C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */; };
 		C1498E392C18881900118C38 /* CanvasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E382C18881900118C38 /* CanvasModelTests.swift */; };
 		C1498E3B2C18884A00118C38 /* BlockGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E3A2C18884A00118C38 /* BlockGroupTests.swift */; };
 		C15DCC912C6E32430061453B /* CanvasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */; };
@@ -88,6 +89,7 @@
 		C12C6E8A2C2AF39300B01C58 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceHolderView.swift; sourceTree = "<group>"; };
 		C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameSongSheet.swift; sourceTree = "<group>"; };
+		C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryPickerSheet.swift; sourceTree = "<group>"; };
 		C1498E382C18881900118C38 /* CanvasModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasModelTests.swift; sourceTree = "<group>"; };
 		C1498E3A2C18884A00118C38 /* BlockGroupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroupTests.swift; sourceTree = "<group>"; };
 		C15DCC922C6E3E4A0061453B /* CanvasStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasStoreTests.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 		C1E5D1802D1DCD430021D803 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */,
 				C1706DDA2C6CE4E000DAC858 /* SongListView.swift */,
 				C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */,
 				C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */,
@@ -496,6 +499,7 @@
 				C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */,
 				C10DE2102D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */,
 				C12C6E872C2AF29500B01C58 /* LibraryView.swift in Sources */,
+				C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */,
 				C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */,
 				C10DE20A2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */,
 			);

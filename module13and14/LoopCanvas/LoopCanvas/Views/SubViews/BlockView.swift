@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+struct PositionedBlockView: View {
+  @ObservedObject var model: Block
+
+  var body: some View {
+    BlockView(model: model)
+    .frame(
+      width: CanvasViewModel.blockSize,
+      height: CanvasViewModel.blockSize)
+    .position(model.location)
+  }
+}
+
 struct BlockView: View {
   @ObservedObject var model: Block
 
@@ -20,9 +32,20 @@ struct BlockView: View {
             .foregroundColor(.white)
         }
     }
-    .frame(
-      width: CanvasViewModel.blockSize,
-      height: CanvasViewModel.blockSize)
-    .position(model.location)
+  }
+}
+
+struct LibraryPickerBlockView: View {
+  @ObservedObject var model: Block
+
+  var body: some View {
+    ZStack {
+      RoundedRectangle(cornerRadius: 10)
+        .foregroundColor(model.color)
+        .overlay {
+          Image(systemName: model.icon)
+            .foregroundColor(.white)
+        }
+    }
   }
 }
