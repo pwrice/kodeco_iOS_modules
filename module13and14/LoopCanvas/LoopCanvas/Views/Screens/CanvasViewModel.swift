@@ -27,6 +27,8 @@ class CanvasViewModel: ObservableObject {
   @Published var selectedSampleSetName: String = ""
   @Published var librarySlotLocations: [CGPoint]
   @Published var canvasSnapshot: UIImage?
+  @Published var addBlockTapGridPosition: CGPoint?
+
 
   var draggingBlock: Block?
   var canvasScrollOffset = CGPoint.zero
@@ -58,17 +60,25 @@ class CanvasViewModel: ObservableObject {
   static func quantizedPoint(for location: CGPoint) -> CGPoint {
     let spacing = gridSpacing()
     let halfBlock = (blockSize + blockSpacing) / 2.0
+    let gridPos = gridPosition(for: location)
+
+    // Convert back to actual canvas coordinates (center of the grid square)
+    let quantizedX = (gridPos.x * spacing) + halfBlock
+    let quantizedY = (gridPos.y * spacing) + halfBlock
+
+    return CGPoint(x: quantizedX, y: quantizedY)
+  }
+
+  static func gridPosition(for location: CGPoint) -> CGPoint {
+    let spacing = gridSpacing()
 
     // Compute grid cell indices
     let col = floor(location.x / spacing)
     let row = floor(location.y / spacing)
 
-    // Convert back to actual canvas coordinates (center of the grid square)
-    let quantizedX = (col * spacing) + halfBlock
-    let quantizedY = (row * spacing) + halfBlock
-
-    return CGPoint(x: quantizedX, y: quantizedY)
+    return CGPoint(x: col, y: row)
   }
+
 
   private var orienttationCancellable: AnyCancellable?
   @Published var isLandscapeOrientation: Bool = UIDevice.current.orientation.isLandscape
@@ -197,6 +207,7 @@ extension CanvasViewModel {
   }
 
   func addBlockToCanvasOnGrid(block: Block) -> Block {
+    addBlockTapGridPosition = nil
     block.location = CanvasViewModel.quantizedPoint(for: CGPoint(
       x: block.location.x - canvasScrollOffset.x,
       y: block.location.y - canvasScrollOffset.y))

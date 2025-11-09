@@ -24,7 +24,7 @@ struct BlockView: View {
 
   var body: some View {
     ZStack {
-      RoundedRectangle(cornerRadius: 10)
+      RoundedRectangle(cornerRadius: 10) // TODO - add this to constants somewhere
         .foregroundColor(model.color)
         .opacity(model.visible ? 1 : 0)
         .overlay {

@@ -10,8 +10,8 @@ import SwiftUI
 
 struct LibraryPickerSheet: View {
   @ObservedObject var library: Library
+  var addBlockTapPosition: CGPoint?
   var viewModel: CanvasViewModel
-  @Binding var addBlockTapPosition: CGPoint?
   @Binding var showingLibraryPickerView: Bool
 
   var body: some View {
@@ -84,7 +84,6 @@ struct LibraryPickerSheet_Previews: PreviewProvider {
       LibraryPickerSheet(
         library: viewModel.canvasModel.library,
         viewModel: viewModel,
-        addBlockTapPosition: .constant(nil),
         showingLibraryPickerView: .constant(true))
       .previewDisplayName("Portrait Mode")
       .previewInterfaceOrientation(.portrait)
@@ -93,7 +92,6 @@ struct LibraryPickerSheet_Previews: PreviewProvider {
       LibraryPickerSheet(
         library: viewModel.canvasModel.library,
         viewModel: viewModel,
-        addBlockTapPosition: .constant(nil),
         showingLibraryPickerView: .constant(true))
       .previewDisplayName("Portrait - Dark Mode")
       .previewInterfaceOrientation(.portrait)
@@ -103,7 +101,6 @@ struct LibraryPickerSheet_Previews: PreviewProvider {
       LibraryPickerSheet(
         library: viewModel.canvasModel.library,
         viewModel: viewModel,
-        addBlockTapPosition: .constant(nil),
         showingLibraryPickerView: .constant(true))
       .previewDisplayName("Landscape Mode")
       .previewInterfaceOrientation(.landscapeLeft)
