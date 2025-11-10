@@ -25,6 +25,7 @@
 		C161307A2D25F79700725FA0 /* DownloadableSampleSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */; };
 		C1706DDB2C6CE4E000DAC858 /* SongListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDA2C6CE4E000DAC858 /* SongListView.swift */; };
 		C1706DDD2C6CE5B700DAC858 /* CanvasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */; };
+		C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */; };
 		C18D4BFF2D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
 		C18D4C002D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
 		C18D4C022D17816F00595432 /* DownloadableSampleSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */; };
@@ -95,6 +96,7 @@
 		C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadableSampleSetTests.swift; sourceTree = "<group>"; };
 		C1706DDA2C6CE4E000DAC858 /* SongListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongListView.swift; sourceTree = "<group>"; };
 		C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasStore.swift; sourceTree = "<group>"; };
+		C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockDetailsSheet.swift; sourceTree = "<group>"; };
 		C18D4BFE2D17355200595432 /* FileDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManager.swift; sourceTree = "<group>"; };
 		C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadableSampleSet.swift; sourceTree = "<group>"; };
 		C19A089E2C962A06008CCB0E /* Dub */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Dub; sourceTree = "<group>"; };
@@ -158,6 +160,17 @@
 				C18D4BFE2D17355200595432 /* FileDownloadManager.swift */,
 			);
 			path = Networking;
+			sourceTree = "<group>";
+		};
+		C185495A2EC15B70008E3D2C /* Sheets */ = {
+			isa = PBXGroup;
+			children = (
+				C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */,
+				C1B150FF2C9F4BF100B4FAE8 /* DownloadGenresSheet.swift */,
+				C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */,
+				C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */,
+			);
+			path = Sheets;
 			sourceTree = "<group>";
 		};
 		C19D853C2C08AE5900477545 = {
@@ -247,6 +260,7 @@
 		C19D85742C08AF2400477545 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C185495A2EC15B70008E3D2C /* Sheets */,
 				C1E5D1812D1DCD870021D803 /* SubViews */,
 				C1E5D1802D1DCD430021D803 /* Screens */,
 			);
@@ -264,14 +278,11 @@
 		C1E5D1802D1DCD430021D803 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
-				C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */,
 				C1706DDA2C6CE4E000DAC858 /* SongListView.swift */,
-				C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */,
 				C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */,
 				C12C6E8A2C2AF39300B01C58 /* HomeView.swift */,
 				C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */,
 				C19D85762C08B00C00477545 /* CanvasView.swift */,
-				C1B150FF2C9F4BF100B4FAE8 /* DownloadGenresSheet.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -495,6 +506,7 @@
 				C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */,
 				C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */,
 				C10DE2102D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */,
+				C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */,
 				C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */,
 				C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */,
 				C10DE20A2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */,

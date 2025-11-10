@@ -31,17 +31,21 @@ struct BlockView: View {
           Image(systemName: model.icon)
             .foregroundColor(.white)
         }
+      RoundedRectangle(cornerRadius: 10) // TODO - make this a constant
+        .fill(.clear)
+        .stroke(.cyan, lineWidth: 2) // TODO - put these colors into Assets
+        .opacity(model.isSelected ? 1 : 0)
     }
   }
 }
 
-struct LibraryPickerBlockView: View {
+struct PreviewBlockView: View {
   @ObservedObject var model: Block
 
   var body: some View {
     ZStack {
       RoundedRectangle(cornerRadius: 10)
-        .foregroundColor(model.color)
+        .foregroundColor(model.normalColor)
         .overlay {
           Image(systemName: model.icon)
             .foregroundColor(.white)

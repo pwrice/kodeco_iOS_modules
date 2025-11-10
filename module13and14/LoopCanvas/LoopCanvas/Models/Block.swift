@@ -37,6 +37,14 @@ class Block: ObservableObject, Identifiable, Codable {
   weak var blockGroup: BlockGroup?
   var isPlaying = false
   var loopPlayer: LoopPlayer?
+  var isSelected: Bool = false
+  var name: String {
+    if let loopURL = loopURL {
+      return loopURL.lastPathComponent
+    }
+    return ""
+  }
+  var isMuted = false
 
   static var blockIdCounter: Int = 0
   static func getNextBlockId() -> Int {

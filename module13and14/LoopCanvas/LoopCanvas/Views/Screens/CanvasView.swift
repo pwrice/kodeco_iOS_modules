@@ -14,10 +14,11 @@ struct CanvasView: View {
   @State var showingRenameSongView = false
   @State var showingDownloadGenresView = false
   @State var showingLibraryPickerView = false
+  @State var showingBlockDetailsView = false
   @State var addBlockTapPosition: CGPoint?
 
   var canvasBlocksView: some View {
-    CanvasBlocksView(viewModel: viewModel)
+    CanvasBlocksView(viewModel: viewModel, showingBlockDetailsView: $showingBlockDetailsView)
   }
 
   var body: some View {
@@ -61,6 +62,11 @@ struct CanvasView: View {
     .onChange(of: showingLibraryPickerView) { _, newValue in
       if newValue == false {
         viewModel.addBlockTapGridPosition = nil
+      }
+    }
+    .onChange(of: showingBlockDetailsView) { _, newValue in
+      if newValue == false {
+        viewModel.unselectCurrentlySelectedBlock()
       }
     }
     .navigationBarItems(
@@ -143,6 +149,16 @@ struct CanvasView: View {
         showingLibraryPickerView: $showingLibraryPickerView)
       .presentationDetents([.medium])
     })
+    .sheet(isPresented: $showingBlockDetailsView, content: {
+      if let selectedBlock = viewModel.selectedBlock {
+        BlockDetailsSheet(
+          block: selectedBlock,
+          showingBlockDetailsView: $showingBlockDetailsView,
+          viewModel: viewModel,
+        )
+        .presentationDetents([.medium])
+      }
+    })
   }
 
   func snapshot(snapshotView: some View) -> UIImage? {
@@ -167,6 +183,7 @@ struct ViewOffsetKey: PreferenceKey {
 
 struct CanvasBlocksView: View {
   @ObservedObject var viewModel: CanvasViewModel
+  @Binding var showingBlockDetailsView: Bool
 
   // TODO - make work w multi-touch (this assumes just a single drag)
   @GestureState private var dragStartLocation: CGPoint?
@@ -196,6 +213,13 @@ struct CanvasBlocksView: View {
           .gesture(
             blockDragGesture(block: blockModel)
           )
+          .simultaneousGesture(
+            TapGesture()
+              .onEnded { _ in
+                viewModel.selectBlock(block: blockModel)
+                showingBlockDetailsView = true
+              }
+            )
       }
     }
   }
@@ -249,6 +273,7 @@ struct UIOverlayView: View {
 }
 
 
+
 struct CanvasView_Previews: PreviewProvider {
   static var previews: some View {
     let sampleSetStore = SampleSetStore()
@@ -290,13 +315,14 @@ struct CanvasView_Previews: PreviewProvider {
 // swiftlint --fix --no-cache --config ~/com.raywenderlich.swiftlint.yml
 
 // UPDATED TODO - Nov 2025
-// - remove library view and related functionality
-//   - add way in pulldown menu to switch genres
-//   - fix tests to exercise adding / removing blocks
+// [DONE]- remove library view and related functionality
+//   [DONE]- add way in pulldown menu to switch genres
+//   [DONE]- fix tests to exercise adding / removing blocks
 // - add context menu for tapping on block
+//   - add selection state for block
 //   - delete loop
 //   - mute loop
-//   - add selection state for block
+//   - add support to custom name block
 //   - add extend loop to multiple bars (or shorten)
 // - add multi-bar support for loops
 //   - extended rectangle renderer

@@ -24,9 +24,9 @@ class CanvasViewModel: ObservableObject {
   @Published var allBlocks: [Block]
   @Published var selectedSampleSetName: String = ""
   @Published var canvasSnapshot: UIImage?
-  @Published var addBlockTapGridPosition: CGPoint?
 
-
+  var addBlockTapGridPosition: CGPoint?
+  var selectedBlock: Block?
   var draggingBlock: Block?
   var canvasScrollOffset = CGPoint.zero
   var songNameToLoad: String?
@@ -220,6 +220,26 @@ extension CanvasViewModel {
       freshCanvasModel.library.name = sampleSetName
       resetCanvasModel(newCanvasModel: freshCanvasModel)
     }
+  }
+
+  func selectBlock(block: Block) {
+    selectedBlock = block
+    block.isSelected = true
+  }
+
+  func unselectCurrentlySelectedBlock() {
+    if let block = selectedBlock {
+      unselectBlock(block: block)
+    }
+  }
+
+  func unselectBlock(block: Block) {
+    selectedBlock = nil
+    block.isSelected = false
+  }
+
+  func toggleMute(block: Block) {
+    block.isMuted = !block.isMuted
   }
 }
 

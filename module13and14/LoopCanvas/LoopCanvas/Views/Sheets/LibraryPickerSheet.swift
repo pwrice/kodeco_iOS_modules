@@ -22,7 +22,7 @@ struct LibraryPickerSheet: View {
             Section {
               ForEach(category.blocks) { blockModel in
                 HStack(alignment: .center, spacing: 12) {
-                  LibraryPickerBlockView(model: blockModel)
+                  PreviewBlockView(model: blockModel)
                     .frame(width: 56, height: 56)
                   Text(blockModel.relativePath ?? "")
                     .font(.subheadline)
