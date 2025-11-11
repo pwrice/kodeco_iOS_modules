@@ -318,10 +318,10 @@ struct CanvasView_Previews: PreviewProvider {
 // [DONE]- remove library view and related functionality
 //   [DONE]- add way in pulldown menu to switch genres
 //   [DONE]- fix tests to exercise adding / removing blocks
-// - add context menu for tapping on block
-//   - add selection state for block
-//   - delete loop
-//   - mute loop
+// [DONE]- add context menu for tapping on block
+//   [DONE]- add selection state for block
+//   [DONE]- delete loop
+//   [DONE]- mute loop
 //   - add support to custom name block
 //   - add extend loop to multiple bars (or shorten)
 // - add multi-bar support for loops
@@ -329,7 +329,11 @@ struct CanvasView_Previews: PreviewProvider {
 //   - incorporate length into model
 // - add animation for block after it is dropped till the next bar when playback starts
 // - add ability to import your own samples from documents folder
+//   - create documents folder
 //   - how to deal with tempo adjustment and loop length?
+//   - copy default files out to documents folder
+//   - download additional genres to documents folder
+//   - store songs in documents folder
 // - figure out how to select a group and set group properties (mute etc...)
 
 // MULTI-USER
@@ -337,6 +341,9 @@ struct CanvasView_Previews: PreviewProvider {
 
 // AUv3
 // make AUv3 plugin so you can record into loops from other audio apps
+
+// Genre downloading
+// - re-do download to download genre zip files from AWS and unzip
 
 
 // Library TODO

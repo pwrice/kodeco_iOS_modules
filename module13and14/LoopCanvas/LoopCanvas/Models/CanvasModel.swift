@@ -142,15 +142,10 @@ class CanvasModel: ObservableObject {
     let allCanvasBlocks = blocksGroups.flatMap { $0.allBlocks }
     for blockGroup in blocksGroups {
       for otherBlock in blockGroup.allBlocks where otherBlock.id != block.id {
-        let relativeSlots: [BlockGroupSlot] = [
-          SlotPostion.top.getSlot(relativeTo: otherBlock.location),
-          SlotPostion.right.getSlot(relativeTo: otherBlock.location),
-          SlotPostion.bottom.getSlot(relativeTo: otherBlock.location),
-          SlotPostion.left.getSlot(relativeTo: otherBlock.location)
-        ]
+        let neighborSlots = BlockGroupSlot.getNeighborSlots(for: otherBlock)
         var intersectingSlot: BlockGroupSlot?
         var minDist: CGFloat = 100000000.0
-        for slot in relativeSlots {
+        for slot in neighborSlots {
           let diffX = block.location.x - slot.location.x
           let diffY = block.location.y - slot.location.y
           let dist = diffX * diffX + diffY * diffY

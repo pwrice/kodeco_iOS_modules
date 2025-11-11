@@ -23,7 +23,7 @@ protocol MusicEngine: AnyObject {
   func stop()
   func reset()
   func stopEngine()
-  func getAvailableLoopPlayer(loopURL: URL?) -> LoopPlayer?
+  func getAvailableLoopPlayer(loopURL: URL?, numBars: Int) -> LoopPlayer?
   func releaseLoopPlayer(player: LoopPlayer)
 }
 
@@ -43,6 +43,14 @@ class LoopPlayer {
   var loopPlaying = false
   var tempo: BPM?
   var allocated = false
+  var loopDuration: Duration?
+  var numBars = 1
+  var maxNumBars: Int {
+    if let loopDuration = loopDuration {
+      return Int(floor(loopDuration.beats / 4.0))
+    }
+    return 0
+  }
 
   init(id: Int, audioPlayer: AudioPlayer? = nil) {
     self.id = id
@@ -50,20 +58,26 @@ class LoopPlayer {
   }
 
   func loadLoop(for loopURL: URL, tempo: BPM) {
+    guard let audioPlayer = audioPlayer else {
+      Self.logger.error("LoopPlayer.loadLoop() error: audioPlayer is nil")
+      return
+    }
     self.loopURL = loopURL
     self.tempo = tempo
 
     do {
       let file = try AVAudioFile(forReading: loopURL)
-      try audioPlayer?.load(file: file, buffered: true, preserveEditTime: true)
+      try audioPlayer.load(file: file, buffered: true, preserveEditTime: true)
     } catch let error {
       Self.logger.error("LoopPlayer.loadLoop() error: \(error)")
     }
 
-    audioPlayer?.isEditTimeEnabled = true
-    audioPlayer?.editStartTime = 0
-    audioPlayer?.editEndTime = Duration(beats: 4, tempo: tempo).seconds
-    audioPlayer?.isLooping = true
+    loopDuration = Duration(seconds: audioPlayer.duration, tempo: tempo)
+    audioPlayer.isEditTimeEnabled = true
+    audioPlayer.editStartTime = 0
+    let loopBars = numBars > maxNumBars ? maxNumBars : numBars
+    audioPlayer.editEndTime = Duration(beats: Double(loopBars * 4), tempo: tempo).seconds
+    audioPlayer.isLooping = true
   }
 }
 
@@ -97,10 +111,12 @@ class BaseMusicEngine {
     if current16thNoteInOneBar == nextBarLogicTick {
       // TODO - figure out how to handle start / stop / looping more gracefully
       for loopPlayer in loopPlayers where loopPlayer.loopPlaying {
-        if let audioPlayer = loopPlayer.audioPlayer, audioPlayer.isPlaying != true {
+        if let audioPlayer = loopPlayer.audioPlayer {
           let lastBarBeat0 = Int(floor(clickTrackPosition.beats / 4)) * 4
           let nextBarBeat0 = lastBarBeat0 + 4
-          scheduleAudioPlaybackOnClickTrack(audioPlayer: audioPlayer, beat: Double(nextBarBeat0))
+          if audioPlayer.isPlaying != true {
+            scheduleAudioPlaybackOnClickTrack(audioPlayer: audioPlayer, beat: Double(nextBarBeat0))
+          }
         }
       }
     }
@@ -123,12 +139,13 @@ class BaseMusicEngine {
   }
 
 
-  func getAvailableLoopPlayer(loopURL: URL?) -> LoopPlayer? {
+  func getAvailableLoopPlayer(loopURL: URL?, numBars: Int) -> LoopPlayer? {
     if let player = loopPlayers.first(where: { $0.allocated == false }), let loopURL = loopURL {
       player.audioPlayer?.stop()
       player.loopPlaying = false
       player.allocated = true
       player.loopURL = loopURL
+      player.numBars = numBars
       player.loadLoop(for: loopURL, tempo: tempo)
       return player
     }

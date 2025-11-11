@@ -18,28 +18,32 @@ enum SlotPostion {
     return getSlot(relativeTo: block.location)
   }
 
-  func getSlot(relativeTo location: CGPoint) -> BlockGroupSlot {
+  func getSlot(relativeTo location: CGPoint, xOffsetMultiple: Int = 0) -> BlockGroupSlot {
     switch self {
     case .top:
       return BlockGroupSlot(
-        gridPosX: 0,
+        gridPosX: xOffsetMultiple,
         gridPosY: -1,
         location: CGPoint(
-          x: location.x,
+          x: location.x +
+            (CGFloat(xOffsetMultiple) * (CanvasViewModel.blockSpacing + CanvasViewModel.blockSize)),
           y: location.y - CanvasViewModel.blockSpacing - CanvasViewModel.blockSize))
     case .right:
       return BlockGroupSlot(
-        gridPosX: 1,
+        gridPosX: 1 + xOffsetMultiple,
         gridPosY: 0,
         location: CGPoint(
-          x: location.x + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
+          x: location.x +
+            CanvasViewModel.blockSpacing + CanvasViewModel.blockSize +
+            (CGFloat(xOffsetMultiple) * (CanvasViewModel.blockSpacing + CanvasViewModel.blockSize)),
           y: location.y))
     case .bottom:
       return BlockGroupSlot(
-        gridPosX: 0,
+        gridPosX: xOffsetMultiple,
         gridPosY: 1,
         location: CGPoint(
-          x: location.x,
+          x: location.x +
+            (CGFloat(xOffsetMultiple) * (CanvasViewModel.blockSpacing + CanvasViewModel.blockSize)),
           y: location.y + CanvasViewModel.blockSpacing + CanvasViewModel.blockSize))
     case .left:
       return BlockGroupSlot(
@@ -56,12 +60,27 @@ struct BlockGroupSlot {
   let gridPosX: Int
   let gridPosY: Int
   let location: CGPoint
+
+  static func getNeighborSlots(for block: Block) -> [BlockGroupSlot] {
+    var neighborSlots: [BlockGroupSlot] = [
+      SlotPostion.left.getSlot(relativeTo: block.location)
+    ]
+    for i in 0..<block.numBars {
+      neighborSlots.append(SlotPostion.top.getSlot(relativeTo: block.location, xOffsetMultiple: i))
+      neighborSlots.append(SlotPostion.bottom.getSlot(relativeTo: block.location, xOffsetMultiple: i))
+      if i == block.numBars - 1 {
+        neighborSlots.append(SlotPostion.right.getSlot(relativeTo: block.location, xOffsetMultiple: i))
+      }
+    }
+
+    return neighborSlots
+  }
 }
 
 class BlockGroup: ObservableObject, Identifiable, Codable {
   private static let logger = Logger(
-      subsystem: "Models",
-      category: String(describing: BlockGroup.self)
+    subsystem: "Models",
+    category: String(describing: BlockGroup.self)
   )
 
   var musicEngine: MusicEngine?
@@ -102,16 +121,19 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     block.blockGroup = self
     block.blockGroupGridPosX = 0
     block.blockGroupGridPosY = 0
-    block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL)
+    block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL, numBars: block.numBars)
     block.isPlaying = false
 
     allBlocks.append(block)
+    // when creating a new group, initialize at the end so the next bar starts at 0
+    currentPlayPosX = block.numBars - 1
+    block.currentRelativeBar = block.numBars - 1
   }
 
   func setMusicEngineAfterLoad(musicEngine: MusicEngine) {
     self.musicEngine = musicEngine
     for block in allBlocks where block.loopPlayer == nil {
-      block.loopPlayer = musicEngine.getAvailableLoopPlayer(loopURL: block.loopURL)
+      block.loopPlayer = musicEngine.getAvailableLoopPlayer(loopURL: block.loopURL, numBars: block.numBars)
     }
   }
 
@@ -119,8 +141,13 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     block.blockGroupGridPosX = gridPosX
     block.blockGroupGridPosY = gridPosY
     block.blockGroup = self
-    block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL)
+    block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL, numBars: block.numBars)
     block.isPlaying = false
+    if allBlocks.isEmpty {
+      // when creating a new group, initialize at the end so the next bar starts at 0
+      currentPlayPosX = block.numBars - 1
+      block.currentRelativeBar = block.numBars - 1
+    }
     allBlocks.append(block)
   }
 
@@ -155,12 +182,13 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     var maxPlayPosX = -10000
     var minPlayPosX = 10000
     for block in allBlocks {
-      if let blockGroupGridPosX = block.blockGroupGridPosX {
-        if blockGroupGridPosX > maxPlayPosX {
-          maxPlayPosX = blockGroupGridPosX
+      if let minBlockGroupGridPosX = block.startBlockGroupGridPosX,
+        let maxBlockGroupGridPosX = block.endBlockGroupGridPosX {
+        if maxBlockGroupGridPosX > maxPlayPosX {
+          maxPlayPosX = maxBlockGroupGridPosX
         }
-        if blockGroupGridPosX < minPlayPosX {
-          minPlayPosX = blockGroupGridPosX
+        if minBlockGroupGridPosX < minPlayPosX {
+          minPlayPosX = minBlockGroupGridPosX
         }
       }
     }
@@ -175,10 +203,14 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
   func tick(step16: Int) {
     if step16 == musicEngine?.nextBarLogicTick {
       let oldPlayPositionX = currentPlayPosX
-      let currentlyPlayingBlocks = allBlocks.filter { $0.blockGroupGridPosX == oldPlayPositionX }
+      let currentlyPlayingBlocks = allBlocks.filter {
+        $0.blockGroupXSpanContains(posX: oldPlayPositionX)
+      }
       let currentlyPlayingBlockIds = currentlyPlayingBlocks.map { $0.id }
       let newPlayPositionX = getNextPlayPos()
-      let newPlayingBlocks = allBlocks.filter { $0.blockGroupGridPosX == newPlayPositionX }
+      let newPlayingBlocks = allBlocks.filter {
+        $0.blockGroupXSpanContains(posX: newPlayPositionX)
+      }
       let newPlayingBlockIds = newPlayingBlocks.map { $0.id }
 
       let blocksStarting = newPlayingBlocks.filter { !currentlyPlayingBlockIds.contains($0.id) }
@@ -188,14 +220,17 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
       for block in blocksStarting {
         block.isPlaying = true
         block.loopPlayer?.loopPlaying = true
+        block.currentRelativeBar = 0
       }
       for block in blocksContinuing {
         block.isPlaying = true
         block.loopPlayer?.loopPlaying = true
+        block.currentRelativeBar = newPlayPositionX - (block.startBlockGroupGridPosX ?? 0)
       }
       for block in blocksStopping {
         block.isPlaying = false
         block.loopPlayer?.loopPlaying = false
+        block.currentRelativeBar = 0
       }
 
       currentPlayPosX = newPlayPositionX

@@ -57,6 +57,31 @@ final class BlockGroupTests: XCTestCase {
     XCTAssertEqual(block.loopPlayer?.loopPlaying, true)
   }
 
+  func testTickPlaysSingleBlockWithTwoBars() throws {
+    let block = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    block.numBars = 2
+    let blockGroup = BlockGroup(id: 0, block: block, musicEngine: musicEngine)
+
+    XCTAssertEqual(blockGroup.currentPlayPosX, 1)
+    XCTAssertEqual(block.isPlaying, false)
+    XCTAssertEqual(block.loopPlayer?.loopPlaying, false)
+
+    let tick = musicEngine.nextBarLogicTick
+    blockGroup.tick(step16: tick)
+
+    XCTAssertEqual(blockGroup.currentPlayPosX, 0)
+    XCTAssertEqual(block.isPlaying, true)
+    XCTAssertEqual(block.loopPlayer?.loopPlaying, true)
+    XCTAssertEqual(block.currentRelativeBar, 0)
+
+    blockGroup.tick(step16: tick)
+
+    XCTAssertEqual(blockGroup.currentPlayPosX, 1)
+    XCTAssertEqual(block.isPlaying, true)
+    XCTAssertEqual(block.loopPlayer?.loopPlaying, true)
+    XCTAssertEqual(block.currentRelativeBar, 1)
+  }
+
   func testTickAdvancesPlayToAdjacentBlock() throws {
     let firstBlock = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
     let blockGroup = BlockGroup(id: 0, block: firstBlock, musicEngine: musicEngine)
@@ -74,6 +99,39 @@ final class BlockGroupTests: XCTestCase {
     blockGroup.tick(step16: musicEngine.nextBarLogicTick)
 
     XCTAssertEqual(blockGroup.currentPlayPosX, 1)
+    XCTAssertEqual(firstBlock.isPlaying, false)
+    XCTAssertEqual(firstBlock.loopPlayer?.loopPlaying, false)
+    XCTAssertEqual(secondBlock.isPlaying, true)
+    XCTAssertEqual(secondBlock.loopPlayer?.loopPlaying, true)
+  }
+
+  func testTickAdvancesPlayToAdjacent2BarBlocks() throws {
+    let firstBlock = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    firstBlock.numBars = 2
+    let blockGroup = BlockGroup(id: 0, block: firstBlock, musicEngine: musicEngine)
+
+    blockGroup.tick(step16: musicEngine.nextBarLogicTick)
+
+    XCTAssertEqual(blockGroup.currentPlayPosX, 0)
+    XCTAssertEqual(firstBlock.isPlaying, true)
+    XCTAssertEqual(firstBlock.loopPlayer?.loopPlaying, true)
+
+    let rightSlot = SlotPostion.right.getSlot(relativeTo: firstBlock.location, xOffsetMultiple: 1)
+    let secondBlock = getTestBlock(id: 1, location: rightSlot.location)
+    secondBlock.numBars = 2
+    blockGroup.addBlock(block: secondBlock, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
+
+    blockGroup.tick(step16: musicEngine.nextBarLogicTick)
+
+    XCTAssertEqual(blockGroup.currentPlayPosX, 1)
+    XCTAssertEqual(firstBlock.isPlaying, true)
+    XCTAssertEqual(firstBlock.loopPlayer?.loopPlaying, true)
+    XCTAssertEqual(secondBlock.isPlaying, false)
+    XCTAssertEqual(secondBlock.loopPlayer?.loopPlaying, false)
+
+    blockGroup.tick(step16: musicEngine.nextBarLogicTick)
+
+    XCTAssertEqual(blockGroup.currentPlayPosX, 2)
     XCTAssertEqual(firstBlock.isPlaying, false)
     XCTAssertEqual(firstBlock.loopPlayer?.loopPlaying, false)
     XCTAssertEqual(secondBlock.isPlaying, true)

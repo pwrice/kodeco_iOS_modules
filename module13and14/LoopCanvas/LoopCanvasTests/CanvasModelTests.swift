@@ -88,6 +88,27 @@ final class CanvasModelTests: XCTestCase {
     XCTAssertEqual(foundSlot.gridPosY, 0)
   }
 
+  func testFindEligibleSlotFor2BarBlock_RightSlot() throws {
+    let firstBlock = getFirstTestBlock()
+    firstBlock.numBars = 2
+    canvasModel.addBlockGroup(initialBlock: firstBlock)
+    let blockGroup = try XCTUnwrap(canvasModel.blocksGroups.first)
+
+    let nextBlock = getSecondTestBlock()
+    let slot = SlotPostion.right.getSlot(relativeTo: firstBlock.location, xOffsetMultiple: 1)
+    nextBlock.location = slot.location
+
+    let (foundGroup, foundSlot) = try XCTUnwrap(canvasModel.findEligibleSlotForBlock(block: nextBlock))
+    XCTAssertEqual(foundGroup.id, blockGroup.id)
+    // An extra x offset should be applied to the location
+    XCTAssertEqual(foundSlot.location, CGPoint(
+      x: firstBlock.location.x +
+      (CGFloat(1) * (CanvasViewModel.blockSpacing + CanvasViewModel.blockSize)) +
+      CanvasViewModel.blockSpacing + CanvasViewModel.blockSize,
+      y: firstBlock.location.y))
+    XCTAssertEqual(foundSlot.gridPosX, 2)
+    XCTAssertEqual(foundSlot.gridPosY, 0)
+  }
 
   func testRemoveBlockFromBlockGroup() throws {
     let firstBlock = getFirstTestBlock()

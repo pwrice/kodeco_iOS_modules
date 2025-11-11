@@ -22,6 +22,23 @@ class Block: ObservableObject, Identifiable, Codable {
 
   var blockGroupGridPosX: Int?
   var blockGroupGridPosY: Int?
+  var startBlockGroupGridPosX: Int? {
+    blockGroupGridPosX
+  }
+  var endBlockGroupGridPosX: Int? {
+    if let blockGroupGridPosX = blockGroupGridPosX {
+      return blockGroupGridPosX + (numBars - 1)
+    }
+    return nil
+  }
+  func blockGroupXSpanContains(posX: Int) -> Bool {
+    if let startBlockGroupGridPosX = startBlockGroupGridPosX,
+       let endBlockGroupGridPosX = endBlockGroupGridPosX {
+      return posX >= startBlockGroupGridPosX && posX <= endBlockGroupGridPosX
+    }
+    return false
+  }
+
   var loopURL: URL?
   let icon: String
   var relativePath: String?
@@ -37,14 +54,16 @@ class Block: ObservableObject, Identifiable, Codable {
   weak var blockGroup: BlockGroup?
   var isPlaying = false
   var loopPlayer: LoopPlayer?
-  var isSelected: Bool = false
+  var isSelected = false
+  var isMuted = false
+  var numBars = 1
+  var currentRelativeBar = 0
   var name: String {
     if let loopURL = loopURL {
       return loopURL.lastPathComponent
     }
     return ""
   }
-  var isMuted = false
 
   static var blockIdCounter: Int = 0
   static func getNextBlockId() -> Int {

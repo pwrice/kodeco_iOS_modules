@@ -93,7 +93,6 @@ class CanvasViewModel: ObservableObject {
     self.sampleSetStore = sampleSetStore
 
     self.allBlocks = []
-//    self.libraryBlocks = []
     self.canvasModel.musicEngine = musicEngine
     musicEngine.delegate = canvasModel
 
