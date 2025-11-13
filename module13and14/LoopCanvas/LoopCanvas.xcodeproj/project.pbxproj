@@ -26,6 +26,7 @@
 		C1706DDB2C6CE4E000DAC858 /* SongListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDA2C6CE4E000DAC858 /* SongListView.swift */; };
 		C1706DDD2C6CE5B700DAC858 /* CanvasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */; };
 		C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */; };
+		C185495E2EC431C2008E3D2C /* Waveform in Frameworks */ = {isa = PBXBuildFile; productRef = C185495D2EC431C2008E3D2C /* Waveform */; };
 		C18D4BFF2D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
 		C18D4C002D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
 		C18D4C022D17816F00595432 /* DownloadableSampleSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */; };
@@ -132,6 +133,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1B9BD0B2C14CA2C0030B733 /* AudioKit in Frameworks */,
+				C185495E2EC431C2008E3D2C /* Waveform in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +175,13 @@
 			path = Sheets;
 			sourceTree = "<group>";
 		};
+		C185495C2EC431C2008E3D2C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		C19D853C2C08AE5900477545 = {
 			isa = PBXGroup;
 			children = (
@@ -181,6 +190,7 @@
 				C19D85472C08AE5900477545 /* LoopCanvas */,
 				C19D85582C08AE6500477545 /* LoopCanvasTests */,
 				C19D85622C08AE6500477545 /* LoopCanvasUITests */,
+				C185495C2EC431C2008E3D2C /* Frameworks */,
 				C19D85462C08AE5900477545 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -342,6 +352,7 @@
 			name = LoopCanvas;
 			packageProductDependencies = (
 				C1B9BD0A2C14CA2C0030B733 /* AudioKit */,
+				C185495D2EC431C2008E3D2C /* Waveform */,
 			);
 			productName = LoopCanvas;
 			productReference = C19D85452C08AE5900477545 /* LoopCanvas.app */;
@@ -417,6 +428,7 @@
 			mainGroup = C19D853C2C08AE5900477545;
 			packageReferences = (
 				C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */,
+				C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */,
 			);
 			productRefGroup = C19D85462C08AE5900477545 /* Products */;
 			projectDirPath = "";
@@ -862,6 +874,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/Waveform.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
 		C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
@@ -873,6 +893,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C185495D2EC431C2008E3D2C /* Waveform */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */;
+			productName = Waveform;
+		};
 		C1B9BD0A2C14CA2C0030B733 /* AudioKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */;

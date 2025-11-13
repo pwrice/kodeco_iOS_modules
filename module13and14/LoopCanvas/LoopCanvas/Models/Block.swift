@@ -33,8 +33,8 @@ class Block: ObservableObject, Identifiable, Codable {
   }
   func blockGroupXSpanContains(posX: Int) -> Bool {
     if let startBlockGroupGridPosX = startBlockGroupGridPosX,
-       let endBlockGroupGridPosX = endBlockGroupGridPosX {
-      return posX >= startBlockGroupGridPosX && posX <= endBlockGroupGridPosX
+      let endBlockGroupGridPosX = endBlockGroupGridPosX {
+        return posX >= startBlockGroupGridPosX && posX <= endBlockGroupGridPosX
     }
     return false
   }
@@ -57,6 +57,12 @@ class Block: ObservableObject, Identifiable, Codable {
   var isSelected = false
   var isMuted = false
   var numBars = 1
+  var maxNumBars:Int {
+    if let loopPlayer = loopPlayer {
+      return loopPlayer.maxNumBars
+    }
+    return 1
+  }
   var currentRelativeBar = 0
   var name: String {
     if let loopURL = loopURL {

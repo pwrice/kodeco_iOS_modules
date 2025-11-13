@@ -49,7 +49,7 @@ class LoopPlayer {
     if let loopDuration = loopDuration {
       return Int(floor(loopDuration.beats / 4.0))
     }
-    return 0
+    return 1
   }
 
   init(id: Int, audioPlayer: AudioPlayer? = nil) {

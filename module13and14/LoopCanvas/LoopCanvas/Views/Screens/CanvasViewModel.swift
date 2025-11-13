@@ -9,6 +9,8 @@ import Combine
 import Foundation
 import SwiftUI
 import os
+import Waveform
+import AVFoundation
 
 class CanvasViewModel: ObservableObject {
   private static let logger = Logger(
@@ -30,6 +32,8 @@ class CanvasViewModel: ObservableObject {
   var draggingBlock: Block?
   var canvasScrollOffset = CGPoint.zero
   var songNameToLoad: String?
+
+  var blockDetailsViewModel: BlockDetailsViewModel?
 
   static let blockSize: CGFloat = 70.0
   static let blockSpacing: CGFloat = 10.0
@@ -224,6 +228,7 @@ extension CanvasViewModel {
   func selectBlock(block: Block) {
     selectedBlock = block
     block.isSelected = true
+    blockDetailsViewModel = BlockDetailsViewModel(block: block)
   }
 
   func unselectCurrentlySelectedBlock() {
@@ -235,10 +240,16 @@ extension CanvasViewModel {
   func unselectBlock(block: Block) {
     selectedBlock = nil
     block.isSelected = false
+    blockDetailsViewModel = nil
   }
 
   func toggleMute(block: Block) {
     block.isMuted = !block.isMuted
+  }
+
+  func update(numBars: Int, for block: Block) {
+    block.numBars = numBars
+    // TODO - adjust block group 
   }
 }
 
@@ -368,9 +379,46 @@ extension CanvasViewModel {
     // Need to keep them consistantly sorted so SwiftUI views have continuity
     newAllBlocksList.sort { $0.id > $1.id }
     allBlocks = newAllBlocksList
-
-//    var newLibraryBlocksList = canvasModel.library.allBlocks
-//    newLibraryBlocksList.sort { $0.id > $1.id }
-//    libraryBlocks = newLibraryBlocksList
   }
 }
+
+// Details View Model
+
+extension AVAudioFile {
+    /// converts to Swift friendly Float array
+    public func toFloatChannelData2() -> [[Float]]? {
+        guard let pcmBuffer = toAVAudioPCMBuffer(),
+              let data = pcmBuffer.toFloatChannelData() else { return nil }
+        return data
+    }
+}
+
+class BlockDetailsViewModel: ObservableObject {
+  private static let logger = Logger(
+    subsystem: "ViewModels",
+    category: String(describing: Library.self)
+  )
+
+  var samples: SampleBuffer
+  let block: Block
+
+  init(block: Block) {
+    self.block = block
+    samples = SampleBuffer(samples: [])
+    do {
+      if let loopUrl = block.loopURL {
+        let file = try AVAudioFile(forReading: loopUrl)
+        updateWaveform(file: file)
+      }
+
+    } catch let error {
+      Self.logger.error("LoopDetailsViewModel.setBlock() error: \(error)")
+    }
+  }
+
+  func updateWaveform(file: AVAudioFile) {
+      let stereo = file.toFloatChannelData2()!
+      samples = SampleBuffer(samples: stereo[0])
+  }
+}
+

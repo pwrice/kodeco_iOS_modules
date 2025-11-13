@@ -150,11 +150,12 @@ struct CanvasView: View {
       .presentationDetents([.medium])
     })
     .sheet(isPresented: $showingBlockDetailsView, content: {
-      if let selectedBlock = viewModel.selectedBlock {
+      if let blockDetailsViewModel = viewModel.blockDetailsViewModel {
         BlockDetailsSheet(
-          block: selectedBlock,
           showingBlockDetailsView: $showingBlockDetailsView,
-          viewModel: viewModel,
+          canvasViewModel: viewModel,
+          viewModel: blockDetailsViewModel,
+          showLiveWaveform: true
         )
         .presentationDetents([.medium])
       }
@@ -324,9 +325,11 @@ struct CanvasView_Previews: PreviewProvider {
 //   [DONE]- mute loop
 //   - add support to custom name block
 //   - add extend loop to multiple bars (or shorten)
-// - add multi-bar support for loops
-//   - extended rectangle renderer
-//   - incorporate length into model
+// - [DONE]add multi-bar support for loops
+//   - [DONE]extended rectangle renderer
+//   - [DONE]incorporate length into model
+//   - change block length on the fly in details view
+//   - update block group positions when block length changes
 // - add animation for block after it is dropped till the next bar when playback starts
 // - add ability to import your own samples from documents folder
 //   - create documents folder
