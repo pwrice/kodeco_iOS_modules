@@ -249,7 +249,30 @@ extension CanvasViewModel {
 
   func update(numBars: Int, for block: Block) {
     block.numBars = numBars
-    // TODO - adjust block group 
+    // TODO - adjust block group
+  }
+
+  // New updates for details sheet
+
+  func update(startOffset: Int, for block: Block) {
+    let maxBeats = max(0, (block.maxNumBars * 4) - 1)
+    let clamped = max(0, min(maxBeats, startOffset))
+    block.startOffset = clamped
+  }
+
+  func update(volume: Double, for block: Block) {
+    let clamped = max(0.0, min(1.0, volume))
+    block.volume = clamped
+  }
+
+  @discardableResult
+  func duplicate(block: Block) -> Block {
+    // Attempt to place to the right by one grid
+    let spacing = CanvasViewModel.gridSpacing()
+    let newLocation = CGPoint(x: block.location.x + spacing, y: block.location.y)
+    let newBlock = block.instantiateCopyWith(location: newLocation, isLibraryBlock: false)
+    newBlock.visible = true
+    return dropBlockOnCanvas(block: newBlock)
   }
 }
 
@@ -385,12 +408,12 @@ extension CanvasViewModel {
 // Details View Model
 
 extension AVAudioFile {
-    /// converts to Swift friendly Float array
-    public func toFloatChannelData2() -> [[Float]]? {
-        guard let pcmBuffer = toAVAudioPCMBuffer(),
-              let data = pcmBuffer.toFloatChannelData() else { return nil }
-        return data
-    }
+  /// converts to Swift friendly Float array
+  public func toFloatChannelData2() -> [[Float]]? {
+    guard let pcmBuffer = toAVAudioPCMBuffer(),
+      let data = pcmBuffer.toFloatChannelData() else { return nil }
+    return data
+  }
 }
 
 class BlockDetailsViewModel: ObservableObject {
@@ -417,8 +440,7 @@ class BlockDetailsViewModel: ObservableObject {
   }
 
   func updateWaveform(file: AVAudioFile) {
-      let stereo = file.toFloatChannelData2()!
-      samples = SampleBuffer(samples: stereo[0])
+    let stereo = file.toFloatChannelData2()!
+    samples = SampleBuffer(samples: stereo[0])
   }
 }
-
