@@ -244,7 +244,7 @@ extension CanvasViewModel {
   }
 
   func toggleMute(block: Block) {
-    block.isMuted = !block.isMuted
+    block.isMuted.toggle()
   }
 
   func update(numBars: Int, for block: Block) {
@@ -433,7 +433,6 @@ class BlockDetailsViewModel: ObservableObject {
         let file = try AVAudioFile(forReading: loopUrl)
         updateWaveform(file: file)
       }
-
     } catch let error {
       Self.logger.error("LoopDetailsViewModel.setBlock() error: \(error)")
     }

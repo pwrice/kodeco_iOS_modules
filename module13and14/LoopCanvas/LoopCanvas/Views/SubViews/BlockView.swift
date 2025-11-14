@@ -51,7 +51,7 @@ struct PositionedBlockView: View {
   }
 }
 
-//struct BlockView: View {
+// struct BlockView: View {
 //  @ObservedObject var model: Block
 //
 //  var body: some View {
@@ -69,7 +69,7 @@ struct PositionedBlockView: View {
 //        .opacity(model.isSelected ? 1 : 0)
 //    }
 //  }
-//}
+// }
 
 struct PreviewBlockView: View {
   @ObservedObject var model: Block

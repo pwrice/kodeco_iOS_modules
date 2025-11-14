@@ -78,6 +78,14 @@ class Library: ObservableObject {
     self.sampleSetStore = sampleSetStore
   }
 
+  // Used for previews
+  init(categories: [Category], sampleSetStore: SampleSetStore) {
+    name = ""
+    self.categories = categories
+    self.sampleSetStore = sampleSetStore
+  }
+
+
   func loadLibraryFrom(libraryFolderName: String) {
     name = libraryFolderName
     let fileManager = FileManager.default

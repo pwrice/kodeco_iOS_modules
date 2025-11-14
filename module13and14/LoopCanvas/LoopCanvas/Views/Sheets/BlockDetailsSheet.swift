@@ -35,7 +35,6 @@ struct BlockDetailsSheet: View {
     NavigationView {
       ScrollView {
         VStack(alignment: .leading, spacing: 16) {
-
           // Card
           VStack(alignment: .leading, spacing: 16) {
             // Waveform header

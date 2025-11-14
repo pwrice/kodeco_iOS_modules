@@ -274,7 +274,6 @@ struct UIOverlayView: View {
 }
 
 
-
 struct CanvasView_Previews: PreviewProvider {
   static var previews: some View {
     let sampleSetStore = SampleSetStore()
