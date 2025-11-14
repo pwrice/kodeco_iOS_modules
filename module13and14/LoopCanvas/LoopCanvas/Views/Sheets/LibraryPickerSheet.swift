@@ -110,8 +110,8 @@ struct CategoryPillsView: View {
               Text(category.name)
                 .font(.headline)
                 .foregroundColor(isSelected ?
-                 LibraryPickerSheet.Style.pillSelectedForegroundColor :
-                  LibraryPickerSheet.Style.pillUnselectedForegroundColor)
+                  LibraryPickerSheet.Style.pillSelectedForegroundColor :
+                    LibraryPickerSheet.Style.pillUnselectedForegroundColor)
                 .padding(.horizontal, LibraryPickerSheet.Style.pillTextHorizontalPadding)
                 .padding(.vertical, LibraryPickerSheet.Style.pillTextVerticalPadding)
                 .background(
@@ -212,12 +212,11 @@ struct LibraryBlockRow: View {
 
 #Preview("LibraryBlockRow Preview") {
   // Minimal environment for the row
-  let sampleSetStore = SampleSetStore(withMockResults: "Samples/SampleSetIndex.json")
   let viewModel = CanvasViewModel(
-    canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
+    canvasModel: CanvasModel(sampleSetStore: nil),
     musicEngine: MockMusicEngine(),
-    canvasStore: CanvasStore(sampleSetStore: sampleSetStore),
-    sampleSetStore: sampleSetStore
+    canvasStore: CanvasStore(sampleSetStore: nil),
+    sampleSetStore: nil
   )
 
   // Create a simple Block for preview purposes

@@ -90,7 +90,8 @@ struct SavedCanvasView: View {
 
 struct SongListView_Previews: PreviewProvider {
   static var previews: some View {
-    let sampleSetStore = SampleSetStore()
+    let sampleSetStore = SampleSetStore(withMockResults: "Samples/SampleSetIndex.json")
+
     let savedCanvases = [
       SavedCanvasModel(
         index: 0,

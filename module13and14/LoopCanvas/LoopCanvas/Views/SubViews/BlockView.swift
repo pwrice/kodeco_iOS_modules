@@ -51,25 +51,6 @@ struct PositionedBlockView: View {
   }
 }
 
-// struct BlockView: View {
-//  @ObservedObject var model: Block
-//
-//  var body: some View {
-//    ZStack {
-//      RoundedRectangle(cornerRadius: 10) // TODO - add this to constants somewhere
-//        .foregroundColor(model.color)
-//        .opacity(model.visible ? 1 : 0)
-//        .overlay {
-//          Image(systemName: model.icon)
-//            .foregroundColor(.white)
-//        }
-//      RoundedRectangle(cornerRadius: 10) // TODO - make this a constant
-//        .fill(.clear)
-//        .stroke(.cyan, lineWidth: 2) // TODO - put these colors into Assets
-//        .opacity(model.isSelected ? 1 : 0)
-//    }
-//  }
-// }
 
 struct PreviewBlockView: View {
   @ObservedObject var model: Block

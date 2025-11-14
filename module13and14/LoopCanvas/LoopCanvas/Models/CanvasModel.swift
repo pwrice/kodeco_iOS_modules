@@ -58,7 +58,6 @@ class CanvasModel: ObservableObject {
   )
 
   var musicEngine: MusicEngine?
-  let sampleSetStore: SampleSetStore
 
   @Published var name: String = "MySong"
   @Published var thumnail: UIImage?
@@ -74,16 +73,14 @@ class CanvasModel: ObservableObject {
     )
   }
 
-  init(sampleSetStore: SampleSetStore) {
-    self.sampleSetStore = sampleSetStore
+  init(sampleSetStore: SampleSetStore?) {
     library = Library(sampleSetStore: sampleSetStore)
   }
 
-  init(data: CanvasModelData, sampleSetStore: SampleSetStore) {
+  init(data: CanvasModelData, sampleSetStore: SampleSetStore?) {
     name = data.name
     blocksGroups = data.blocksGroups
     library = Library(libraryData: data.libraryData, sampleSetStore: sampleSetStore)
-    self.sampleSetStore = sampleSetStore
   }
 
   func cleanup() {

@@ -62,24 +62,24 @@ class Library: ObservableObject {
 
   let maxCategories = 7
 
-  let sampleSetStore: SampleSetStore
+  let sampleSetStore: SampleSetStore?
 
   var data: LibraryData {
     LibraryData(name: name)
   }
 
-  init(sampleSetStore: SampleSetStore) {
+  init(sampleSetStore: SampleSetStore?) {
     name = ""
     self.sampleSetStore = sampleSetStore
   }
 
-  init(libraryData: LibraryData, sampleSetStore: SampleSetStore) {
+  init(libraryData: LibraryData, sampleSetStore: SampleSetStore?) {
     name = libraryData.name
     self.sampleSetStore = sampleSetStore
   }
 
   // Used for previews
-  init(categories: [Category], sampleSetStore: SampleSetStore) {
+  init(categories: [Category], sampleSetStore: SampleSetStore?) {
     name = ""
     self.categories = categories
     self.sampleSetStore = sampleSetStore
@@ -87,6 +87,11 @@ class Library: ObservableObject {
 
 
   func loadLibraryFrom(libraryFolderName: String) {
+    guard let sampleSetStore = sampleSetStore else {
+      Self.logger.error("Error: loadLibraryFrom sampleSetStore is nil")
+      return
+    }
+
     name = libraryFolderName
     let fileManager = FileManager.default
     let libraryDirectoryURL = URL(

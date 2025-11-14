@@ -22,16 +22,16 @@ class CanvasStore: ObservableObject {
     subsystem: "Models",
     category: String(describing: CanvasStore.self)
   )
-  let sampleSetStore: SampleSetStore
+  let sampleSetStore: SampleSetStore?
 
   @Published var savedCanvases: [SavedCanvasModel] = []
   var debugSavedCanvases: [SavedCanvasModel]?
 
-  init(sampleSetStore: SampleSetStore) {
+  init(sampleSetStore: SampleSetStore?) {
     self.sampleSetStore = sampleSetStore
   }
 
-  init(debugSavedCanvases: [SavedCanvasModel], sampleSetStore: SampleSetStore) {
+  init(debugSavedCanvases: [SavedCanvasModel], sampleSetStore: SampleSetStore?) {
     self.debugSavedCanvases = debugSavedCanvases
     self.savedCanvases = debugSavedCanvases
     self.sampleSetStore = sampleSetStore

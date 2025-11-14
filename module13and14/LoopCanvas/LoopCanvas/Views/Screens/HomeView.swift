@@ -69,10 +69,12 @@ struct HomeView: View {
           )
           CanvasView(viewModel: canvasViewModel)
         case .allSongs:
-          SongListView(
-            canvasStore: canvasStore,
-            sampleSetStore: canvasStore.sampleSetStore,
-            screenName: "Saved Songs")
+          if let sampleSetStore = canvasStore.sampleSetStore {
+            SongListView(
+              canvasStore: canvasStore,
+              sampleSetStore: sampleSetStore,
+              screenName: "Saved Songs")
+          }
         default:
           PlaceHolderView()
         }

@@ -20,7 +20,7 @@ class CanvasViewModel: ObservableObject {
 
   let musicEngine: MusicEngine
   let canvasStore: CanvasStore
-  let sampleSetStore: SampleSetStore
+  let sampleSetStore: SampleSetStore?
 
   @Published var canvasModel: CanvasModel
   @Published var allBlocks: [Block]
@@ -88,7 +88,7 @@ class CanvasViewModel: ObservableObject {
     canvasModel: CanvasModel,
     musicEngine: MusicEngine,
     canvasStore: CanvasStore,
-    sampleSetStore: SampleSetStore,
+    sampleSetStore: SampleSetStore?,
     songNameToLoad: String? = nil
   ) {
     self.musicEngine = musicEngine
@@ -115,7 +115,7 @@ class CanvasViewModel: ObservableObject {
     musicEngine.stop()
     canvasModel.cleanup()
 
-    sampleSetStore.loadLocalSampleSets()
+    sampleSetStore?.loadLocalSampleSets()
     canvasModel = newCanvasModel
     canvasModel.library.loadLibraryFrom(libraryFolderName: canvasModel.library.name)
     musicEngine.tempo = canvasModel.library.tempo
@@ -138,7 +138,7 @@ extension CanvasViewModel {
       canvasModel.library.loadLibraryFrom(libraryFolderName: "Funk")
       musicEngine.tempo = canvasModel.library.tempo
       selectedSampleSetName = canvasModel.library.name
-      sampleSetStore.loadLocalSampleSets()
+      sampleSetStore?.loadLocalSampleSets()
       updateAllBlocksList()
     }
 
@@ -306,12 +306,12 @@ extension CanvasViewModel {
 
 extension CanvasViewModel {
   func downloadRemoteSampleSet(_ remoteSampleSet: DownloadableSampleSet) {
-    sampleSetStore.downloadRemoteSampleSet(remoteSampleSet)
+    sampleSetStore?.downloadRemoteSampleSet(remoteSampleSet)
   }
 
   func removeLocalSampleSet(_ remoteSampleSet: DownloadableSampleSet) {
     if selectedSampleSetName != remoteSampleSet.remoteSampleSet.name {
-      sampleSetStore.removeLocalSampleSet(remoteSampleSet)
+      sampleSetStore?.removeLocalSampleSet(remoteSampleSet)
     }
   }
 }

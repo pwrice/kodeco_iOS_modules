@@ -293,13 +293,11 @@ private extension Block {
 
 private extension CanvasViewModel {
   static func previewMock() -> CanvasViewModel {
-    let sampleSetStore = SampleSetStore(withMockResults: "Samples/SampleSetIndex.json")
-
     let viewModel = CanvasViewModel(
-      canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
+      canvasModel: CanvasModel(sampleSetStore: nil),
       musicEngine: MockMusicEngine(),
-      canvasStore: CanvasStore(sampleSetStore: sampleSetStore),
-      sampleSetStore: sampleSetStore)
+      canvasStore: CanvasStore(sampleSetStore: nil),
+      sampleSetStore: nil)
 
     return viewModel
   }

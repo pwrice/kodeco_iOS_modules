@@ -104,7 +104,7 @@ struct CanvasView: View {
           .disabled(true)
 
           // List all local sample sets as selectable items
-          ForEach(viewModel.sampleSetStore.localSampleSets.map { $0.name }, id: \.self) { name in
+          ForEach(localSampleSets.map { $0.name }, id: \.self) { name in
             Button(action: {
               if name != viewModel.selectedSampleSetName {
                 viewModel.selectedSampleSetName = name
@@ -136,10 +136,12 @@ struct CanvasView: View {
       RenameSongSheet(viewModel: viewModel, showingRenameSongView: $showingRenameSongView)
     })
     .sheet(isPresented: $showingDownloadGenresView, content: {
-      DownloadGenresSheet(
-        viewModel: viewModel,
-        store: viewModel.sampleSetStore,
-        showingDownloadGenresView: $showingDownloadGenresView)
+      if let sampleSetStore = viewModel.sampleSetStore {
+        DownloadGenresSheet(
+          viewModel: viewModel,
+          store: sampleSetStore,
+          showingDownloadGenresView: $showingDownloadGenresView)
+      }
     })
     .sheet(isPresented: $showingLibraryPickerView, content: {
       LibraryPickerSheet(
@@ -160,6 +162,10 @@ struct CanvasView: View {
         .presentationDetents([.medium])
       }
     })
+  }
+
+  var localSampleSets: [LocalSampleSet] {
+    viewModel.sampleSetStore?.localSampleSets ?? []
   }
 
   func snapshot(snapshotView: some View) -> UIImage? {
@@ -276,7 +282,8 @@ struct UIOverlayView: View {
 
 struct CanvasView_Previews: PreviewProvider {
   static var previews: some View {
-    let sampleSetStore = SampleSetStore()
+    let sampleSetStore = SampleSetStore(withMockResults: "Samples/SampleSetIndex.json")
+
     let viewModel = CanvasViewModel(
       canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
       musicEngine: MockMusicEngine(),
