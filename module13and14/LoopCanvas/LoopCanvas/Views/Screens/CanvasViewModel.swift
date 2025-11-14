@@ -19,7 +19,7 @@ class CanvasViewModel: ObservableObject {
   )
 
   let musicEngine: MusicEngine
-  let canvasStore: CanvasStore
+  let canvasStore: CanvasStore?
   let sampleSetStore: SampleSetStore?
 
   @Published var canvasModel: CanvasModel
@@ -87,7 +87,7 @@ class CanvasViewModel: ObservableObject {
   init(
     canvasModel: CanvasModel,
     musicEngine: MusicEngine,
-    canvasStore: CanvasStore,
+    canvasStore: CanvasStore?,
     sampleSetStore: SampleSetStore?,
     songNameToLoad: String? = nil
   ) {
@@ -145,7 +145,7 @@ extension CanvasViewModel {
     musicEngine.initializeEngine()
     musicEngine.play()
 
-    if let songName = songNameToLoad {
+    if let songName = songNameToLoad, let canvasStore = canvasStore {
       if let canvasModel = canvasStore.loadCanvas(name: songName) {
         resetCanvasModel(newCanvasModel: canvasModel)
         songNameToLoad = nil
@@ -292,11 +292,11 @@ extension CanvasViewModel {
   }
 
   func saveSong() {
-    canvasStore.saveCanvas(canvasModel: canvasModel)
+    canvasStore?.saveCanvas(canvasModel: canvasModel)
   }
 
   func loadSong() {
-    if let canvasModel = canvasStore.loadCanvas(name: canvasModel.name) {
+    if let canvasStore = canvasStore, let canvasModel = canvasStore.loadCanvas(name: canvasModel.name) {
       resetCanvasModel(newCanvasModel: canvasModel)
     }
   }

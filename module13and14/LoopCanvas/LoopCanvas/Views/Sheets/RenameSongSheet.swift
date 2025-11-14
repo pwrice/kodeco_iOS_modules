@@ -57,7 +57,7 @@ struct RenameSongSheet_Previews: PreviewProvider {
       canvasModel: CanvasModel(
         sampleSetStore: nil),
       musicEngine: MockMusicEngine(),
-      canvasStore: CanvasStore(sampleSetStore: nil),
+      canvasStore: nil,
       sampleSetStore: nil
     )
 

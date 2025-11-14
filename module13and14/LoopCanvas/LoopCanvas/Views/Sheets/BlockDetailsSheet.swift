@@ -296,7 +296,7 @@ private extension CanvasViewModel {
     let viewModel = CanvasViewModel(
       canvasModel: CanvasModel(sampleSetStore: nil),
       musicEngine: MockMusicEngine(),
-      canvasStore: CanvasStore(sampleSetStore: nil),
+      canvasStore: nil,
       sampleSetStore: nil)
 
     return viewModel

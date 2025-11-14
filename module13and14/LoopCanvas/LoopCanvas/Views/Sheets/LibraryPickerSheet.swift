@@ -133,13 +133,12 @@ struct CategoryPillsView: View {
 
 struct LibraryPickerSheet_Previews: PreviewProvider {
   static var previews: some View {
-    let sampleSetStore = SampleSetStore(withMockResults: "Samples/SampleSetIndex.json")
     let viewModel = CanvasViewModel(
       canvasModel: CanvasModel(
-        sampleSetStore: sampleSetStore),
+        sampleSetStore: nil),
       musicEngine: MockMusicEngine(),
-      canvasStore: CanvasStore(sampleSetStore: sampleSetStore),
-      sampleSetStore: sampleSetStore
+      canvasStore: nil,
+      sampleSetStore: nil
     )
 
 
@@ -215,7 +214,7 @@ struct LibraryBlockRow: View {
   let viewModel = CanvasViewModel(
     canvasModel: CanvasModel(sampleSetStore: nil),
     musicEngine: MockMusicEngine(),
-    canvasStore: CanvasStore(sampleSetStore: nil),
+    canvasStore: nil,
     sampleSetStore: nil
   )
 
