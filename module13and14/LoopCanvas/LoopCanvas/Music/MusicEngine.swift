@@ -94,6 +94,7 @@ class LoopPlayer {
     return defaultMaxNumBars
   }
   var defaultMaxNumBars = 1
+  var startOffsetInBars = 0
 
   var sampleStartTime: Double {
     if let audioPlayer {
@@ -196,13 +197,23 @@ class LoopPlayer {
   }
 
   func updateNumBars(_ numBars: Int) {
-    self.numBars = numBars
     guard let audioPlayer, let tempo else { return }
     let loopBars = numBars > maxNumBars ? maxNumBars : numBars
-    audioPlayer.editEndTime = Duration(beats: Double(loopBars * 4), tempo: tempo).seconds
+    let startTime = Duration(beats: Double(startOffsetInBars * 4), tempo: tempo).seconds
+    let endTime = startTime + Duration(beats: Double(loopBars * 4), tempo: tempo).seconds
+    self.numBars = numBars
+    audioPlayer.editEndTime = endTime
+  }
+
+  func updateStartOffset(_ newStartOffsetInBars: Int) {
+    guard let audioPlayer, let tempo, newStartOffsetInBars < maxNumBars else { return }
+    let deltaTime = Duration(beats: Double(newStartOffsetInBars * 4), tempo: tempo).seconds
+      - Duration(beats: Double(startOffsetInBars * 4), tempo: tempo).seconds
+    audioPlayer.editStartTime += deltaTime
+    audioPlayer.editEndTime += deltaTime
+    self.startOffsetInBars = newStartOffsetInBars
   }
 }
-
 
 class BaseMusicEngine {
   private static let logger = Logger(

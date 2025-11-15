@@ -250,8 +250,7 @@ extension CanvasViewModel {
   // New updates for details sheet
 
   func update(startOffset: Int, for block: Block) {
-    let clamped = max(0, min(block.maxNumBars - 1, startOffset))
-    block.startOffset = clamped
+    block.blockGroup?.updateBlockStartOffset(block: block, newStartOffset: startOffset)
   }
 
   func update(volume: Double, for block: Block) {
@@ -275,18 +274,12 @@ extension CanvasViewModel {
 
   /// Decrement the start offset for a block by 1 with clamping to [0, (block.maxNumBars) - 1]
   func decrementStartOffset(for block: Block) {
-    let newVal = max(0, min(block.maxNumBars, block.startOffset - 1))
-    if newVal != block.startOffset {
-      update(startOffset: newVal, for: block)
-    }
+    update(startOffset: block.startOffset - 1, for: block)
   }
 
   /// Increment the start offset for a block by 1 with clamping to [0, (block.maxNumBars) - 1]
   func incrementStartOffset(for block: Block) {
-    let newVal = max(0, min(block.maxNumBars, block.startOffset + 1))
-    if newVal != block.startOffset {
-      update(startOffset: newVal, for: block)
-    }
+    update(startOffset: block.startOffset + 1, for: block)
   }
 
   @discardableResult
@@ -435,7 +428,7 @@ extension AVAudioFile {
   /// converts to Swift friendly Float array
   public func toFloatChannelData2() -> [[Float]]? {
     guard let pcmBuffer = toAVAudioPCMBuffer(),
-      let data = pcmBuffer.toFloatChannelData() else { return nil }
+          let data = pcmBuffer.toFloatChannelData() else { return nil }
     return data
   }
 }

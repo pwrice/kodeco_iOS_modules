@@ -241,6 +241,12 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     }
   }
 
+  func updateBlockStartOffset(block: Block, newStartOffset: Int) {
+    let clampedNew = max(0, min(block.maxNumBars - 1, newStartOffset))
+    block.startOffset = clampedNew
+    block.loopPlayer?.updateStartOffset(clampedNew)
+  }
+
   /// Updates the given block's number of bars and shifts neighbor blocks in the group accordingly.
   /// - Parameters:
   ///   - block: The block whose length is changing.
@@ -261,10 +267,6 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
 
     // Capture the changed block's old end X before modification
     let oldEndX = startX + (oldNumBars - 1)
-
-    // Update the block's own numBars
-    block.numBars = clampedNew
-    block.loopPlayer?.updateNumBars(clampedNew)
 
     // Compute the pixel delta for x location shift based on bars
     let barPixelWidth = CanvasViewModel.blockSpacing + CanvasViewModel.blockSize
@@ -292,6 +294,10 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     if currentPlayPosX > oldEndX {
       currentPlayPosX += delta
     }
+
+    // Update the block's own numBars
+    block.numBars = clampedNew
+    block.loopPlayer?.updateNumBars(clampedNew)
   }
 
   // Codable implementation
