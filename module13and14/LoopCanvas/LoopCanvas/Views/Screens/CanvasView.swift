@@ -330,12 +330,16 @@ struct CanvasView_Previews: PreviewProvider {
 //   [DONE]- delete loop
 //   [DONE]- mute loop
 //   - add support to custom name block
-//   - add extend loop to multiple bars (or shorten)
+//   [DONE]- add extend loop to multiple bars (or shorten)
 // - [DONE]add multi-bar support for loops
 //   - [DONE]extended rectangle renderer
 //   - [DONE]incorporate length into model
-//   - change block length on the fly in details view
-//   - update block group positions when block length changes
+//   - [DONE]change block length on the fly in details view
+//   - **update block group positions when block length changes
+//   - update block details waveform view to show loop boundary
+//   - implement loop offset
+//   - refactor increment / decrement settings to view model
+//   - visually disable increment / decriment buttons when they are beyond their limits
 // - add animation for block after it is dropped till the next bar when playback starts
 // - add ability to import your own samples from documents folder
 //   - create documents folder

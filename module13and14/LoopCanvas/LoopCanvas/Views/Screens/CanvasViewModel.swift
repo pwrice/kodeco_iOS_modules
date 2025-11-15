@@ -265,6 +265,40 @@ extension CanvasViewModel {
     block.volume = clamped
   }
 
+  /// Decrement the number of bars for a block by 1 with clamping to [1, block.maxNumBars]
+  func decrementNumBars(for block: Block) {
+    let newVal = max(1, min(block.maxNumBars, block.numBars - 1))
+    if newVal != block.numBars {
+      update(numBars: newVal, for: block)
+    }
+  }
+
+  /// Increment the number of bars for a block by 1 with clamping to [1, block.maxNumBars]
+  func incrementNumBars(for block: Block) {
+    let newVal = max(1, min(block.maxNumBars, block.numBars + 1))
+    if newVal != block.numBars {
+      update(numBars: newVal, for: block)
+    }
+  }
+
+  /// Decrement the start offset for a block by 1 with clamping to [0, (block.maxNumBars*4) - 1]
+  func decrementStartOffset(for block: Block) {
+    let maxBeats = max(0, (block.maxNumBars * 4) - 1)
+    let newVal = max(0, min(maxBeats, block.startOffset - 1))
+    if newVal != block.startOffset {
+      update(startOffset: newVal, for: block)
+    }
+  }
+
+  /// Increment the start offset for a block by 1 with clamping to [0, (block.maxNumBars*4) - 1]
+  func incrementStartOffset(for block: Block) {
+    let maxBeats = max(0, (block.maxNumBars * 4) - 1)
+    let newVal = max(0, min(maxBeats, block.startOffset + 1))
+    if newVal != block.startOffset {
+      update(startOffset: newVal, for: block)
+    }
+  }
+
   @discardableResult
   func duplicate(block: Block) -> Block {
     // Attempt to place to the right by one grid

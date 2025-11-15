@@ -51,135 +51,17 @@ struct BlockDetailsSheet: View {
   @ObservedObject var viewModel: BlockDetailsViewModel
   let showLiveWaveform: Bool
 
-  // MARK: - Helpers
-
-  private func clampBars(_ value: Int) -> Int {
-    max(1, min(viewModel.block.maxNumBars, value))
-  }
-
-  private func clampStartOffset(_ value: Int) -> Int {
-    let maxBeats = max(0, (viewModel.block.maxNumBars * 4) - 1)
-    return max(0, min(maxBeats, value))
-  }
-
-  private func volumePercent(_ volume: Double) -> Int {
-    Int(round(volume * 100.0))
-  }
-
   // MARK: - View
 
   var body: some View {
     NavigationView {
       ScrollView {
         VStack(alignment: .leading, spacing: Style.rowSpacing) {
-          // Card
-          VStack(alignment: .leading, spacing: Style.rowSpacing) {
-            // Waveform header
-            ZStack {
-              RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous)
-                .fill(Style.secondaryBackground)
-                .overlay(
-                  Group {
-                    if showLiveWaveform {
-                      Waveform(samples: viewModel.samples)
-                        .foregroundColor(.green)
-                        .padding(Style.contentPadding - 4)
-                    } else {
-                      Color.clear
-                    }
-                  }
-                )
-                .clipShape(RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous))
-            }
-            .frame(height: Style.waveformHeight)
-
-            // Number of Bars row
-            rowWithSteppers(
-              title: "Number of Bars",
-              valueText: "\(viewModel.block.numBars)",
-              onDecrement: {
-                let newVal = clampBars(viewModel.block.numBars - 1)
-                if newVal != viewModel.block.numBars {
-                  canvasViewModel.update(numBars: newVal, for: viewModel.block)
-                }
-              },
-              onIncrement: {
-                let newVal = clampBars(viewModel.block.numBars + 1)
-                if newVal != viewModel.block.numBars {
-                  canvasViewModel.update(numBars: newVal, for: viewModel.block)
-                }
-              }
-            )
-
-            Divider()
-
-            // Start Offset row
-            rowWithSteppers(
-              title: "Start Offset",
-              valueText: "\(viewModel.block.startOffset)",
-              onDecrement: {
-                let newVal = clampStartOffset(viewModel.block.startOffset - 1)
-                if newVal != viewModel.block.startOffset {
-                  canvasViewModel.update(startOffset: newVal, for: viewModel.block)
-                }
-              },
-              onIncrement: {
-                let newVal = clampStartOffset(viewModel.block.startOffset + 1)
-                if newVal != viewModel.block.startOffset {
-                  canvasViewModel.update(startOffset: newVal, for: viewModel.block)
-                }
-              }
-            )
-
-            Divider()
-
-            // Volume row
-            VStack(alignment: .leading, spacing: Style.smallSpacing) {
-              HStack {
-                Text("Volume")
-                  .font(.headline)
-                Spacer()
-                Text("\(volumePercent(viewModel.block.volume))%")
-                  .foregroundColor(.secondary)
-              }
-
-              Slider(
-                value: Binding(
-                  get: { viewModel.block.volume },
-                  set: { newValue in
-                    let clamped = max(0.0, min(1.0, newValue))
-                    canvasViewModel.update(volume: clamped, for: viewModel.block)
-                  }),
-                in: 0...1
-              )
-            }
-
-            // Mute pill
-            Button {
-              canvasViewModel.toggleMute(block: viewModel.block)
-            } label: {
-              HStack(spacing: 8) {
-                Image(systemName: "speaker.slash")
-                Text(viewModel.block.isMuted ? "Unmute Block" : "Mute Block")
-              }
-              .font(.headline)
-              .foregroundColor(Style.accent)
-              .padding(.horizontal, Style.pillHorizontalPadding)
-              .padding(.vertical, Style.pillVerticalPadding)
-              .background(
-                Capsule()
-                  .fill(Style.cardFill)
-                  .shadow(color: Style.smallShadowColor, radius: Style.smallShadowRadius, x: Style.smallShadowX, y: Style.smallShadowY)
-              )
-            }
-            .buttonStyle(.plain)
-            .padding(.top, Style.smallSpacing / 2)
-          }
-          .padding(Style.cardPadding)
-          .background(
-            RoundedRectangle(cornerRadius: Style.cardCornerRadius, style: .continuous)
-              .fill(Style.cardFill)
-              .shadow(color: Style.cardShadowColor, radius: Style.cardShadowRadius, x: Style.cardShadowX, y: Style.cardShadowY)
+          BlockDetailsCardView(
+            block: viewModel.block,
+            samples: viewModel.samples,
+            showLiveWaveform: showLiveWaveform,
+            canvasViewModel: canvasViewModel
           )
 
           // Spacer divider
@@ -234,43 +116,136 @@ struct BlockDetailsSheet: View {
           Button("Done") { showingBlockDetailsView = false }
         }
         ToolbarItem(placement: .principal) {
-          HStack(spacing: 10) {
+          HStack {
             PreviewBlockView(model: viewModel.block)
               .frame(
                 width: CanvasViewModel.blockSize,
                 height: CanvasViewModel.blockSize)
               .scaleEffect(Style.blockPreviewScale)
+             // TODO - figure out how to shrink block preview as well as shrink icon
             Text(viewModel.block.name)
               .font(.headline)
               .lineLimit(1)
               .truncationMode(.tail)
-            Spacer()
           }
         }
       }
     }
   }
+}
 
-  // MARK: - Subviews
+private struct BlockDetailsCardView: View {
+  @ObservedObject var block: Block
+  let samples: SampleBuffer
+  let showLiveWaveform: Bool
+  @ObservedObject var canvasViewModel: CanvasViewModel
 
-  @ViewBuilder
-  private func rowWithSteppers(
-    title: String,
-    valueText: String,
-    onDecrement: @escaping () -> Void,
-    onIncrement: @escaping () -> Void
-  ) -> some View {
-    HStack(alignment: .center) {
-      Text(title)
-        .font(.headline)
-      Spacer()
-      HStack(spacing: 12) {
-        circularButton(system: "chevron.down", action: onDecrement)
-        Text(valueText)
-          .frame(minWidth: 20)
-        circularButton(system: "chevron.up", action: onIncrement)
+  var body: some View {
+    VStack(alignment: .leading, spacing: Style.rowSpacing) {
+      // Waveform header
+      ZStack {
+        RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous)
+          .fill(Style.secondaryBackground)
+          .overlay(
+            Group {
+              if showLiveWaveform {
+                Waveform(samples: samples)
+                  .foregroundColor(.green)
+                  .padding(Style.contentPadding - 4)
+              } else {
+                Color.clear
+              }
+            }
+          )
+          .clipShape(RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous))
       }
+      .frame(height: Style.waveformHeight)
+
+      // Number of Bars row
+      HStack(alignment: .center) {
+        Text("Number of Bars")
+          .font(.headline)
+        Spacer()
+        HStack(spacing: 12) {
+          circularButton(system: "chevron.down") {
+            canvasViewModel.decrementNumBars(for: block)
+          }
+          Text("\(block.numBars)")
+            .frame(minWidth: 20)
+          circularButton(system: "chevron.up") {
+            canvasViewModel.incrementNumBars(for: block)
+          }
+        }
+      }
+
+      Divider()
+
+      // Start Offset row
+      HStack(alignment: .center) {
+        Text("Start Offset")
+          .font(.headline)
+        Spacer()
+        HStack(spacing: 12) {
+          circularButton(system: "chevron.down") {
+            canvasViewModel.decrementStartOffset(for: block)
+          }
+          Text("\(block.startOffset)")
+            .frame(minWidth: 20)
+          circularButton(system: "chevron.up") {
+            canvasViewModel.incrementStartOffset(for: block)
+          }
+        }
+      }
+
+      Divider()
+
+      // Volume row
+      VStack(alignment: .leading, spacing: Style.smallSpacing) {
+        HStack {
+          Text("Volume")
+            .font(.headline)
+          Spacer()
+          Text("\(Int(round(block.volume * 100.0)))%")
+            .foregroundColor(.secondary)
+        }
+
+        Slider(
+          value: Binding(
+            get: { block.volume },
+            set: { newValue in
+              canvasViewModel.update(volume: newValue, for: block)
+            }),
+          in: 0...1
+        )
+      }
+
+      // Mute pill
+      Button {
+        canvasViewModel.toggleMute(block: block)
+      } label: {
+        HStack(spacing: 8) {
+          Image(systemName: "speaker.slash")
+          Text(block.isMuted ? "Unmute Block" : "Mute Block")
+        }
+        .font(.headline)
+        .foregroundColor(Style.accent)
+        .padding(.horizontal, Style.pillHorizontalPadding)
+        .padding(.vertical, Style.pillVerticalPadding)
+        .background(
+          Capsule()
+            .fill(Style.cardFill)
+            .shadow(color: Style.smallShadowColor, radius: Style.smallShadowRadius, x: Style.smallShadowX, y: Style.smallShadowY)
+        )
+      }
+      .buttonStyle(.plain)
+      .padding(.top, Style.smallSpacing / 2)
     }
+    .padding(Style.cardPadding)
+    .background(
+      RoundedRectangle(cornerRadius: Style.cardCornerRadius, style: .continuous)
+        .fill(Style.cardFill)
+        .shadow(color: Style.cardShadowColor, radius: Style.cardShadowRadius, x: Style.cardShadowX, y: Style.cardShadowY)
+    )
   }
 
   @ViewBuilder
@@ -314,8 +289,8 @@ private extension Block {
       location: CGPoint(x: 200, y: 200),
       color: .green,
       icon: "circle",
-      loopURL: URL(fileURLWithPath: "Samples/Fink/Drums/Funky_105a_timefix.wav", relativeTo: Bundle.main.bundleURL),
-      relativePath: "Samples/Fink/Drums/Funky_105a_timefix.wav",
+      loopURL: URL(fileURLWithPath: "Samples/Fink/Drums/Funky.wav", relativeTo: Bundle.main.bundleURL),
+      relativePath: "Samples/Fink/Drums/Funky.wav",
       isLibraryBlock: false
     )
 
