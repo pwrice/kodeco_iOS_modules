@@ -336,21 +336,20 @@ struct CanvasView_Previews: PreviewProvider {
 //   - [DONE]incorporate length into model
 //   - [DONE]change block length on the fly in details view
 //   - [DONE]**update block group positions when block length changes
-//   - update block details waveform view to show loop boundary
-//   - 
-//   - **implement loop offset
+//   - [DONE]update block details waveform view to show loop boundary
+//   - [DONE]**implement loop offset
 //   [DONE]- refactor increment / decrement settings to view model
 //   - fix perf problems when incrementing / decrementing numBars
 //   - visually disable increment / decriment buttons when they are beyond their limits
 // - **implement duplicate blocks
-// - add animation for block after it is dropped till the next bar when playback starts
-// - add ability to import your own samples from documents folder
+// - [DONE]**add animation for block after it is dropped till the next bar when playback starts
+// - **(add ability to import your own samples from documents folder
 //   - create documents folder
 //   - how to deal with tempo adjustment and loop length?
 //   - copy default files out to documents folder
 //   - download additional genres to documents folder
 //   - store songs in documents folder
-// - figure out how to select a group and set group properties (mute etc...)
+// - **figure out how to select a group and set group properties (mute etc...)
 
 // MULTI-USER
 // hook up shareplay so multiple users can edit a canvas at the same time

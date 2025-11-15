@@ -59,6 +59,8 @@ protocol MusicEngine: AnyObject {
   var delegate: MusicEngineDelegate? { get set }
   var tempo: Double { get set }
 
+  func timeUntilNextBar() -> TimeInterval
+
   init()
   func initializeEngine()
   func play()
@@ -367,6 +369,20 @@ class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
     sequencer.setTempo(newTempo)
   }
 
+  func timeUntilNextBar() -> TimeInterval {
+    // Determine current position in beats with the engine's tempo
+    var position = sequencer.currentRelativePosition
+    position.tempo = tempo
+    let beats = position.beats
+    // Compute next bar start in beats (bars are 4 beats)
+    let currentBarIndex = floor(beats / 4.0)
+    let nextBarStartBeats = (currentBarIndex + 1.0) * 4.0
+    let beatsRemaining = max(0.0, nextBarStartBeats - beats)
+    // Convert beats remaining to seconds given current tempo
+    let secondsRemaining = Duration(beats: beatsRemaining, tempo: tempo).seconds
+    return secondsRemaining
+  }
+
   func reset() {
     sequencer.rewind()
   }
@@ -409,6 +425,8 @@ class MockMusicEngine: BaseMusicEngine, MusicEngine {
 
   func stopEngine() {
   }
+
+  func timeUntilNextBar() -> TimeInterval { 0 }
 
   override func scheduleAudioPlaybackOnClickTrack(audioPlayer: AudioPlayer, beat: Double) {
   }

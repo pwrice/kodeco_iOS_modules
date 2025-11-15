@@ -123,6 +123,7 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     block.blockGroupGridPosY = 0
     block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL, numBars: block.numBars)
     block.isPlaying = false
+    block.triggerBlockLoadingAnimation = true
 
     allBlocks.append(block)
     // when creating a new group, initialize at the end so the next bar starts at 0
@@ -143,6 +144,7 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     block.blockGroup = self
     block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL, numBars: block.numBars)
     block.isPlaying = false
+    block.triggerBlockLoadingAnimation = true
     if allBlocks.isEmpty {
       // when creating a new group, initialize at the end so the next bar starts at 0
       currentPlayPosX = block.numBars - 1

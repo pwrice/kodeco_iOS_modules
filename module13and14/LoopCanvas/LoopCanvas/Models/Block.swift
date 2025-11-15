@@ -71,6 +71,12 @@ class Block: ObservableObject, Identifiable, Codable {
   @Published var loopPlayPosition: Double = 0.0 // 0.0 ... 1.0 normalized within current loop
   @Published var samplePlayPosition: Double = 0.0 // 0.0 ... 1.0 full sample length
 
+  var timeUntilNextBar: Double {
+    blockGroup?.musicEngine?.timeUntilNextBar() ?? defaultTimeUntilNextBar
+  }
+  var defaultTimeUntilNextBar = 1.0
+  @Published var triggerBlockLoadingAnimation = false
+
   // 0.0 ... 1.0 full sample length
   var sampleStartTime: Double {
     if let loopPlayer {

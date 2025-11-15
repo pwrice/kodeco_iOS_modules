@@ -21,11 +21,12 @@ private enum Style {
 
 struct PositionedBlockView: View {
   @ObservedObject var model: Block
+  @State private var overlayWidth: CGFloat = CanvasViewModel.blockSize
 
   var body: some View {
     ZStack {
       let backgroundWidth = (CGFloat(model.numBars) * CanvasViewModel.blockSize) +
-        ((CGFloat(model.numBars) - 1.0) * CanvasViewModel.blockSpacing)
+      ((CGFloat(model.numBars) - 1.0) * CanvasViewModel.blockSpacing)
       // Because the subviews are positioned by their center, the wider they are the more
       // we need to move them to the left
       let backgroundOffset = (backgroundWidth / 2) - (CanvasViewModel.blockSize / 2)
@@ -37,6 +38,7 @@ struct PositionedBlockView: View {
           width: backgroundWidth,
           height: CanvasViewModel.blockSize)
         .position(CGPoint(x: model.location.x + backgroundOffset, y: model.location.y))
+
 
       ForEach(0..<model.numBars, id: \.self) { index in
         let locX = model.location.x + CGFloat(index) * (CanvasViewModel.blockSize + CanvasViewModel.blockSpacing)
@@ -58,6 +60,35 @@ struct PositionedBlockView: View {
           height: CanvasViewModel.blockSize)
         .position(location)
       }
+
+      // Loading overlay that reveals the block from left to right as it shrinks
+      ZStack {
+        RoundedRectangle(cornerRadius: 0)
+          .fill(Color(.white))
+          .frame(width: overlayWidth, height: CanvasViewModel.blockSize)
+          .mask(
+            RoundedRectangle(cornerRadius: Style.blockCornerRadius)
+              .frame(width: backgroundWidth, height: CanvasViewModel.blockSize)
+          )
+          .frame(width: backgroundWidth, height: CanvasViewModel.blockSize, alignment: .trailing)
+          .position(CGPoint(x: model.location.x + backgroundOffset, y: model.location.y))
+          .opacity(model.visible ? 0.7 : 0)
+      }
+      .onAppear {
+        guard model.triggerBlockLoadingAnimation else { return }
+        // Prevent immediate re-trigger
+        model.triggerBlockLoadingAnimation = false
+        // Set starting width to full, then animate to zero over the next bar duration
+        overlayWidth = backgroundWidth
+        let duration = max(0, model.timeUntilNextBar)
+        withAnimation(.linear(duration: duration)) {
+          overlayWidth = 0
+        }
+      }
+
+      .onChange(of: model.triggerBlockLoadingAnimation) { _, _ in
+      }
+
 
       RoundedRectangle(cornerRadius: Style.blockCornerRadius)
         .fill(.clear)
