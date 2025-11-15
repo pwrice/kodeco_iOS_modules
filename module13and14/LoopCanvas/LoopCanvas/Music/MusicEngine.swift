@@ -11,6 +11,48 @@ import AudioKit
 import AVFoundation
 import os
 
+protocol AudioPlayable: AnyObject {
+  var duration: Double { get }
+  var isEditTimeEnabled: Bool { get set }
+  var editStartTime: Double { get set }
+  var editEndTime: Double { get set }
+  var isLooping: Bool { get set }
+  var currentTime: Double { get }
+  var isPlaying: Bool { get }
+
+  func load(file: AVAudioFile, buffered: Bool?, preserveEditTime: Bool) throws
+  func play(from startTime: TimeInterval?,
+            to endTime: TimeInterval?,
+            at when: AVAudioTime?,
+            completionCallbackType: AVAudioPlayerNodeCompletionCallbackType)
+  func stop()
+}
+
+extension AudioPlayer: AudioPlayable {}
+
+// Minimal mock conforming to AudioPlayable
+final class MockAudioPlayer: AudioPlayable {
+  var duration: Double
+  var isEditTimeEnabled = false
+  var editStartTime: Double = 0
+  var editEndTime: Double = 0
+  var isLooping = false
+  var isPlaying = false
+
+  // currentTime is settable for tests via a backing var
+  private var _currentTime: Double = 0
+  var currentTime: Double { _currentTime }
+
+  init(duration: Double) {
+    self.duration = duration
+  }
+
+  func setCurrentTime(_ time: Double) { _currentTime = time }
+
+  func load(file: AVAudioFile, buffered: Bool?, preserveEditTime: Bool) throws {}
+  func play(from startTime: TimeInterval?, to endTime: TimeInterval?, at when: AVAudioTime?, completionCallbackType: AVAudioPlayerNodeCompletionCallbackType) {}
+  func stop() { isPlaying = false }
+}
 
 protocol MusicEngine: AnyObject {
   var nextBarLogicTick: Int { get set }
@@ -33,13 +75,13 @@ protocol MusicEngineDelegate: AnyObject {
 
 class LoopPlayer {
   private static let logger = Logger(
-      subsystem: "MusicEngine",
-      category: String(describing: LoopPlayer.self)
+    subsystem: "MusicEngine",
+    category: String(describing: LoopPlayer.self)
   )
 
   let id: Int
   var loopURL: URL?
-  let audioPlayer: AudioPlayer?
+  let audioPlayer: AudioPlayable?
   var loopPlaying = false
   var tempo: BPM?
   var allocated = false
@@ -53,7 +95,79 @@ class LoopPlayer {
   }
   var defaultMaxNumBars = 1
 
-  init(id: Int, audioPlayer: AudioPlayer? = nil) {
+  var sampleStartTime: Double {
+    if let audioPlayer {
+      return audioPlayer.editStartTime / audioPlayer.duration
+    }
+    return defaultSampleStartTime
+  }
+  var defaultSampleStartTime = 1.0
+
+  var sampleEndTime: Double {
+    if let audioPlayer {
+      return audioPlayer.editEndTime / audioPlayer.duration
+    }
+    return defaultSampleEndTime
+  }
+  var defaultSampleEndTime = 1.0
+
+  var samplePlayPosition: Double {
+    guard let audioPlayer = audioPlayer else { return defaultSamplePlayPosition }
+
+    let startSec = 0.0
+    let endSec: Double = audioPlayer.duration
+    // Current time in seconds within the file
+    return audioPlayer.currentTime / (endSec - startSec)
+  }
+  var defaultSamplePlayPosition = 0.0
+
+  var loopPlayPosition: Double {
+    guard let audioPlayer = audioPlayer, let tempo = tempo else { return 0.0 }
+
+    // Effective loop length in bars
+    let loopBars = min(numBars, maxNumBars)
+
+    // Establish edit window
+    let startSec = max(0.0, audioPlayer.editStartTime)
+    let endSec: Double = {
+      let candidate = audioPlayer.editEndTime
+      if candidate > 0 {
+        return candidate
+      } else if audioPlayer.duration > 0 {
+        return audioPlayer.duration
+      } else {
+        return 0.0
+      }
+    }()
+
+    let window = max(0.0, endSec - startSec)
+    guard window > 0, loopBars > 0 else { return 0.0 }
+
+    // Current time in seconds within the file
+    let current = audioPlayer.currentTime
+
+    // Map current time into the edit window
+    var relative: Double
+    if audioPlayer.isLooping {
+      // Normalize into [0, window)
+      let offset = current - startSec
+      let mod = offset.truncatingRemainder(dividingBy: window)
+      relative = mod >= 0 ? mod : (mod + window)
+    } else {
+      // Clamp into [0, window]
+      relative = min(max(0.0, current - startSec), window)
+    }
+
+    // Convert seconds -> beats -> bars
+    let beats = Duration(seconds: relative, tempo: tempo).beats
+    let bars = beats / 4.0
+
+    // Normalize to 0.0 ... 1.0 over the loopBars
+    let normalized = bars / Double(loopBars)
+    return min(max(0.0, normalized), 1.0)
+  }
+
+  init(id: Int, audioPlayer: AudioPlayable? = nil) {
     self.id = id
     self.audioPlayer = audioPlayer
   }
@@ -80,12 +194,20 @@ class LoopPlayer {
     audioPlayer.editEndTime = Duration(beats: Double(loopBars * 4), tempo: tempo).seconds
     audioPlayer.isLooping = true
   }
+
+  func updateNumBars(_ numBars: Int) {
+    self.numBars = numBars
+    guard let audioPlayer, let tempo else { return }
+    let loopBars = numBars > maxNumBars ? maxNumBars : numBars
+    audioPlayer.editEndTime = Duration(beats: Double(loopBars * 4), tempo: tempo).seconds
+  }
 }
+
 
 class BaseMusicEngine {
   private static let logger = Logger(
-      subsystem: "MusicEngine",
-      category: String(describing: BaseMusicEngine.self)
+    subsystem: "MusicEngine",
+    category: String(describing: BaseMusicEngine.self)
   )
 
   var nextBarLogicTick: Int = 15 // when we run the logic to schedule the next bar loop, advance the block counter etc..
@@ -116,7 +238,7 @@ class BaseMusicEngine {
           let lastBarBeat0 = Int(floor(clickTrackPosition.beats / 4)) * 4
           let nextBarBeat0 = lastBarBeat0 + 4
           if audioPlayer.isPlaying != true {
-            scheduleAudioPlaybackOnClickTrack(audioPlayer: audioPlayer, beat: Double(nextBarBeat0))
+            scheduleAudioPlaybackOnClickTrack(audioPlayer: audioPlayer as! AudioPlayer, beat: Double(nextBarBeat0))
           }
         }
       }
@@ -166,8 +288,8 @@ class BaseMusicEngine {
 
 class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
   private static let logger = Logger(
-      subsystem: "MusicEngine",
-      category: String(describing: AudioKitMusicEngine.self)
+    subsystem: "MusicEngine",
+    category: String(describing: AudioKitMusicEngine.self)
   )
 
   let engine = AudioEngine()
@@ -184,7 +306,7 @@ class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
       loopPlayers.append(LoopPlayer(id: ind, audioPlayer: AudioPlayer()))
     }
 
-    let allAudioPlayers = loopPlayers.compactMap { $0.audioPlayer }
+    let allAudioPlayers = loopPlayers.compactMap { $0.audioPlayer as? AudioPlayer }
     engine.output = Mixer(allAudioPlayers, name: "Main Mixer")
     try? engine.start()
 

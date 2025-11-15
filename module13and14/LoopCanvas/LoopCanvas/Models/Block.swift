@@ -68,6 +68,27 @@ class Block: ObservableObject, Identifiable, Codable {
   var defaultMaxNumBars = 1
 
   var currentRelativeBar = 0
+  @Published var loopPlayPosition: Double = 0.0 // 0.0 ... 1.0 normalized within current loop
+  @Published var samplePlayPosition: Double = 0.0 // 0.0 ... 1.0 full sample length
+
+  // 0.0 ... 1.0 full sample length
+  var sampleStartTime: Double {
+    if let loopPlayer {
+      return loopPlayer.sampleStartTime
+    }
+    return defaultSampleStartTime
+  }
+  var defaultSampleStartTime = 1.0
+
+  // 0.0 ... 1.0 full sample length
+  var sampleEndTime: Double {
+    if let loopPlayer {
+      return loopPlayer.sampleEndTime
+    }
+    return defaultSampleEndTime
+  }
+  var defaultSampleEndTime = 1.0
+
 
   var name: String {
     if let loopURL = loopURL {
@@ -129,6 +150,14 @@ class Block: ObservableObject, Identifiable, Codable {
       color = highlightColor
     } else if color != normalColor {
       color = normalColor
+    }
+
+    if let loopPlayer = loopPlayer {
+      loopPlayPosition = loopPlayer.loopPlayPosition
+      samplePlayPosition = loopPlayer.samplePlayPosition
+    } else {
+      loopPlayPosition = 0.0
+      samplePlayPosition = 0.0
     }
   }
 
@@ -237,4 +266,3 @@ extension Block: Equatable {
     lhs.blockGroupGridPosY == rhs.blockGroupGridPosY
   }
 }
-

@@ -264,6 +264,7 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
 
     // Update the block's own numBars
     block.numBars = clampedNew
+    block.loopPlayer?.updateNumBars(clampedNew)
 
     // Compute the pixel delta for x location shift based on bars
     let barPixelWidth = CanvasViewModel.blockSpacing + CanvasViewModel.blockSize
@@ -318,4 +319,3 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     try container.encode(allBlocks, forKey: .allBlocks)
   }
 }
-

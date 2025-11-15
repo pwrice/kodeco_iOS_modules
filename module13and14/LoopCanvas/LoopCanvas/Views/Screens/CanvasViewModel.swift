@@ -250,7 +250,7 @@ extension CanvasViewModel {
   // New updates for details sheet
 
   func update(startOffset: Int, for block: Block) {
-    let clamped = max(0, min(block.maxNumBars-1, startOffset))
+    let clamped = max(0, min(block.maxNumBars - 1, startOffset))
     block.startOffset = clamped
   }
 

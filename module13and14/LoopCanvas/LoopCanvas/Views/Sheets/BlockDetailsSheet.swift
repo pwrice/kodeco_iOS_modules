@@ -143,23 +143,8 @@ private struct BlockDetailsCardView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: Style.rowSpacing) {
       // Waveform header
-      ZStack {
-        RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous)
-          .fill(Style.secondaryBackground)
-          .overlay(
-            Group {
-              if showLiveWaveform {
-                Waveform(samples: samples)
-                  .foregroundColor(.green)
-                  .padding(Style.contentPadding - 4)
-              } else {
-                Color.clear
-              }
-            }
-          )
-          .clipShape(RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous))
-      }
-      .frame(height: Style.waveformHeight)
+      WaveformHeaderView(block: block, samples: samples, showLiveWaveform: showLiveWaveform)
+        .frame(height: Style.waveformHeight)
 
       // Number of Bars row
       HStack(alignment: .center) {
@@ -261,6 +246,62 @@ private struct BlockDetailsCardView: View {
         )
     }
     .buttonStyle(.plain)
+  }
+}
+
+private struct WaveformHeaderView: View {
+  @ObservedObject var block: Block
+  let samples: SampleBuffer
+  let showLiveWaveform: Bool
+
+  var body: some View {
+    GeometryReader { proxy in
+      let width = proxy.size.width
+      let clamped = max(0, min(1, block.samplePlayPosition))
+      let x = width * clamped
+
+      ZStack(alignment: .leading) {
+        RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous)
+          .fill(Style.secondaryBackground)
+          .overlay(
+            Group {
+              if showLiveWaveform {
+                Waveform(samples: samples)
+                  .foregroundColor(.green)
+                  .padding(Style.contentPadding - 4)
+              } else {
+                Color.clear
+              }
+            }
+          )
+          .clipShape(RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous))
+
+        // Non-playing left overlay: 0 -> sampleStartTime
+        if block.sampleStartTime > 0 {
+          Rectangle()
+            .fill(Color.black.opacity(0.25))
+            .frame(width: width * max(0, min(1, block.sampleStartTime)))
+            .allowsHitTesting(false)
+        }
+
+        // Non-playing right overlay: sampleEndTime -> 1.0
+        if block.sampleEndTime < 1 {
+          let startX = width * max(0, min(1, block.sampleEndTime))
+          Rectangle()
+            .fill(Color.black.opacity(0.25))
+            .frame(width: width - startX)
+            .position(x: startX + (width - startX) / 2, y: proxy.size.height / 2)
+            .allowsHitTesting(false)
+        }
+
+        // Playhead line overlay
+        Rectangle()
+          .fill(Color.red.opacity(0.9))
+          .frame(width: 2)
+          .position(x: x, y: proxy.size.height / 2)
+          .allowsHitTesting(false)
+      }
+    }
   }
 }
 

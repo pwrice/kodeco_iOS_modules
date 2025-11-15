@@ -335,8 +335,9 @@ struct CanvasView_Previews: PreviewProvider {
 //   - [DONE]extended rectangle renderer
 //   - [DONE]incorporate length into model
 //   - [DONE]change block length on the fly in details view
-//   - **update block group positions when block length changes
+//   - [DONE]**update block group positions when block length changes
 //   - update block details waveform view to show loop boundary
+//   - 
 //   - **implement loop offset
 //   [DONE]- refactor increment / decrement settings to view model
 //   - fix perf problems when incrementing / decrementing numBars
