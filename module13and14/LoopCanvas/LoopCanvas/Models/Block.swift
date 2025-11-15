@@ -56,14 +56,19 @@ class Block: ObservableObject, Identifiable, Codable {
   var loopPlayer: LoopPlayer?
   var isSelected = false
   var isMuted = false
+
   var numBars = 1
+  var startOffset: Int = 0 // in bars
   var maxNumBars: Int {
     if let loopPlayer = loopPlayer {
       return loopPlayer.maxNumBars
     }
-    return 1
+    return defaultMaxNumBars
   }
+  var defaultMaxNumBars = 1
+
   var currentRelativeBar = 0
+
   var name: String {
     if let loopURL = loopURL {
       return loopURL.lastPathComponent
@@ -71,7 +76,6 @@ class Block: ObservableObject, Identifiable, Codable {
     return ""
   }
 
-  var startOffset: Int = 0         // in beats
   var volume: Double = 0.75        // 0...1
 
   static var blockIdCounter: Int = 0
@@ -233,3 +237,4 @@ extension Block: Equatable {
     lhs.blockGroupGridPosY == rhs.blockGroupGridPosY
   }
 }
+

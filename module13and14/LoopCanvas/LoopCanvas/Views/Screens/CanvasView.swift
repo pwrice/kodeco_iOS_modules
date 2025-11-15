@@ -337,9 +337,11 @@ struct CanvasView_Previews: PreviewProvider {
 //   - [DONE]change block length on the fly in details view
 //   - **update block group positions when block length changes
 //   - update block details waveform view to show loop boundary
-//   - implement loop offset
-//   - refactor increment / decrement settings to view model
+//   - **implement loop offset
+//   [DONE]- refactor increment / decrement settings to view model
+//   - fix perf problems when incrementing / decrementing numBars
 //   - visually disable increment / decriment buttons when they are beyond their limits
+// - **implement duplicate blocks
 // - add animation for block after it is dropped till the next bar when playback starts
 // - add ability to import your own samples from documents folder
 //   - create documents folder

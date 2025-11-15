@@ -44,7 +44,6 @@ private enum Style {
 }
 
 struct LibraryPickerSheet: View {
-
   @ObservedObject var library: Library
   var addBlockTapPosition: CGPoint?
   var viewModel: CanvasViewModel

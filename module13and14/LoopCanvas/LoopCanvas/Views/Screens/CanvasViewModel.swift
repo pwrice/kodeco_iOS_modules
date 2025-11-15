@@ -249,14 +249,15 @@ extension CanvasViewModel {
 
   func update(numBars: Int, for block: Block) {
     block.numBars = numBars
+    
+
     // TODO - adjust block group
   }
 
   // New updates for details sheet
 
   func update(startOffset: Int, for block: Block) {
-    let maxBeats = max(0, (block.maxNumBars * 4) - 1)
-    let clamped = max(0, min(maxBeats, startOffset))
+    let clamped = max(0, min(block.maxNumBars-1, startOffset))
     block.startOffset = clamped
   }
 
@@ -281,19 +282,17 @@ extension CanvasViewModel {
     }
   }
 
-  /// Decrement the start offset for a block by 1 with clamping to [0, (block.maxNumBars*4) - 1]
+  /// Decrement the start offset for a block by 1 with clamping to [0, (block.maxNumBars) - 1]
   func decrementStartOffset(for block: Block) {
-    let maxBeats = max(0, (block.maxNumBars * 4) - 1)
-    let newVal = max(0, min(maxBeats, block.startOffset - 1))
+    let newVal = max(0, min(block.maxNumBars, block.startOffset - 1))
     if newVal != block.startOffset {
       update(startOffset: newVal, for: block)
     }
   }
 
-  /// Increment the start offset for a block by 1 with clamping to [0, (block.maxNumBars*4) - 1]
+  /// Increment the start offset for a block by 1 with clamping to [0, (block.maxNumBars) - 1]
   func incrementStartOffset(for block: Block) {
-    let maxBeats = max(0, (block.maxNumBars * 4) - 1)
-    let newVal = max(0, min(maxBeats, block.startOffset + 1))
+    let newVal = max(0, min(block.maxNumBars, block.startOffset + 1))
     if newVal != block.startOffset {
       update(startOffset: newVal, for: block)
     }

@@ -99,6 +99,7 @@ struct PreviewBlockView: View {
     isLibraryBlock: false
   )
   block.numBars = 2
+  block.defaultMaxNumBars = 2
   block.visible = true
   block.isSelected = true
 
