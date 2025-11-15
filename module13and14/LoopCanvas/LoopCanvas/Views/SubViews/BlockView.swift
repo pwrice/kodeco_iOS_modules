@@ -47,7 +47,8 @@ struct PositionedBlockView: View {
           RoundedRectangle(cornerRadius: Style.blockCornerRadius)
             .fill(model.color == model.highlightColor
                   && index == model.currentRelativeBar ? model.color : .clear)
-            .opacity(model.visible ? 1 : 0)
+            .opacity((model.visible && (model.color == model.highlightColor && index == model.currentRelativeBar)) ? 1 : 0)
+            .animation(.easeOut(duration: 0.2), value: (model.color == model.highlightColor && index == model.currentRelativeBar))
             .overlay {
               if index == 0 {
                 Image(systemName: model.icon)
