@@ -241,6 +241,58 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     }
   }
 
+  /// Updates the given block's number of bars and shifts neighbor blocks in the group accordingly.
+  /// - Parameters:
+  ///   - block: The block whose length is changing.
+  ///   - newNumBars: The new number of bars for the block.
+  ///
+  /// This function adjusts all blocks that start to the right of the changed block by the delta in bars.
+  /// If the block grows, neighbors shift right; if it shrinks, neighbors shift left. It updates both the
+  /// grid positions and physical locations to remain consistent with CanvasViewModel spacing and size.
+  func updateBlockNumBars(block: Block, newNumBars: Int) {
+    // Guard against no-op or invalid values
+    let clampedNew = max(1, min(block.maxNumBars, newNumBars))
+    let oldNumBars = block.numBars
+    let delta = clampedNew - oldNumBars
+    guard delta != 0 else { return }
+
+    // Establish the anchor X (start) for the changed block
+    guard let startX = block.startBlockGroupGridPosX else { return }
+
+    // Capture the changed block's old end X before modification
+    let oldEndX = startX + (oldNumBars - 1)
+
+    // Update the block's own numBars
+    block.numBars = clampedNew
+
+    // Compute the pixel delta for x location shift based on bars
+    let barPixelWidth = CanvasViewModel.blockSpacing + CanvasViewModel.blockSize
+    let pixelDelta = CGFloat(delta) * barPixelWidth
+
+    // Identify blocks that should shift: those whose start is strictly to the right of the changed block's old end
+    let shouldShift: (Block) -> Bool = { other in
+      guard other.id != block.id, let otherStart = other.startBlockGroupGridPosX else { return false }
+      return otherStart > oldEndX
+    }
+
+    // Shift all affected blocks by delta in grid space and pixel space
+    for other in allBlocks where shouldShift(other) {
+      // Shift writable grid position (only X is affected for linear sequence)
+      if let x = other.blockGroupGridPosX {
+        other.blockGroupGridPosX = x + delta
+      }
+      // Do not write to get-only span properties; their getters should reflect derived values
+
+      // Shift the visual location horizontally
+      other.location = CGPoint(x: other.location.x + pixelDelta, y: other.location.y)
+    }
+
+    // Adjust the group's currentPlayPosX if it is to the right of the changed block's old end
+    if currentPlayPosX > oldEndX {
+      currentPlayPosX += delta
+    }
+  }
+
   // Codable implementation
 
   enum CodingKeys: String, CodingKey {
@@ -266,3 +318,4 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     try container.encode(allBlocks, forKey: .allBlocks)
   }
 }
+

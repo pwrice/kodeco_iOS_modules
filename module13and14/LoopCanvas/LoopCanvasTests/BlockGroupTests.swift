@@ -223,4 +223,79 @@ final class BlockGroupTests: XCTestCase {
     block.blockGroupGridPosY = blockGroupGridPosY
     return block
   }
+
+  func testUpdateBlockNumBars_Grow_ShiftsRightNeighborsAndPlayPos() throws {
+    // Arrange: base block at x=0 with 1 bar
+    let first = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    let group = BlockGroup(id: 0, block: first, musicEngine: musicEngine)
+    first.loopPlayer?.defaultMaxNumBars = 3
+
+
+    // Place a neighbor to the right at grid x=1
+    let rightSlot = SlotPostion.right.getSlot(relativeTo: first)
+    let second = getTestBlock(id: 1, location: rightSlot.location)
+    group.addBlock(block: second, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
+
+    // Ensure play head is to the right of the first block's old end (which is 0)
+    group.currentPlayPosX = 1
+
+    // Act: grow first block from 1 to 3 bars (delta +2)
+    group.updateBlockNumBars(block: first, newNumBars: 3)
+
+    // Assert: second block shifted right by +2 in grid and pixels
+    XCTAssertEqual(second.blockGroupGridPosX, rightSlot.gridPosX + 2)
+    let barWidth = CanvasViewModel.blockSpacing + CanvasViewModel.blockSize
+    XCTAssertEqual(second.location.x, rightSlot.location.x + CGFloat(2 * barWidth))
+
+    // currentPlayPosX should also shift right by +2 since it was > old end
+    XCTAssertEqual(group.currentPlayPosX, 3)
+  }
+
+  func testUpdateBlockNumBars_Shrink_ShiftsRightNeighborsAndPlayPosLeft() throws {
+    // Arrange: base block at x=0 with 3 bars
+    let first = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    first.numBars = 3
+    let group = BlockGroup(id: 0, block: first, musicEngine: musicEngine)
+
+    // Neighbor begins at x=3 (right of old end which is 2)
+    let rightSlot = SlotPostion.right.getSlot(relativeTo: first.location, xOffsetMultiple: 2)
+    let second = getTestBlock(id: 1, location: rightSlot.location)
+    group.addBlock(block: second, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
+
+    // Set play head to the right of old end (2)
+    group.currentPlayPosX = 5
+
+    // Act: shrink first block from 3 to 1 bar (delta -2)
+    group.updateBlockNumBars(block: first, newNumBars: 1)
+
+    // Assert: second block shifted left by -2 in grid and pixels
+    XCTAssertEqual(second.blockGroupGridPosX, rightSlot.gridPosX - 2)
+    let barWidth = CanvasViewModel.blockSpacing + CanvasViewModel.blockSize
+    XCTAssertEqual(second.location.x, rightSlot.location.x - CGFloat(2 * barWidth))
+
+    // currentPlayPosX should also shift left by -2
+    XCTAssertEqual(group.currentPlayPosX, 3)
+  }
+
+  func testUpdateBlockNumBars_PlayHeadLeftOrOnBlock_Unchanged() throws {
+    // Arrange: base block at x=0 with 2 bars
+    let first = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    first.numBars = 2
+    let group = BlockGroup(id: 0, block: first, musicEngine: musicEngine)
+
+    // Place a neighbor to the right at x=2
+    let rightSlot = SlotPostion.right.getSlot(relativeTo: first.location, xOffsetMultiple: 1)
+    let second = getTestBlock(id: 1, location: rightSlot.location)
+    group.addBlock(block: second, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
+
+    // Case 1: play head on the block (<= old end which is 1)
+    group.currentPlayPosX = 1
+    group.updateBlockNumBars(block: first, newNumBars: 3)
+    XCTAssertEqual(group.currentPlayPosX, 1)
+
+    // Case 2: play head to the left of the block
+    group.currentPlayPosX = -1
+    group.updateBlockNumBars(block: first, newNumBars: 2) // shrink by 1
+    XCTAssertEqual(group.currentPlayPosX, -1)
+  }
 }

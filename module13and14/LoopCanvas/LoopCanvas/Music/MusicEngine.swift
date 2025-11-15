@@ -49,8 +49,9 @@ class LoopPlayer {
     if let loopDuration = loopDuration {
       return Int(floor(loopDuration.beats / 4.0))
     }
-    return 1
+    return defaultMaxNumBars
   }
+  var defaultMaxNumBars = 1
 
   init(id: Int, audioPlayer: AudioPlayer? = nil) {
     self.id = id

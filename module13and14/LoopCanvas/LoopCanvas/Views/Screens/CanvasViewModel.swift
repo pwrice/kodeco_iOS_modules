@@ -247,13 +247,6 @@ extension CanvasViewModel {
     block.isMuted.toggle()
   }
 
-  func update(numBars: Int, for block: Block) {
-    block.numBars = numBars
-    
-
-    // TODO - adjust block group
-  }
-
   // New updates for details sheet
 
   func update(startOffset: Int, for block: Block) {
@@ -268,18 +261,16 @@ extension CanvasViewModel {
 
   /// Decrement the number of bars for a block by 1 with clamping to [1, block.maxNumBars]
   func decrementNumBars(for block: Block) {
-    let newVal = max(1, min(block.maxNumBars, block.numBars - 1))
-    if newVal != block.numBars {
-      update(numBars: newVal, for: block)
-    }
+    update(numBars: block.numBars - 1, for: block)
   }
 
   /// Increment the number of bars for a block by 1 with clamping to [1, block.maxNumBars]
   func incrementNumBars(for block: Block) {
-    let newVal = max(1, min(block.maxNumBars, block.numBars + 1))
-    if newVal != block.numBars {
-      update(numBars: newVal, for: block)
-    }
+    update(numBars: block.numBars + 1, for: block)
+  }
+
+  func update(numBars: Int, for block: Block) {
+    block.blockGroup?.updateBlockNumBars(block: block, newNumBars: numBars)
   }
 
   /// Decrement the start offset for a block by 1 with clamping to [0, (block.maxNumBars) - 1]
