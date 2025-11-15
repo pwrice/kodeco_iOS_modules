@@ -8,6 +8,43 @@
 import SwiftUI
 import Waveform
 
+private enum Style {
+  // Sizes
+  static let waveformHeight: CGFloat = 100
+  static let blockPreviewScale: CGFloat = 0.5
+  static let circularButtonSize: CGFloat = 30
+
+  // Paddings
+  static let cardPadding: CGFloat = 16
+  static let rowSpacing: CGFloat = 16
+  static let smallSpacing: CGFloat = 8
+  static let contentPadding: CGFloat = 16
+  static let pillHorizontalPadding: CGFloat = 16
+  static let pillVerticalPadding: CGFloat = 10
+  static let bottomButtonHorizontalPadding: CGFloat = 18
+  static let bottomButtonVerticalPadding: CGFloat = 12
+
+  // Corner radii
+  static let cardCornerRadius: CGFloat = 22
+  static let waveformCornerRadius: CGFloat = 18
+
+  // Shadows
+  static let smallShadowColor = Color(.sRGBLinear, white: 0, opacity: 0.12)
+  static let smallShadowRadius: CGFloat = 6
+  static let smallShadowX: CGFloat = 0
+  static let smallShadowY: CGFloat = 3
+
+  static let cardShadowColor = Color(.sRGBLinear, white: 0, opacity: 0.12)
+  static let cardShadowRadius: CGFloat = 10
+  static let cardShadowX: CGFloat = 0
+  static let cardShadowY: CGFloat = 6
+
+  // Colors
+  static let cardFill = Color(.systemBackground)
+  static let secondaryBackground = Color(.secondarySystemBackground)
+  static let accent = Color.blue
+}
+
 struct BlockDetailsSheet: View {
   @Binding var showingBlockDetailsView: Bool
   @ObservedObject var canvasViewModel: CanvasViewModel
@@ -34,27 +71,27 @@ struct BlockDetailsSheet: View {
   var body: some View {
     NavigationView {
       ScrollView {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: Style.rowSpacing) {
           // Card
-          VStack(alignment: .leading, spacing: 16) {
+          VStack(alignment: .leading, spacing: Style.rowSpacing) {
             // Waveform header
             ZStack {
-              RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
+              RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous)
+                .fill(Style.secondaryBackground)
                 .overlay(
                   Group {
                     if showLiveWaveform {
                       Waveform(samples: viewModel.samples)
                         .foregroundColor(.green)
-                        .padding(12)
+                        .padding(Style.contentPadding - 4)
                     } else {
                       Color.clear
                     }
                   }
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: Style.waveformCornerRadius, style: .continuous))
             }
-            .frame(height: 100)
+            .frame(height: Style.waveformHeight)
 
             // Number of Bars row
             rowWithSteppers(
@@ -97,7 +134,7 @@ struct BlockDetailsSheet: View {
             Divider()
 
             // Volume row
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Style.smallSpacing) {
               HStack {
                 Text("Volume")
                   .font(.headline)
@@ -126,31 +163,31 @@ struct BlockDetailsSheet: View {
                 Text(viewModel.block.isMuted ? "Unmute Block" : "Mute Block")
               }
               .font(.headline)
-              .foregroundColor(.blue)
-              .padding(.horizontal, 16)
-              .padding(.vertical, 10)
+              .foregroundColor(Style.accent)
+              .padding(.horizontal, Style.pillHorizontalPadding)
+              .padding(.vertical, Style.pillVerticalPadding)
               .background(
                 Capsule()
-                  .fill(Color(.systemBackground))
-                  .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.12), radius: 6, x: 0, y: 3)
+                  .fill(Style.cardFill)
+                  .shadow(color: Style.smallShadowColor, radius: Style.smallShadowRadius, x: Style.smallShadowX, y: Style.smallShadowY)
               )
             }
             .buttonStyle(.plain)
-            .padding(.top, 4)
+            .padding(.top, Style.smallSpacing / 2)
           }
-          .padding(16)
+          .padding(Style.cardPadding)
           .background(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-              .fill(Color(.systemBackground))
-              .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.12), radius: 10, x: 0, y: 6)
+            RoundedRectangle(cornerRadius: Style.cardCornerRadius, style: .continuous)
+              .fill(Style.cardFill)
+              .shadow(color: Style.cardShadowColor, radius: Style.cardShadowRadius, x: Style.cardShadowX, y: Style.cardShadowY)
           )
 
           // Spacer divider
           Divider()
-            .padding(.vertical, 8)
+            .padding(.vertical, Style.smallSpacing)
 
           // Bottom actions
-          HStack(spacing: 16) {
+          HStack(spacing: Style.rowSpacing) {
             Button {
               _ = canvasViewModel.duplicate(block: viewModel.block)
             } label: {
@@ -158,13 +195,13 @@ struct BlockDetailsSheet: View {
                 Image(systemName: "square.on.square")
                 Text("Duplicate Block")
               }
-              .foregroundColor(.blue)
-              .padding(.horizontal, 18)
-              .padding(.vertical, 12)
+              .foregroundColor(Style.accent)
+              .padding(.horizontal, Style.bottomButtonHorizontalPadding)
+              .padding(.vertical, Style.bottomButtonVerticalPadding)
               .background(
                 Capsule()
-                  .fill(Color(.systemBackground))
-                  .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.12), radius: 10, x: 0, y: 6)
+                  .fill(Style.cardFill)
+                  .shadow(color: Style.cardShadowColor, radius: Style.cardShadowRadius, x: Style.cardShadowX, y: Style.cardShadowY)
               )
             }
             .buttonStyle(.plain)
@@ -177,18 +214,18 @@ struct BlockDetailsSheet: View {
                 Image(systemName: "trash")
                 Text("Delete Block")
               }
-              .padding(.horizontal, 18)
-              .padding(.vertical, 12)
+              .padding(.horizontal, Style.bottomButtonHorizontalPadding)
+              .padding(.vertical, Style.bottomButtonVerticalPadding)
               .background(
                 Capsule()
-                  .fill(Color(.systemBackground))
-                  .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.12), radius: 10, x: 0, y: 6)
+                  .fill(Style.cardFill)
+                  .shadow(color: Style.cardShadowColor, radius: Style.cardShadowRadius, x: Style.cardShadowX, y: Style.cardShadowY)
               )
             }
             .buttonStyle(.plain)
           }
         }
-        .padding()
+        .padding(Style.contentPadding)
       }
       .navigationTitle(viewModel.block.name)
       .navigationBarTitleDisplayMode(.inline)
@@ -202,7 +239,7 @@ struct BlockDetailsSheet: View {
               .frame(
                 width: CanvasViewModel.blockSize,
                 height: CanvasViewModel.blockSize)
-              .scaleEffect(0.5)
+              .scaleEffect(Style.blockPreviewScale)
             Text(viewModel.block.name)
               .font(.headline)
               .lineLimit(1)
@@ -241,11 +278,11 @@ struct BlockDetailsSheet: View {
     Button(action: action) {
       Image(systemName: system)
         .foregroundColor(.primary)
-        .frame(width: 30, height: 30)
+        .frame(width: Style.circularButtonSize, height: Style.circularButtonSize)
         .background(
           Circle()
-            .fill(Color(.systemBackground))
-            .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.12), radius: 6, x: 0, y: 3)
+            .fill(Style.cardFill)
+            .shadow(color: Style.smallShadowColor, radius: Style.smallShadowRadius, x: Style.smallShadowX, y: Style.smallShadowY)
         )
     }
     .buttonStyle(.plain)
