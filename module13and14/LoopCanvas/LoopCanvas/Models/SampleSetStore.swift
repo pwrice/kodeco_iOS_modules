@@ -63,8 +63,8 @@ class SampleSetStore: ObservableObject {
   var mockErrorDownloadingSampleSets: Bool?
 
   let remoteSampleSetS3Path = "https://loopcanvas.s3.amazonaws.com/Samples/"
+  var localSamplesDirectory = "Samples"
   var baseSampleSetsRemoteURL: URL?
-  let localSamplesDirectory = "Samples/"
   var baseSampleSetsLocalURL: URL
 
   private var cancellables = Set<AnyCancellable>()
@@ -108,10 +108,74 @@ class SampleSetStore: ObservableObject {
   /// - Parameter urlSessionLoader: A loader for network requests.
   init (urlSessionLoader: URLSessionLoading) {
     baseSampleSetsRemoteURL = URL(string: remoteSampleSetS3Path)
-    baseSampleSetsLocalURL = URL(
-      fileURLWithPath: localSamplesDirectory,
-      relativeTo: Bundle.main.bundleURL)
     self.urlSessionLoader = urlSessionLoader
+    // Initialize user-writable Samples directory under Documents/LoopCanvas/Samples
+    self.baseSampleSetsLocalURL = Self.setupUserSamplesDirectoryAndCopyDefaultsIfNeeded(bundleSamplesSubdirectoryName: localSamplesDirectory)
+  }
+
+  /// Returns the URL to a specific library folder inside the user-writable Samples directory
+  /// - Parameter libraryFolderName: The name of the library (sample set) folder
+  /// - Returns: URL pointing to Documents/LoopCanvas/Samples/<libraryFolderName>
+  func libraryDirectoryURL(for libraryFolderName: String) -> URL {
+    return baseSampleSetsLocalURL.appendingPathComponent(libraryFolderName, isDirectory: true)
+  }
+
+  /// Ensures a user-writable Samples directory exists at Documents/LoopCanvas/Samples,
+  /// and copies default bundled SampleSets into it if they are not present.
+  /// - Parameter bundleSamplesSubdirectoryName: The name of the Samples directory inside the app bundle (e.g., "Samples").
+  /// - Returns: The URL to the user-writable Samples directory.
+  static func setupUserSamplesDirectoryAndCopyDefaultsIfNeeded(bundleSamplesSubdirectoryName: String) -> URL {
+    let fileManager = FileManager.default
+
+    // Documents directory for the app sandbox
+    let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+    let loopCanvasURL = documentsURL.appendingPathComponent("LoopCanvas", isDirectory: true)
+    let userSamplesURL = loopCanvasURL.appendingPathComponent("Samples", isDirectory: true)
+
+    print(">> documentsURL \(documentsURL)")
+    print(">> loopCanvasURL \(loopCanvasURL)")
+    print(">> userSamplesURL \(userSamplesURL)")
+
+    // Create LoopCanvas and Samples directories if they do not exist
+    do {
+      if !fileManager.fileExists(atPath: loopCanvasURL.path) {
+        try fileManager.createDirectory(at: loopCanvasURL, withIntermediateDirectories: true)
+        print(">> created loopCanvasURL")
+      }
+      if !fileManager.fileExists(atPath: userSamplesURL.path) {
+        try fileManager.createDirectory(at: userSamplesURL, withIntermediateDirectories: true)
+        print(">> created userSamplesURL")
+      }
+    } catch {
+      Self.logger.error("Failed to create user samples directories: \(String(describing: error))")
+    }
+
+    // Locate bundled default Samples directory
+    let bundleBaseURL = Bundle.main.bundleURL
+    let bundledSamplesURL = URL(fileURLWithPath: bundleSamplesSubdirectoryName, relativeTo: bundleBaseURL)
+
+    // Copy each default SampleSet folder (subdirectory) if not already present in userSamplesURL
+    do {
+      if let bundledContents = try? fileManager.contentsOfDirectory(at: bundledSamplesURL, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) {
+        for item in bundledContents {
+          // Only consider directories (each default SampleSet is a subdirectory)
+          if (try? item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
+            let destination = userSamplesURL.appendingPathComponent(item.lastPathComponent, isDirectory: true)
+            if !fileManager.fileExists(atPath: destination.path) {
+              do {
+                try fileManager.copyItem(at: item, to: destination)
+                print(">> copying \(item)")
+                print(">> to \(destination)")
+              } catch {
+                Self.logger.error("Failed to copy default SampleSet \(item.lastPathComponent) to user directory: \(String(describing: error))")
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return userSamplesURL
   }
 
   /// Loads the remote sample set index.

@@ -94,9 +94,7 @@ class Library: ObservableObject {
 
     name = libraryFolderName
     let fileManager = FileManager.default
-    let libraryDirectoryURL = URL(
-      fileURLWithPath: sampleSetStore.localSamplesDirectory + libraryFolderName,
-      relativeTo: Bundle.main.bundleURL)
+    let libraryDirectoryURL = sampleSetStore.libraryDirectoryURL(for: libraryFolderName)
 
     do {
       let sampleSetJsonURL = URL(fileURLWithPath: "SampleSetInfo.json", relativeTo: libraryDirectoryURL)
@@ -130,8 +128,7 @@ class Library: ObservableObject {
             color: categoryColor,
             icon: cateogryIcons[sampleInd % cateogryIcons.count],
             loopURL: URL(fileURLWithPath: sampleFile, relativeTo: categoryDirectoryURL),
-            relativePath: sampleSetStore.localSamplesDirectory
-              + "/" + libraryFolderName + "/" + categoryFolderName + "/" + sampleFile,
+            relativePath: sampleSetStore.localSamplesDirectory + "/" + libraryFolderName + "/" + categoryFolderName + "/" + sampleFile,
             isLibraryBlock: true)
           blocks.append(block)
         }
