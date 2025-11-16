@@ -73,8 +73,17 @@ class CanvasModel: ObservableObject {
     blocksGroups = []
   }
 
-  func addBlockGroup(initialBlock: Block) {
+  @discardableResult
+  func addBlockGroup(initialBlock: Block, mutateModel: Bool = true) -> BlockGroup {
     let newBlockGroup = BlockGroup(id: UUID(), block: initialBlock, musicEngine: musicEngine)
+    if mutateModel {
+      blocksGroups.append(newBlockGroup)
+    }
+    return newBlockGroup
+  }
+
+  func addBlockGroup(from blockGroupDTO: BlockGroupDTO) {
+    let newBlockGroup = BlockGroup(dto: blockGroupDTO, musicEngine: musicEngine)
     blocksGroups.append(newBlockGroup)
   }
 
@@ -142,14 +151,21 @@ class CanvasModel: ObservableObject {
     return nil
   }
 
-  func checkBlockPositionAndAddToAvailableGroup(block: Block) -> Bool {
+  func addBlockToExistingOrNewGroup(block: Block, mutateModel: Bool = true) -> (Block, BlockGroup?) {
+    var newBlockGroup: BlockGroup?
+    var existingBlockGroup: BlockGroup?
+
     // Check all slots around all blocks to see if there is a connection
     if let (blockGroup, slot) = findEligibleSlotForBlock(block: block) {
+      existingBlockGroup = mutateModel ? blockGroup : BlockGroup(dto: blockGroup.toDTO())
       addBlockToExistingBlockGroup(blockGroup: blockGroup, block: block, slot: slot)
-      return true
     }
 
-    return false
+    if existingBlockGroup == nil {
+      newBlockGroup = addBlockGroup(initialBlock: block, mutateModel: mutateModel)
+    }
+
+    return (block, newBlockGroup)
   }
 }
 

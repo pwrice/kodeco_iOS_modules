@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C108AA002ECA481600B6865C /* CanvasMessageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C108A9FF2ECA481000B6865C /* CanvasMessageStore.swift */; };
 		C108AA012ECA481600B6865C /* CanvasMessageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C108A9FF2ECA481000B6865C /* CanvasMessageStore.swift */; };
+		C108AA032ECA4D9C00B6865C /* CanvasMessageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C108AA022ECA4D9400B6865C /* CanvasMessageStoreTests.swift */; };
 		C10DE20A2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE2092D1F38BC00466C0C /* URLSessionLoader.swift */; };
 		C10DE20B2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE2092D1F38BC00466C0C /* URLSessionLoader.swift */; };
 		C10DE20D2D1F3C3900466C0C /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE20C2D1F3C3100466C0C /* ToastModifier.swift */; };
@@ -87,6 +88,7 @@
 
 /* Begin PBXFileReference section */
 		C108A9FF2ECA481000B6865C /* CanvasMessageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasMessageStore.swift; sourceTree = "<group>"; };
+		C108AA022ECA4D9400B6865C /* CanvasMessageStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasMessageStoreTests.swift; sourceTree = "<group>"; };
 		C10DE2092D1F38BC00466C0C /* URLSessionLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionLoader.swift; sourceTree = "<group>"; };
 		C10DE20C2D1F3C3100466C0C /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
 		C10DE20E2D20B65400466C0C /* URLSessionProgressDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionProgressDataLoader.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 		C19D85582C08AE6500477545 /* LoopCanvasTests */ = {
 			isa = PBXGroup;
 			children = (
+				C108AA022ECA4D9400B6865C /* CanvasMessageStoreTests.swift */,
 				C125E4D82EC8EB9A00A7A5BA /* MusicEngineTests.swift */,
 				C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */,
 				C10DE2112D20BD7000466C0C /* FileDownloadManagerTests.swift */,
@@ -555,6 +558,7 @@
 				C1B150FE2C9F153900B4FAE8 /* SampleSetStoreTests.swift in Sources */,
 				C1498E3B2C18884A00118C38 /* BlockGroupTests.swift in Sources */,
 				C15DCC932C6E3E4A0061453B /* CanvasStoreTests.swift in Sources */,
+				C108AA032ECA4D9C00B6865C /* CanvasMessageStoreTests.swift in Sources */,
 				C10DE20B2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */,
 				C161307A2D25F79700725FA0 /* DownloadableSampleSetTests.swift in Sources */,
 				C15DCC912C6E32430061453B /* CanvasStore.swift in Sources */,

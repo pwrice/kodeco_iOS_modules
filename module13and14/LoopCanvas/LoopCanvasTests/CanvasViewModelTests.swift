@@ -486,4 +486,3 @@ extension CanvasViewModelTests {
     return newBlock
   }
 }
-

@@ -336,4 +336,3 @@ class BlockGroup: ObservableObject, Identifiable {
     return BlockGroupDTO(id: id, allBlocks: blockDTOs)
   }
 }
-

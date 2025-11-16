@@ -12,8 +12,6 @@ import os
 import Waveform
 import AVFoundation
 
-
-
 class CanvasViewModel: ObservableObject {
   private static let logger = Logger(
     subsystem: "ViewModels",
@@ -120,6 +118,7 @@ class CanvasViewModel: ObservableObject {
     messagesCancellable = canvasMessageStore?
       .$messages
       .receive(on: DispatchQueue.main)
+      .dropFirst()
       .sink { [weak self] messages in
         self?.processCanvasMessages(messages)
       }
@@ -127,17 +126,6 @@ class CanvasViewModel: ObservableObject {
     self.updateAllBlocksList()
 
     self.songNameToLoad = songNameToLoad
-  }
-
-}
-
-// Canvas messages handling
-extension CanvasViewModel {
-  private func processCanvasMessages(_ messages: [CanvasMessage]) {
-    // TODO: Implement processing of incoming canvas messages
-    // For now, simply log count and refresh lists if needed
-    Self.logger.debug("Received canvas messages: \(messages.count)")
-    // Depending on message types, you might update models here; keeping minimal per request
   }
 }
 
@@ -178,6 +166,23 @@ extension CanvasViewModel {
       if let canvasModel = canvasStore.loadCanvas(name: songName) {
         resetCanvasModel(newCanvasModel: canvasModel)
         songNameToLoad = nil
+      }
+    }
+  }
+}
+
+// Canvas messages handling
+
+extension CanvasViewModel {
+  private func processCanvasMessages(_ messages: [CanvasMessage]) {
+    Self.logger.debug("Received canvas messages: \(messages.count)")
+
+    for message in messages {
+      if let addBlockMessage = message as? BlockAddedMessage {
+        if let newBlockGroupDTO = addBlockMessage.newBlockGroup {
+          canvasModel.addBlockGroup(from: newBlockGroupDTO)
+          updateAllBlocksList()
+        }
       }
     }
   }
@@ -226,7 +231,7 @@ extension CanvasViewModel {
   }
 
   func dropBlockOnCanvas(block: Block) -> Block {
-    let (newBlock, newBlockGroup) = dropBlockOnCanvasWithNewGroup(block: block)
+    let (newBlock, _) = dropBlockOnCanvasWithNewGroup(block: block)
     return newBlock
   }
 
@@ -248,13 +253,7 @@ extension CanvasViewModel {
       )
     }
 
-    let blockAddedToGroup = canvasModel.checkBlockPositionAndAddToAvailableGroup(block: blockDroppedOnCanvas)
-
-    var newBlockGroup: BlockGroup? = nil
-    if !blockAddedToGroup {
-      canvasModel.addBlockGroup(initialBlock: blockDroppedOnCanvas)
-      newBlockGroup = blockDroppedOnCanvas.blockGroup
-    }
+    let (_, newBlockGroup) = canvasModel.addBlockToExistingOrNewGroup(block: blockDroppedOnCanvas)
 
     updateAllBlocksList()
 
@@ -628,4 +627,3 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
-

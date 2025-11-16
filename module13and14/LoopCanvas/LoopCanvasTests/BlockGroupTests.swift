@@ -328,4 +328,3 @@ final class BlockGroupTests: XCTestCase {
     XCTAssertEqual(group.currentPlayPosX, -1)
   }
 }
-
