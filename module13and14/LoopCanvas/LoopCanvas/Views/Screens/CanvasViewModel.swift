@@ -29,6 +29,7 @@ class CanvasViewModel: ObservableObject {
   @Published var selectedSampleSetName: String = ""
   @Published var canvasSnapshot: UIImage?
 
+  var id: UUID
   var addBlockTapGridPosition: CGPoint?
   var selectedBlock: Block?
   var draggingBlock: Block?
@@ -94,8 +95,10 @@ class CanvasViewModel: ObservableObject {
     canvasStore: CanvasStore?,
     sampleSetStore: SampleSetStore?,
     canvasMessageStore: CanvasMessageStore?,
-    songNameToLoad: String? = nil
+    songNameToLoad: String? = nil,
+    viewModelId: UUID = UUID()
   ) {
+    self.id = viewModelId
     self.musicEngine = musicEngine
     self.canvasModel = canvasModel
     self.canvasStore = canvasStore
@@ -177,16 +180,28 @@ extension CanvasViewModel {
   private func processCanvasMessages(_ messages: [CanvasMessage]) {
     Self.logger.debug("Received canvas messages: \(messages.count)")
 
-    for message in messages {
+    for message in messages where message.viewModelId != self.id {
       if let addBlockMessage = message as? BlockAddedMessage {
         if let newBlockGroupDTO = addBlockMessage.newBlockGroup {
           canvasModel.addBlockGroup(from: newBlockGroupDTO)
+          updateAllBlocksList()
+        }
+      } else if let moveBlockMessage = message as? BlockMovedMessage {
+        if let newBlockGroupDTO = moveBlockMessage.newBlockGroup {
+          canvasModel.addBlockGroup(from: newBlockGroupDTO)
+          updateAllBlocksList()
+        }
+      } else if let disconnectBlockMessage = message as? BlockDisconnectedFromGroupMessage {
+        if let block = allBlocks.first(where: { $0.id == disconnectBlockMessage.updatedBlock.id }),
+           let blockGroup = block.blockGroup {
+          canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
           updateAllBlocksList()
         }
       }
     }
   }
 }
+
 
 // Events from view interactions
 
@@ -207,6 +222,8 @@ extension CanvasViewModel {
       draggingBlock = block
     }
     updateAllBlocksList()
+
+    canvasMessageStore?.disconnectBlockFromGroupMessage(viewModelId: id, updatedBlock: block)
   }
 
   func addBlockToCanvasOnGrid(newBlock: Block) -> Block {
@@ -218,7 +235,7 @@ extension CanvasViewModel {
 
     let (updatedBlock, newBlockGroup) = dropBlockOnCanvasWithNewGroup(block: newBlock)
 
-    canvasMessageStore?.addBlockToCanvasOnGrid(newBlock: updatedBlock, newGroup: newBlockGroup)
+    canvasMessageStore?.addBlockToCanvasOnGrid(viewModelId: id, newBlock: updatedBlock, newGroup: newBlockGroup)
 
     return updatedBlock
   }
@@ -231,8 +248,12 @@ extension CanvasViewModel {
   }
 
   func dropBlockOnCanvas(block: Block) -> Block {
-    let (newBlock, _) = dropBlockOnCanvasWithNewGroup(block: block)
-    return newBlock
+    let (updatedBlock, newBlockGroup) = dropBlockOnCanvasWithNewGroup(block: block)
+
+    // TODO - figure out if this is an existing block and call add if it is new
+    canvasMessageStore?.moveBlock(viewModelId: id, updatedBlock: updatedBlock, newGroup: newBlockGroup)
+
+    return updatedBlock
   }
 
   func dropBlockOnCanvasWithNewGroup(block: Block) -> (Block, BlockGroup?) {

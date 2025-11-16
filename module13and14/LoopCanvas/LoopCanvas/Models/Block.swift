@@ -179,7 +179,7 @@ class Block: ObservableObject, Identifiable {
     )
   }
 
-  func instantiateCopyWith(location: CGPoint, isLibraryBlock: Bool) -> Block {
+  func instantiateCopyWith(location: CGPoint, isLibraryBlock: Bool = false) -> Block {
     let copy = Block(
       id: Block.getNextBlockId(),
       location: location,

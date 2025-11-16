@@ -100,12 +100,14 @@ class CanvasModel: ObservableObject {
     blocksGroups.removeAll { $0.id == blockGroup.id }
   }
 
-  func removeBlockFromBlockGroup(block: Block, blockGroup: BlockGroup) {
+  @discardableResult
+  func removeBlockFromBlockGroup(block: Block, blockGroup: BlockGroup) -> BlockGroup {
     // TODO - verify that block is actually in block group
     blockGroup.removeBlock(block: block)
     if blockGroup.allBlocks.isEmpty {
       removeBlockGroup(blockGroup: blockGroup)
     }
+    return blockGroup
   }
 
   func findEligibleSlotForBlock(block: Block) -> (BlockGroup, BlockGroupSlot)? {

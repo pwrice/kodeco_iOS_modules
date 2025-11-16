@@ -22,8 +22,7 @@ struct CanvasView: View {
     CanvasBlocksView(
       viewModel: viewModel,
       showingBlockDetailsView: $showingBlockDetailsView,
-      showingBlockGroupDetailsView: $showingBlockGroupDetailsView,
-    )
+      showingBlockGroupDetailsView: $showingBlockGroupDetailsView)
   }
 
   var body: some View {
@@ -295,7 +294,7 @@ struct BackgroundDots: View {
 
   func highlightBlock(x: Int, y: Int) -> Bool {
     return (addBlockTapGridPosition?.x == CGFloat(x) &&
-            addBlockTapGridPosition?.y == CGFloat(y))
+      addBlockTapGridPosition?.y == CGFloat(y))
   }
 
   var body: some View {
@@ -436,7 +435,6 @@ extension CanvasViewModel {
 // - add the ability to connect block groups when dragging them next to each other
 
 
-
 // MULTI-USER
 // hook up shareplay so multiple users can edit a canvas at the same time
 // - add DTO for all objects
@@ -504,4 +502,3 @@ extension CanvasViewModel {
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0
-
