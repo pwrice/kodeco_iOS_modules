@@ -179,6 +179,7 @@ final class CanvasViewModelTests: XCTestCase {
     let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
     // A block group is created
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
 
     // Drop second block far to the right of the first block
     let newLocation = CGPoint(
@@ -190,12 +191,11 @@ final class CanvasViewModelTests: XCTestCase {
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
 
     // The second block has been added to a new block group
-    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[1])
+    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first { $0.id != origBlockGroup.id })
     XCTAssertEqual(newBlockGroup.allBlocks.count, 1)
     XCTAssertTrue(newBlockGroup.allBlocks.contains(secondBlock))
 
     // The second block is not a member of the original block group
-    let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
     XCTAssertEqual(origBlockGroup.allBlocks.count, 1)
     XCTAssertTrue(origBlockGroup.allBlocks.contains(firstBlock))
     XCTAssertFalse(origBlockGroup.allBlocks.contains(secondBlock))
@@ -211,6 +211,7 @@ final class CanvasViewModelTests: XCTestCase {
   func testDropOnOccupiedSlotDoesNotConnect() throws {
     // Drop the first block on the canvas
     let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
 
     // Drop second block to connect to the first
     let secondBlock = try addBlockToCanvas(
@@ -233,14 +234,13 @@ final class CanvasViewModelTests: XCTestCase {
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
 
     // The third block is not a member of the original block group
-    let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
     XCTAssertEqual(origBlockGroup.allBlocks.count, 2)
     XCTAssertTrue(origBlockGroup.allBlocks.contains(firstBlock))
     XCTAssertTrue(origBlockGroup.allBlocks.contains(secondBlock))
     XCTAssertFalse(origBlockGroup.allBlocks.contains(thirdBlock))
 
     // The third block has been added to a new block group
-    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[1])
+    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first { $0.id != origBlockGroup.id })
     XCTAssertEqual(newBlockGroup.allBlocks.count, 1)
     XCTAssertTrue(newBlockGroup.allBlocks.contains(thirdBlock))
 
@@ -256,6 +256,8 @@ final class CanvasViewModelTests: XCTestCase {
   func testDisconnectBlockOnCanvasToCreateNewGroup() throws {
     // Drop the first block on the canvas
     let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+
     // A block group is created
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
 
@@ -281,14 +283,12 @@ final class CanvasViewModelTests: XCTestCase {
     // We now have 2 block groups
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
 
-    // The second block is nolonger a member of the original block group
-    let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
     XCTAssertEqual(origBlockGroup.allBlocks.count, 1)
     XCTAssertTrue(origBlockGroup.allBlocks.contains(firstBlock))
     XCTAssertFalse(origBlockGroup.allBlocks.contains(secondBlock))
 
     // The second block has been added to a new block group
-    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[1])
+    let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first { $0.id != origBlockGroup.id })
     XCTAssertEqual(newBlockGroup.allBlocks.count, 1)
     XCTAssertTrue(newBlockGroup.allBlocks.contains(secondBlock))
   }
@@ -296,7 +296,9 @@ final class CanvasViewModelTests: XCTestCase {
   func testDisconnectBlockOnCanvasToAddToExistingGroup() throws {
     // Drop two blocks on different areas of the canvas
     let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 100, y: 100))
+    let firstBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
     let secondBlock = try addBlockToCanvas(libraryBlockIndex: 1, location: CGPoint(x: 300, y: 500))
+    let secondBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first { $0.id != firstBlockGroup.id })
 
     // We now have 2 block groups
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
@@ -307,8 +309,6 @@ final class CanvasViewModelTests: XCTestCase {
 
     // We still have 2 block groups
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 2)
-    let firstBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[0])
-    let secondBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups[1])
 
     // The first and third block are in the first group, the second block is in its own group
     XCTAssertTrue(firstBlockGroup.allBlocks.contains(firstBlock))

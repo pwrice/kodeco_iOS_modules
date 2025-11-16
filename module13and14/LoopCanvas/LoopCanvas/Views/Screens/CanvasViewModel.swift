@@ -192,8 +192,7 @@ extension CanvasViewModel {
   }
 
   func dropBlockOnCanvas(block: Block) -> Block {
-    // TODO - break this function up and refator logic into Canvas Model
-
+    let blockWasBeingDragged = block.dragging
     block.dragging = false
     draggingBlock = nil
 
@@ -210,13 +209,6 @@ extension CanvasViewModel {
       )
     }
 
-    let adjusted = CGPoint(x: blockDroppedOnCanvas.location.x - canvasScrollOffset.x,
-                           y: blockDroppedOnCanvas.location.y - canvasScrollOffset.y)
-    let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
-    withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
-      blockDroppedOnCanvas.location = quantized
-    }
-
     let blockAddedToGroup = canvasModel.checkBlockPositionAndAddToAvailableGroup(block: blockDroppedOnCanvas)
 
     if !blockAddedToGroup {
@@ -225,6 +217,16 @@ extension CanvasViewModel {
 
     updateAllBlocksList()
 
+    if blockWasBeingDragged {
+      // Animate the block into place
+      let adjusted = CGPoint(x: blockDroppedOnCanvas.location.x - canvasScrollOffset.x,
+                             y: blockDroppedOnCanvas.location.y - canvasScrollOffset.y)
+      let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
+      withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
+        blockDroppedOnCanvas.location = quantized
+      }
+    }
+
     return blockDroppedOnCanvas
   }
 
@@ -232,11 +234,11 @@ extension CanvasViewModel {
     // Move the entire group's blocks by the delta from the left-most block anchor
     guard let anchor = blockGroup.leftMostBlock?.location else { return }
 
-    let dx = location.x - anchor.x
-    let dy = location.y - anchor.y
+    let deltaX = location.x - anchor.x
+    let deltaY = location.y - anchor.y
 
     for block in blockGroup.allBlocks {
-      block.location = CGPoint(x: block.location.x + dx, y: block.location.y + dy)
+      block.location = CGPoint(x: block.location.x + deltaX, y: block.location.y + deltaY)
     }
 
     updateAllBlocksList()
