@@ -207,6 +207,55 @@ final class CanvasMessageStoreTests: XCTestCase {
     // Now the block group got deleted as well since there was only 1 block left
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 0)
   }
+
+  func testUpdateBlockNumBarsMessage() throws {
+    // Arrange: add two connected blocks in one group
+    let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    firstBlock.loopPlayer = nil
+    firstBlock.defaultMaxNumBars = 2
+    let secondBlock = try addBlockToCanvas(
+      libraryBlockIndex: 1,
+      location: CGPoint(
+        x: firstBlock.location.x + CanvasViewModel.blockSize,
+        y: firstBlock.location.y))
+
+    // Verify initial state
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let group = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertTrue(group.allBlocks.contains(firstBlock))
+    XCTAssertTrue(group.allBlocks.contains(secondBlock))
+
+    // Capture original positions to validate downstream shifts
+    let originalSecondX = try XCTUnwrap(secondBlock.blockGroupGridPosX)
+    let originalSecondLocationX = secondBlock.location.x
+
+    // Act: simulate an external VM updating firstBlock numBars to 2
+    let (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+
+    // Recreate a DTO-based copy to simulate the message payload
+    let updatedFirstCopy = Block(dto: firstBlock.toDTO())
+    updatedFirstCopy.numBars = 2
+
+    // Send the update message
+    canvasMessageStore.updateBlockNumBars(
+      viewModelId: otherViewModelId,
+      updatedBlock: updatedFirstCopy,
+      numBars: updatedFirstCopy.numBars)
+
+    // Assert: wait for processing
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // The first block's numBars should be updated, and second block should shift right by one bar
+    XCTAssertEqual(firstBlock.numBars, 2)
+
+    // Validate second block shifted by +1 in grid X and visually by one bar width
+    let expectedGridX = originalSecondX + 1
+    XCTAssertEqual(secondBlock.blockGroupGridPosX, expectedGridX)
+
+    let barPixelWidth = CanvasViewModel.blockSpacing + CanvasViewModel.blockSize
+    XCTAssertEqual(secondBlock.location.x, originalSecondLocationX + barPixelWidth)
+  }
 }
 
 // Test Helpers

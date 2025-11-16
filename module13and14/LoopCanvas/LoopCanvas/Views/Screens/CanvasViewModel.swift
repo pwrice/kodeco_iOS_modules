@@ -203,23 +203,33 @@ extension CanvasViewModel {
           canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
           updateAllBlocksList()
         }
+      } else if let numBarsUpdatedMessage = message as? BlockNumBarsUpdatedMessage {
+        if let block = allBlocks.first(where: { $0.id == numBarsUpdatedMessage.blockId }) {
+          let newNumBars = numBarsUpdatedMessage.numBars
+          block.blockGroup?.updateBlockNumBars(block: block, newNumBars: newNumBars)
+          updateAllBlocksList()
+        }
       }
     }
   }
 }
 
 
-
 // Events from view interactions
 
 extension CanvasViewModel {
-  func updateBlockDragLocation(block: Block, location: CGPoint) {
-    if !block.dragging {
-      startBlockDrag(block: block)
+  func loadSampleSetAndResetCanvas(sampleSetName: String) {
+    if sampleSetName != canvasModel.library.name {
+      let freshCanvasModel = CanvasModel(sampleSetStore: sampleSetStore)
+      freshCanvasModel.library.name = sampleSetName
+      resetCanvasModel(newCanvasModel: freshCanvasModel)
     }
-    block.location = location
   }
+}
 
+// Block events
+
+extension CanvasViewModel {
   func startBlockDrag(block: Block) {
     block.dragging = true
     if let blockGroup = block.blockGroup {
@@ -231,6 +241,13 @@ extension CanvasViewModel {
     updateAllBlocksList()
 
     canvasMessageStore?.disconnectBlockFromGroupMessage(viewModelId: id, updatedBlock: block)
+  }
+
+  func updateBlockDragLocation(block: Block, location: CGPoint) {
+    if !block.dragging {
+      startBlockDrag(block: block)
+    }
+    block.location = location
   }
 
   func addBlockToCanvasOnGrid(newBlock: Block) -> Block {
@@ -300,48 +317,6 @@ extension CanvasViewModel {
     return (blockDroppedOnCanvas, newBlockGroup)
   }
 
-  func updateBlockGroupDragLocation(blockGroup: BlockGroup, location: CGPoint) {
-    // Move the entire group's blocks by the delta from the left-most block anchor
-    guard let anchor = blockGroup.leftMostBlock?.location else { return }
-
-    let deltaX = location.x - anchor.x
-    let deltaY = location.y - anchor.y
-
-    for block in blockGroup.allBlocks {
-      block.location = CGPoint(x: block.location.x + deltaX, y: block.location.y + deltaY)
-    }
-
-    updateAllBlocksList()
-  }
-
-  @discardableResult
-  func dropBlockGroupOnCanvas(blockGroup: BlockGroup) -> BlockGroup {
-    // Quantize all blocks in the group to the grid on drop, similar to single-block behavior
-    withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
-      for block in blockGroup.allBlocks {
-        let adjusted = CGPoint(x: block.location.x - canvasScrollOffset.x,
-                               y: block.location.y - canvasScrollOffset.y)
-        let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
-        block.location = quantized
-      }
-    }
-
-    updateAllBlocksList()
-    return blockGroup
-  }
-
-  func loadSampleSetAndResetCanvas(sampleSetName: String) {
-    if sampleSetName != canvasModel.library.name {
-      let freshCanvasModel = CanvasModel(sampleSetStore: sampleSetStore)
-      freshCanvasModel.library.name = sampleSetName
-      resetCanvasModel(newCanvasModel: freshCanvasModel)
-    }
-  }
-}
-
-// Block events
-
-extension CanvasViewModel {
   func selectBlock(block: Block) {
     selectedBlock = block
     block.isSelected = true
@@ -375,6 +350,11 @@ extension CanvasViewModel {
     block.volume = clamped
   }
 
+  func update(numBars: Int, for block: Block) {
+    block.blockGroup?.updateBlockNumBars(block: block, newNumBars: numBars)
+    canvasMessageStore?.updateBlockNumBars(viewModelId: id, updatedBlock: block, numBars: numBars)
+  }
+
   /// Decrement the number of bars for a block by 1 with clamping to [1, block.maxNumBars]
   func decrementNumBars(for block: Block) {
     update(numBars: block.numBars - 1, for: block)
@@ -383,10 +363,6 @@ extension CanvasViewModel {
   /// Increment the number of bars for a block by 1 with clamping to [1, block.maxNumBars]
   func incrementNumBars(for block: Block) {
     update(numBars: block.numBars + 1, for: block)
-  }
-
-  func update(numBars: Int, for block: Block) {
-    block.blockGroup?.updateBlockNumBars(block: block, newNumBars: numBars)
   }
 
   /// Decrement the start offset for a block by 1 with clamping to [0, (block.maxNumBars) - 1]
@@ -412,6 +388,36 @@ extension CanvasViewModel {
 
 // Block Group events
 extension CanvasViewModel {
+  func updateBlockGroupDragLocation(blockGroup: BlockGroup, location: CGPoint) {
+    // Move the entire group's blocks by the delta from the left-most block anchor
+    guard let anchor = blockGroup.leftMostBlock?.location else { return }
+
+    let deltaX = location.x - anchor.x
+    let deltaY = location.y - anchor.y
+
+    for block in blockGroup.allBlocks {
+      block.location = CGPoint(x: block.location.x + deltaX, y: block.location.y + deltaY)
+    }
+
+    updateAllBlocksList()
+  }
+
+  @discardableResult
+  func dropBlockGroupOnCanvas(blockGroup: BlockGroup) -> BlockGroup {
+    // Quantize all blocks in the group to the grid on drop, similar to single-block behavior
+    withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
+      for block in blockGroup.allBlocks {
+        let adjusted = CGPoint(x: block.location.x - canvasScrollOffset.x,
+                               y: block.location.y - canvasScrollOffset.y)
+        let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
+        block.location = quantized
+      }
+    }
+
+    updateAllBlocksList()
+    return blockGroup
+  }
+
   func selectBlockGroup(group: BlockGroup) {
     // Unselect any previously selected group
     if let prev = selectedBlockGroup, prev.id != group.id {
