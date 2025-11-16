@@ -63,7 +63,7 @@ final class CanvasMessageStoreTests: XCTestCase {
     canvasViewModel.updateAllBlocksList()
   }
 
-  func testBlockAddedMessage() throws {
+  func testBlockAndGroupAdded() throws {
     let blockToAdd = Block(
       id: Block.getNextBlockId(),
       location: CGPoint(x: 200, y: 400),
@@ -110,9 +110,6 @@ final class CanvasMessageStoreTests: XCTestCase {
     let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
     let origBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
 
-    // A block group is created
-    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
-
     // Drop second block below and to the right of the first block,
     // within the slot connecting distance
     let secondBlock = try addBlockToCanvas(
@@ -121,7 +118,7 @@ final class CanvasMessageStoreTests: XCTestCase {
         x: firstBlock.location.x + 20,
         y: firstBlock.location.y + CanvasViewModel.blockSize + 20))
 
-    // We still only have 1 block group
+    // We have 1 block group
     XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
 
     // Sumimuate drag second block away from first block
@@ -165,6 +162,50 @@ final class CanvasMessageStoreTests: XCTestCase {
     let newBlockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first { $0.id != origBlockGroup.id })
     XCTAssertEqual(newBlockGroup.allBlocks.count, 1)
     XCTAssertTrue(newBlockGroup.allBlocks.contains(updatedSecondBlock))
+  }
+
+  func testDeleteBlockFromExistingGroup() throws {
+    // Drop two blocks on canvas to connect them
+    let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    let secondBlock = try addBlockToCanvas(
+      libraryBlockIndex: 1,
+      location: CGPoint(
+        x: firstBlock.location.x + 20,
+        y: firstBlock.location.y + CanvasViewModel.blockSize + 20))
+
+    // We have 1 block group and both blocks are members
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let blockGroup = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertEqual(blockGroup.allBlocks.count, 2)
+    XCTAssertTrue(blockGroup.allBlocks.contains(firstBlock))
+    XCTAssertTrue(blockGroup.allBlocks.contains(secondBlock))
+
+    // We have 1 block group
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+
+    // Send the delete block message
+    var (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let deletedSecondBlock = Block(dto: secondBlock.toDTO())
+    let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    canvasMessageStore?.deleteBlock(viewModelId: otherViewModelId, deletedBlock: deletedSecondBlock)
+
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Now the only the first block is in the first group,
+    // and the second block is gone
+    XCTAssertTrue(blockGroup.allBlocks.contains(firstBlock))
+    XCTAssertFalse(blockGroup.allBlocks.contains(secondBlock))
+    XCTAssertFalse(canvasViewModel.allBlocks.contains(secondBlock))
+
+    // Send anther delete block message
+    (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let deletedFirstBlock = Block(dto: firstBlock.toDTO())
+    canvasMessageStore?.deleteBlock(viewModelId: otherViewModelId, deletedBlock: deletedFirstBlock)
+
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Now the block group got deleted as well since there was only 1 block left
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 0)
   }
 }
 

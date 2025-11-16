@@ -33,6 +33,12 @@ struct BlockMovedMessage: CanvasMessage {
   let newBlockGroup: BlockGroupDTO?
 }
 
+struct BlockDeteledMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let deletedBlock: BlockDTO
+}
+
 
 // Manages browsing, loading, saving of canvas
 class CanvasMessageStore: ObservableObject {
@@ -75,6 +81,15 @@ class CanvasMessageStore: ObservableObject {
       viewModelId: viewModelId,
       updatedBlock: updatedBlock.toDTO(),
       newBlockGroup: newGroup?.toDTO())
+    messages.append(message)
+  }
+
+  func deleteBlock(viewModelId: UUID, deletedBlock: Block) {
+    canvasVersion += 1
+    let message = BlockDeteledMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      deletedBlock: deletedBlock.toDTO())
     messages.append(message)
   }
 }

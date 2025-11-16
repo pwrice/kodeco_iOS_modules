@@ -197,10 +197,17 @@ extension CanvasViewModel {
           canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
           updateAllBlocksList()
         }
+      } else if let deletedBlockMessage = message as? BlockDeteledMessage {
+        if let block = allBlocks.first(where: { $0.id == deletedBlockMessage.deletedBlock.id }),
+           let blockGroup = block.blockGroup {
+          canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
+          updateAllBlocksList()
+        }
       }
     }
   }
 }
+
 
 
 // Events from view interactions
@@ -245,6 +252,8 @@ extension CanvasViewModel {
       canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
     }
     updateAllBlocksList()
+
+    canvasMessageStore?.deleteBlock(viewModelId: id, deletedBlock: block)
   }
 
   func dropBlockOnCanvas(block: Block) -> Block {
