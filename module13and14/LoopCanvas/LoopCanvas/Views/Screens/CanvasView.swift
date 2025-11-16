@@ -15,10 +15,15 @@ struct CanvasView: View {
   @State var showingDownloadGenresView = false
   @State var showingLibraryPickerView = false
   @State var showingBlockDetailsView = false
+  @State var showingBlockGroupDetailsView = false
   @State var addBlockTapPosition: CGPoint?
 
   var canvasBlocksView: some View {
-    CanvasBlocksView(viewModel: viewModel, showingBlockDetailsView: $showingBlockDetailsView)
+    CanvasBlocksView(
+      viewModel: viewModel,
+      showingBlockDetailsView: $showingBlockDetailsView,
+      showingBlockGroupDetailsView: $showingBlockGroupDetailsView,
+    )
   }
 
   var body: some View {
@@ -42,7 +47,7 @@ struct CanvasView: View {
         .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
       }
       .defaultScrollAnchor(.zero) // TODO - when setting this to 0, the initial scroll
-                                  // view offset is incorrect until the user interacts
+      // view offset is incorrect until the user interacts
       .coordinateSpace(name: "CanvasCoordinateSpace")
       .onPreferenceChange(ViewOffsetKey.self) {
         viewModel.canvasScrollOffset = $0
@@ -162,6 +167,16 @@ struct CanvasView: View {
         .presentationDetents([.medium])
       }
     })
+    .sheet(isPresented: $showingBlockGroupDetailsView, content: {
+      if let selectedBlockGroup = viewModel.selectedBlockGroup {
+        BlockGroupDetailsSheet(
+          canvasViewModel: viewModel,
+          group: selectedBlockGroup,
+          isPresented: $showingBlockGroupDetailsView
+        )
+        .presentationDetents([.medium])
+      }
+    })
   }
 
   var localSampleSets: [LocalSampleSet] {
@@ -191,9 +206,11 @@ struct ViewOffsetKey: PreferenceKey {
 struct CanvasBlocksView: View {
   @ObservedObject var viewModel: CanvasViewModel
   @Binding var showingBlockDetailsView: Bool
+  @Binding var showingBlockGroupDetailsView: Bool
 
   // TODO - make work w multi-touch (this assumes just a single drag)
   @GestureState private var dragStartLocation: CGPoint?
+  @GestureState private var groupDragStartLocation: CGPoint?
 
   func blockDragGesture(block: Block) -> some Gesture {
     DragGesture(minimumDistance: 2)
@@ -212,6 +229,23 @@ struct CanvasBlocksView: View {
       }
   }
 
+  func blockGroupDragGesture(blockGroup: BlockGroup) -> some Gesture {
+    DragGesture(minimumDistance: 2)
+      .updating($groupDragStartLocation) { _, startLocation, _ in
+        // Called before onChanged
+        startLocation = startLocation ?? (blockGroup.leftMostBlock?.location ?? .zero)
+      }
+      .onChanged { value in
+        var newLocation = groupDragStartLocation ?? (blockGroup.leftMostBlock?.location ?? .zero)
+        newLocation.x += value.translation.width
+        newLocation.y += value.translation.height
+        viewModel.updateBlockGroupDragLocation(blockGroup: blockGroup, location: newLocation)
+      }
+      .onEnded { _ in
+        _ = viewModel.dropBlockGroupOnCanvas(blockGroup: blockGroup)
+      }
+  }
+
   var body: some View {
     ZStack { // This is just the blocks
       Spacer()
@@ -226,7 +260,31 @@ struct CanvasBlocksView: View {
                 viewModel.selectBlock(block: blockModel)
                 showingBlockDetailsView = true
               }
+          )
+      }
+
+      ForEach(viewModel.allBlockGroups, id: \.id) { group in
+        if group.allBlocks.count >= 2, let left = group.leftMostBlock {
+          RoundedRectangle(cornerRadius: 12)
+            .fill(Color.gray.opacity(0.2))
+            .overlay(
+              Image(systemName: "slider.vertical.3")
+                .foregroundColor(.gray)
             )
+            .frame(width: 20, height: max(40, CGFloat(left.numBars) * (CanvasViewModel.blockSize + CanvasViewModel.blockSpacing)))
+            .position(CGPoint(
+              x: left.location.x - (CanvasViewModel.blockSize / 2) - CanvasViewModel.blockSpacing - 12,
+              y: left.location.y
+            ))
+            .gesture(blockGroupDragGesture(blockGroup: group))
+            .simultaneousGesture(
+              TapGesture()
+                .onEnded { _ in
+                  viewModel.selectBlockGroup(group: group)
+                  showingBlockGroupDetailsView = true
+                }
+            )
+        }
       }
     }
   }
@@ -237,7 +295,7 @@ struct BackgroundDots: View {
 
   func highlightBlock(x: Int, y: Int) -> Bool {
     return (addBlockTapGridPosition?.x == CGFloat(x) &&
-     addBlockTapGridPosition?.y == CGFloat(y))
+            addBlockTapGridPosition?.y == CGFloat(y))
   }
 
   var body: some View {
@@ -341,18 +399,36 @@ struct CanvasView_Previews: PreviewProvider {
 //   [DONE]- refactor increment / decrement settings to view model
 //   - fix perf problems when incrementing / decrementing numBars
 //   - visually disable increment / decriment buttons when they are beyond their limits
-// - **implement duplicate blocks
+// - [DONE] **implement duplicate blocks
+// - **implement volume on blocks
+//   - hook up mute and gray out the block when it is muted
 // - [DONE]**add animation for block after it is dropped till the next bar when playback starts
-// - **(add ability to import your own samples from documents folder
-//   - create documents folder
-//   - how to deal with tempo adjustment and loop length?
-//   - copy default files out to documents folder
-//   - download additional genres to documents folder
-//   - store songs in documents folder
-// - **figure out how to select a group and set group properties (mute etc...)
+// - [DONE]**(add ability to import your own samples from documents folder
+//   [DONE]- create documents folder
+//   [DONE]- how to deal with tempo adjustment and loop length?
+//   [DONE]- copy default files out to documents folder
+//   [DONE]- download additional genres to documents folder
+//   [DONE]- store songs in documents folder
+// [DONE]- **figure out how to select a group and set group properties (mute etc...)
+//   [DONE]- add some control pill that hangs out under groups
+//   - add controls to this pill
+//   [DONE]- allow the user to drag the pill to move it around
+//   [DONE]- tapping should bring up a group details sheet
+//   - group details operations (mute, solo?, volume ?)
+//      - delete group
+//      - volume
+//      - duplicate group
+//   - fix animation for dragging
+// - update tests for loading and saving to make sure all block and canvas state can be serialized properly
+// - add the ability to connect block groups when dragging them next to each other
+
+
 
 // MULTI-USER
 // hook up shareplay so multiple users can edit a canvas at the same time
+// - add DTO for all objects
+// - hook up messages for actions
+//
 
 // AUv3
 // make AUv3 plugin so you can record into loops from other audio apps
@@ -391,7 +467,7 @@ struct CanvasView_Previews: PreviewProvider {
 // [DONE]-- fix bug where library blocks appear on canvas during initial transition
 // [DONE]-- fix bug where you can delete currently playing genre
 
-// Refactor all views so they easily work with preview w/ mock data
+// [DONE] Refactor all views so they easily work with preview w/ mock data
 
 
 // Capstone project requirements
@@ -400,36 +476,18 @@ struct CanvasView_Previews: PreviewProvider {
 //    -- canvas view
 //   [DONE]-- make library blocks reset location on rotation
 //   [DONE]-- make library 1 row of blocks
-//     -- make portrait mode work upside-down
+//   [NA]-- make portrait mode work upside-down
 //   [DONE]-- home view
 //   [DONE]-- song list view
 //   [DONE]-- download genres sheet
 //   [DONE]-- rename song sheet
 //   [DONE]-- place holder view
 // -- make app work in light and dark mode
-// -- add SwiftUI animation somewhere
-// -- find a place to add tab navigation
+// -- [DONE] add SwiftUI animation somewhere
+// -- [DONE] find a place to add tab navigation
 // -- add UI tests
 
 // Add more comprehensive tests (+ view model refactoring to make this easier)
-
-
-// Update tests for library behavior
-// context tap to select block
-// block contextual menu
-// add delete block
-
-// context tab to select block group
-// - tap near group
-// group context menu
-// delete group etc..
-
-// add navigation tabs below (per freeform)
-// - loops
-// - sample triggers / effects (add search here)
-//   - hook up the api search here
-
-// How to make the library work with different phone sizes?
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0

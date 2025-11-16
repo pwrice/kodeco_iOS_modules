@@ -90,6 +90,9 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
 
   var currentPlayPosX = 0
 
+  var isSelected = false
+  var volume = 0.75
+
   var isEmpty: Bool {
     allBlocks.isEmpty
   }
@@ -300,6 +303,10 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
     // Update the block's own numBars
     block.numBars = clampedNew
     block.loopPlayer?.updateNumBars(clampedNew)
+  }
+
+  var leftMostBlock: Block? {
+    return allBlocks.min(by: { lhs, rhs in lhs.location.x < rhs.location.x })
   }
 
   // Codable implementation

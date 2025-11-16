@@ -14,6 +14,8 @@
 		C10DE2102D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE20E2D20B65400466C0C /* URLSessionProgressDataLoader.swift */; };
 		C10DE2122D20BD7A00466C0C /* FileDownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE2112D20BD7000466C0C /* FileDownloadManagerTests.swift */; };
 		C125E4D92EC8EB9A00A7A5BA /* MusicEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C125E4D82EC8EB9A00A7A5BA /* MusicEngineTests.swift */; };
+		C125E4DE2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */; };
+		C125E4DF2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */; };
 		C12C6E892C2AF2E200B01C58 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E882C2AF2E200B01C58 /* BlockView.swift */; };
 		C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8A2C2AF39300B01C58 /* HomeView.swift */; };
 		C12C6E8D2C2AFA7700B01C58 /* PlaceHolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */; };
@@ -87,6 +89,7 @@
 		C10DE20E2D20B65400466C0C /* URLSessionProgressDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionProgressDataLoader.swift; sourceTree = "<group>"; };
 		C10DE2112D20BD7000466C0C /* FileDownloadManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManagerTests.swift; sourceTree = "<group>"; };
 		C125E4D82EC8EB9A00A7A5BA /* MusicEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicEngineTests.swift; sourceTree = "<group>"; };
+		C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroupDetailsSheet.swift; sourceTree = "<group>"; };
 		C12C6E882C2AF2E200B01C58 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
 		C12C6E8A2C2AF39300B01C58 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceHolderView.swift; sourceTree = "<group>"; };
@@ -173,6 +176,7 @@
 				C1B150FF2C9F4BF100B4FAE8 /* DownloadGenresSheet.swift */,
 				C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */,
 				C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */,
+				C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */,
 			);
 			path = Sheets;
 			sourceTree = "<group>";
@@ -524,6 +528,7 @@
 				C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */,
 				C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */,
 				C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */,
+				C125E4DE2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */,
 				C10DE20A2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -561,6 +566,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C19D85662C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift in Sources */,
+				C125E4DF2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */,
 				C19D85642C08AE6500477545 /* LoopCanvasUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

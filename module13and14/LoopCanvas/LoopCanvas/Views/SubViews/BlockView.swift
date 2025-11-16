@@ -87,10 +87,6 @@ struct PositionedBlockView: View {
         }
       }
 
-      .onChange(of: model.triggerBlockLoadingAnimation) { _, _ in
-      }
-
-
       RoundedRectangle(cornerRadius: Style.blockCornerRadius)
         .fill(.clear)
         .stroke(Style.selectionStrokeColor, lineWidth: Style.selectionStrokeLineWidth)

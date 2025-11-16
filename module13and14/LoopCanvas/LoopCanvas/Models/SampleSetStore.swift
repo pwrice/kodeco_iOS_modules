@@ -132,19 +132,13 @@ class SampleSetStore: ObservableObject {
     let loopCanvasURL = documentsURL.appendingPathComponent("LoopCanvas", isDirectory: true)
     let userSamplesURL = loopCanvasURL.appendingPathComponent("Samples", isDirectory: true)
 
-    print(">> documentsURL \(documentsURL)")
-    print(">> loopCanvasURL \(loopCanvasURL)")
-    print(">> userSamplesURL \(userSamplesURL)")
-
     // Create LoopCanvas and Samples directories if they do not exist
     do {
       if !fileManager.fileExists(atPath: loopCanvasURL.path) {
         try fileManager.createDirectory(at: loopCanvasURL, withIntermediateDirectories: true)
-        print(">> created loopCanvasURL")
       }
       if !fileManager.fileExists(atPath: userSamplesURL.path) {
         try fileManager.createDirectory(at: userSamplesURL, withIntermediateDirectories: true)
-        print(">> created userSamplesURL")
       }
     } catch {
       Self.logger.error("Failed to create user samples directories: \(String(describing: error))")
@@ -164,8 +158,6 @@ class SampleSetStore: ObservableObject {
             if !fileManager.fileExists(atPath: destination.path) {
               do {
                 try fileManager.copyItem(at: item, to: destination)
-                print(">> copying \(item)")
-                print(">> to \(destination)")
               } catch {
                 Self.logger.error("Failed to copy default SampleSet \(item.lastPathComponent) to user directory: \(String(describing: error))")
               }

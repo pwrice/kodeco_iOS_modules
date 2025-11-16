@@ -24,12 +24,15 @@ class CanvasViewModel: ObservableObject {
 
   @Published var canvasModel: CanvasModel
   @Published var allBlocks: [Block]
+  @Published var allBlockGroups: [BlockGroup]
   @Published var selectedSampleSetName: String = ""
   @Published var canvasSnapshot: UIImage?
 
   var addBlockTapGridPosition: CGPoint?
   var selectedBlock: Block?
   var draggingBlock: Block?
+  var selectedBlockGroup: BlockGroup?
+
   var canvasScrollOffset = CGPoint.zero
   var songNameToLoad: String?
 
@@ -97,6 +100,7 @@ class CanvasViewModel: ObservableObject {
     self.sampleSetStore = sampleSetStore
 
     self.allBlocks = []
+    self.allBlockGroups = []
     self.canvasModel.musicEngine = musicEngine
     musicEngine.delegate = canvasModel
 
@@ -206,6 +210,13 @@ extension CanvasViewModel {
       )
     }
 
+    let adjusted = CGPoint(x: blockDroppedOnCanvas.location.x - canvasScrollOffset.x,
+                           y: blockDroppedOnCanvas.location.y - canvasScrollOffset.y)
+    let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
+    withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
+      blockDroppedOnCanvas.location = quantized
+    }
+
     let blockAddedToGroup = canvasModel.checkBlockPositionAndAddToAvailableGroup(block: blockDroppedOnCanvas)
 
     if !blockAddedToGroup {
@@ -217,6 +228,36 @@ extension CanvasViewModel {
     return blockDroppedOnCanvas
   }
 
+  func updateBlockGroupDragLocation(blockGroup: BlockGroup, location: CGPoint) {
+    // Move the entire group's blocks by the delta from the left-most block anchor
+    guard let anchor = blockGroup.leftMostBlock?.location else { return }
+
+    let dx = location.x - anchor.x
+    let dy = location.y - anchor.y
+
+    for block in blockGroup.allBlocks {
+      block.location = CGPoint(x: block.location.x + dx, y: block.location.y + dy)
+    }
+
+    updateAllBlocksList()
+  }
+
+  @discardableResult
+  func dropBlockGroupOnCanvas(blockGroup: BlockGroup) -> BlockGroup {
+    // Quantize all blocks in the group to the grid on drop, similar to single-block behavior
+    withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
+      for block in blockGroup.allBlocks {
+        let adjusted = CGPoint(x: block.location.x - canvasScrollOffset.x,
+                               y: block.location.y - canvasScrollOffset.y)
+        let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
+        block.location = quantized
+      }
+    }
+
+    updateAllBlocksList()
+    return blockGroup
+  }
+
   func loadSampleSetAndResetCanvas(sampleSetName: String) {
     if sampleSetName != canvasModel.library.name {
       let freshCanvasModel = CanvasModel(sampleSetStore: sampleSetStore)
@@ -224,7 +265,11 @@ extension CanvasViewModel {
       resetCanvasModel(newCanvasModel: freshCanvasModel)
     }
   }
+}
 
+// Block events
+
+extension CanvasViewModel {
   func selectBlock(block: Block) {
     selectedBlock = block
     block.isSelected = true
@@ -290,6 +335,84 @@ extension CanvasViewModel {
     let newBlock = block.instantiateCopyWith(location: newLocation, isLibraryBlock: false)
     newBlock.visible = true
     return dropBlockOnCanvas(block: newBlock)
+  }
+}
+
+// Block Group events
+extension CanvasViewModel {
+  func selectBlockGroup(group: BlockGroup) {
+    // Unselect any previously selected group
+    if let prev = selectedBlockGroup, prev.id != group.id {
+      unselectBlockGroup(group: prev)
+    }
+    selectedBlockGroup = group
+    group.isSelected = true
+    for block in group.allBlocks { block.isSelected = true }
+  }
+
+  func unselectCurrentlySelectedBlockGroup() {
+    if let group = selectedBlockGroup {
+      unselectBlockGroup(group: group)
+    }
+  }
+
+  func unselectBlockGroup(group: BlockGroup) {
+    if selectedBlockGroup?.id == group.id { selectedBlockGroup = nil }
+    group.isSelected = false
+    for block in group.allBlocks { block.isSelected = false }
+  }
+
+  func update(volume: Double, for group: BlockGroup) {
+    let clamped = max(0.0, min(1.0, volume))
+    group.volume = clamped
+    for block in group.allBlocks {
+      update(volume: clamped, for: block)
+    }
+  }
+
+  /// Toggles mute state for all blocks in the given group.
+  /// If any block is currently unmuted, mutes all; otherwise, unmutes all.
+  func toggleMute(blockGroup group: BlockGroup) {
+    let shouldMute = group.allBlocks.contains { !$0.isMuted }
+    for block in group.allBlocks {
+      if block.isMuted != shouldMute {
+        toggleMute(block: block)
+      }
+    }
+  }
+
+  /// Creates a duplicate of all blocks in the group, offset to the right by one grid spacing, and returns the new group.
+  @discardableResult
+  func duplicate(blockGroup group: BlockGroup) -> BlockGroup? {
+    // Compute an offset of one grid spacing in X
+    let spacing = CanvasViewModel.gridSpacing()
+
+    // Create copies of each block shifted by spacing
+    var newBlocks: [Block] = []
+    for block in group.allBlocks {
+      let newLocation = CGPoint(x: block.location.x + spacing, y: block.location.y)
+      let copy = block.instantiateCopyWith(location: newLocation, isLibraryBlock: false)
+      copy.visible = true
+      newBlocks.append(copy)
+    }
+
+    // Place first block to start a new group
+    guard let first = newBlocks.first else { return nil }
+    let droppedFirst = dropBlockOnCanvas(block: first)
+
+    // Add remaining blocks to that new or existing group via normal drop logic
+    for block in newBlocks.dropFirst() {
+      _ = dropBlockOnCanvas(block: block)
+    }
+
+    // Find and return the new group (the group containing droppedFirst)
+    return droppedFirst.blockGroup
+  }
+
+  func delete(blockGroup group: BlockGroup) {
+    // Remove all blocks in this group from the canvas
+    for block in group.allBlocks { deleteBlockFromCanvas(block: block) }
+    updateAllBlocksList()
   }
 }
 
@@ -413,12 +536,14 @@ extension CanvasViewModel {
 
 extension CanvasViewModel {
   func updateAllBlocksList() {
+    canvasModel.blocksGroups.sort { $0.id > $1.id }
     var newAllBlocksList = canvasModel.blocksGroups.flatMap { $0.allBlocks }
     + [draggingBlock].compactMap { $0 }
 
     // Need to keep them consistantly sorted so SwiftUI views have continuity
     newAllBlocksList.sort { $0.id > $1.id }
     allBlocks = newAllBlocksList
+    allBlockGroups = canvasModel.blocksGroups
   }
 }
 
@@ -460,3 +585,4 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
+

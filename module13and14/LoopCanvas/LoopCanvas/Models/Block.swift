@@ -137,7 +137,7 @@ class Block: ObservableObject, Identifiable, Codable {
     let copy = Block(
       id: Block.getNextBlockId(),
       location: location,
-      color: self.color,
+      color: self.normalColor,
       icon: self.icon,
       visible: self.visible,
       loopURL: self.loopURL,
@@ -148,6 +148,7 @@ class Block: ObservableObject, Identifiable, Codable {
     copy.isMuted = self.isMuted
     copy.startOffset = self.startOffset
     copy.volume = self.volume
+    copy.color = self.normalColor
     return copy
   }
 
