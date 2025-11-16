@@ -49,7 +49,8 @@ final class CanvasViewModelTests: XCTestCase {
       canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
       musicEngine: musicEngine,
       canvasStore: canvasStore,
-      sampleSetStore: sampleSetStore)
+      sampleSetStore: sampleSetStore,
+      canvasMessageStore: nil)
     canvasViewModel.canvasModel.library.loadLibraryFrom(libraryFolderName: "Dub")
     canvasViewModel.updateAllBlocksList()
   }
@@ -78,7 +79,7 @@ final class CanvasViewModelTests: XCTestCase {
 
     let addBlockTapPosition = CGPoint(x: 200, y: 400)
     _ = canvasViewModel.addBlockToCanvasOnGrid(
-      block: blockToAdd.instantiateCopyWith(
+      newBlock: blockToAdd.instantiateCopyWith(
         location: addBlockTapPosition, isLibraryBlock: false))
 
     // A new block group is created which contains a new block
@@ -396,7 +397,8 @@ final class CanvasViewModelTests: XCTestCase {
       canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
       musicEngine: musicEngine,
       canvasStore: canvasStore,
-      sampleSetStore: sampleSetStore
+      sampleSetStore: sampleSetStore,
+      canvasMessageStore: nil
     )
     newCanvasViewModel.canvasModel.library.loadLibraryFrom(libraryFolderName: "Dub")
     newCanvasViewModel.updateAllBlocksList()
@@ -479,8 +481,9 @@ extension CanvasViewModelTests {
   func addBlockToCanvas(libraryBlockIndex: Int, location: CGPoint) throws -> Block {
     let blockToAdd = testBlocks[libraryBlockIndex]
     let newBlock = canvasViewModel.addBlockToCanvasOnGrid(
-      block: blockToAdd.instantiateCopyWith(
+      newBlock: blockToAdd.instantiateCopyWith(
         location: location, isLibraryBlock: false))
     return newBlock
   }
 }
+

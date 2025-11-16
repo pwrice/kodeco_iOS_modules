@@ -16,8 +16,10 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testInitWithBlock() throws {
-    let block = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
-    let blockGroup = BlockGroup(id: 0, block: block, musicEngine: musicEngine)
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let block = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
+    let blockGroup = BlockGroup(id: groupId0, block: block, musicEngine: musicEngine)
 
     XCTAssertEqual(blockGroup.allBlocks.count, 1)
     XCTAssertEqual(blockGroup.allBlocks.first, block)
@@ -25,8 +27,10 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testNoOpOnTick() throws {
-    let block = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
-    let blockGroup = BlockGroup(id: 0, block: block, musicEngine: musicEngine)
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let block = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
+    let blockGroup = BlockGroup(id: groupId0, block: block, musicEngine: musicEngine)
 
     XCTAssertEqual(blockGroup.currentPlayPosX, 0)
     XCTAssertEqual(block.isPlaying, false)
@@ -42,8 +46,10 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testTickPlaysSingleBlock() throws {
-    let block = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
-    let blockGroup = BlockGroup(id: 0, block: block, musicEngine: musicEngine)
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let block = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
+    let blockGroup = BlockGroup(id: groupId0, block: block, musicEngine: musicEngine)
 
     XCTAssertEqual(blockGroup.currentPlayPosX, 0)
     XCTAssertEqual(block.isPlaying, false)
@@ -58,9 +64,11 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testTickPlaysSingleBlockWithTwoBars() throws {
-    let block = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let block = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
     block.numBars = 2
-    let blockGroup = BlockGroup(id: 0, block: block, musicEngine: musicEngine)
+    let blockGroup = BlockGroup(id: groupId0, block: block, musicEngine: musicEngine)
 
     XCTAssertEqual(blockGroup.currentPlayPosX, 1)
     XCTAssertEqual(block.isPlaying, false)
@@ -83,8 +91,10 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testTickAdvancesPlayToAdjacentBlock() throws {
-    let firstBlock = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
-    let blockGroup = BlockGroup(id: 0, block: firstBlock, musicEngine: musicEngine)
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let firstBlock = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
+    let blockGroup = BlockGroup(id: groupId0, block: firstBlock, musicEngine: musicEngine)
 
     blockGroup.tick(step16: musicEngine.nextBarLogicTick)
 
@@ -93,7 +103,8 @@ final class BlockGroupTests: XCTestCase {
     XCTAssertEqual(firstBlock.loopPlayer?.loopPlaying, true)
 
     let rightSlot = SlotPostion.right.getSlot(relativeTo: firstBlock)
-    let secondBlock = getTestBlock(id: 1, location: rightSlot.location)
+    let id1 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let secondBlock = getTestBlock(id: id1, location: rightSlot.location)
     blockGroup.addBlock(block: secondBlock, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
 
     blockGroup.tick(step16: musicEngine.nextBarLogicTick)
@@ -106,9 +117,11 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testTickAdvancesPlayToAdjacent2BarBlocks() throws {
-    let firstBlock = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let firstBlock = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
     firstBlock.numBars = 2
-    let blockGroup = BlockGroup(id: 0, block: firstBlock, musicEngine: musicEngine)
+    let blockGroup = BlockGroup(id: groupId0, block: firstBlock, musicEngine: musicEngine)
 
     blockGroup.tick(step16: musicEngine.nextBarLogicTick)
 
@@ -117,7 +130,8 @@ final class BlockGroupTests: XCTestCase {
     XCTAssertEqual(firstBlock.loopPlayer?.loopPlaying, true)
 
     let rightSlot = SlotPostion.right.getSlot(relativeTo: firstBlock.location, xOffsetMultiple: 1)
-    let secondBlock = getTestBlock(id: 1, location: rightSlot.location)
+    let id1 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let secondBlock = getTestBlock(id: id1, location: rightSlot.location)
     secondBlock.numBars = 2
     blockGroup.addBlock(block: secondBlock, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
 
@@ -139,8 +153,9 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testEncodeBlockToJSON() throws {
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
     let testBlock = getTestBlock(
-      id: 0,
+      id: id0,
       location: CGPoint(x: 0, y: 0),
       blockGroupGridPosX: 0,
       blockGroupGridPosY: 0
@@ -167,18 +182,21 @@ final class BlockGroupTests: XCTestCase {
   }
 
   func testEncodeBlockGroupToJSON() throws {
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
     let firstBlock = getTestBlock(
-      id: 0,
+      id: id0,
       location: CGPoint(x: 0, y: 0),
       blockGroupGridPosX: 0,
       blockGroupGridPosY: 0
     )
 
-    let blockGroup = BlockGroup(id: 0, block: firstBlock, musicEngine: musicEngine)
+    let blockGroup = BlockGroup(id: groupId0, block: firstBlock, musicEngine: musicEngine)
 
     let rightSlot = SlotPostion.right.getSlot(relativeTo: firstBlock)
+    let id1 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
     let secondBlock = getTestBlock(
-      id: 1,
+      id: id1,
       location: rightSlot.location,
       blockGroupGridPosX: 0,
       blockGroupGridPosY: 0
@@ -212,7 +230,7 @@ final class BlockGroupTests: XCTestCase {
     }
   }
 
-  func getTestBlock(id: Int, location: CGPoint, blockGroupGridPosX: Int? = nil, blockGroupGridPosY: Int? = nil) -> Block {
+  func getTestBlock(id: UUID, location: CGPoint, blockGroupGridPosX: Int? = nil, blockGroupGridPosY: Int? = nil) -> Block {
     let block = Block(
       id: id,
       location: location,
@@ -228,14 +246,17 @@ final class BlockGroupTests: XCTestCase {
 
   func testUpdateBlockNumBars_Grow_ShiftsRightNeighborsAndPlayPos() throws {
     // Arrange: base block at x=0 with 1 bar
-    let first = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
-    let group = BlockGroup(id: 0, block: first, musicEngine: musicEngine)
+    let id1 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let id2 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let first = getTestBlock(id: id1, location: CGPoint(x: 0, y: 0))
+    let group = BlockGroup(id: groupId0, block: first, musicEngine: musicEngine)
     first.loopPlayer?.defaultMaxNumBars = 3
 
 
     // Place a neighbor to the right at grid x=1
     let rightSlot = SlotPostion.right.getSlot(relativeTo: first)
-    let second = getTestBlock(id: 1, location: rightSlot.location)
+    let second = getTestBlock(id: id2, location: rightSlot.location)
     group.addBlock(block: second, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
 
     // Ensure play head is to the right of the first block's old end (which is 0)
@@ -255,13 +276,16 @@ final class BlockGroupTests: XCTestCase {
 
   func testUpdateBlockNumBars_Shrink_ShiftsRightNeighborsAndPlayPosLeft() throws {
     // Arrange: base block at x=0 with 3 bars
-    let first = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let first = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
     first.numBars = 3
-    let group = BlockGroup(id: 0, block: first, musicEngine: musicEngine)
+    let group = BlockGroup(id: groupId0, block: first, musicEngine: musicEngine)
 
     // Neighbor begins at x=3 (right of old end which is 2)
     let rightSlot = SlotPostion.right.getSlot(relativeTo: first.location, xOffsetMultiple: 2)
-    let second = getTestBlock(id: 1, location: rightSlot.location)
+    let id1 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let second = getTestBlock(id: id1, location: rightSlot.location)
     group.addBlock(block: second, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
 
     // Set play head to the right of old end (2)
@@ -281,13 +305,16 @@ final class BlockGroupTests: XCTestCase {
 
   func testUpdateBlockNumBars_PlayHeadLeftOrOnBlock_Unchanged() throws {
     // Arrange: base block at x=0 with 2 bars
-    let first = getTestBlock(id: 0, location: CGPoint(x: 0, y: 0))
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let groupId0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+    let first = getTestBlock(id: id0, location: CGPoint(x: 0, y: 0))
     first.numBars = 2
-    let group = BlockGroup(id: 0, block: first, musicEngine: musicEngine)
+    let group = BlockGroup(id: groupId0, block: first, musicEngine: musicEngine)
 
     // Place a neighbor to the right at x=2
     let rightSlot = SlotPostion.right.getSlot(relativeTo: first.location, xOffsetMultiple: 1)
-    let second = getTestBlock(id: 1, location: rightSlot.location)
+    let id1 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let second = getTestBlock(id: id1, location: rightSlot.location)
     group.addBlock(block: second, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
 
     // Case 1: play head on the block (<= old end which is 1)
@@ -301,3 +328,4 @@ final class BlockGroupTests: XCTestCase {
     XCTAssertEqual(group.currentPlayPosX, -1)
   }
 }
+

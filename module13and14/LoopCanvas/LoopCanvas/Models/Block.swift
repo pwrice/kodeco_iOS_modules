@@ -10,7 +10,7 @@ import SwiftUI
 import os
 
 struct BlockDTO: Codable {
-  let id: Int
+  let id: UUID
   let location: CGPoint
   let color: Block.Colors
   let relativePath: String?
@@ -30,7 +30,7 @@ class Block: ObservableObject, Identifiable {
   )
 
   // Persistent props
-  @Published var id: Int
+  @Published var id: UUID
   @Published var location: CGPoint
   @Published var color: Color
 
@@ -119,15 +119,12 @@ class Block: ObservableObject, Identifiable {
 
   var volume: Double = 0.75        // 0...1
 
-  static var blockIdCounter: Int = 0
-  static func getNextBlockId() -> Int {
-    let blockId = blockIdCounter
-    blockIdCounter += 1
-    return blockId
+  static func getNextBlockId() -> UUID {
+    return UUID()
   }
 
   init(
-    id: Int,
+    id: UUID,
     location: CGPoint,
     color: Color,
     icon: String,

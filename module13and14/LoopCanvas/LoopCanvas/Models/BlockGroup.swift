@@ -9,7 +9,7 @@ import Foundation
 import os
 
 struct BlockGroupDTO: Codable {
-  let id: Int
+  let id: UUID
   let allBlocks: [BlockDTO]
 }
 
@@ -90,7 +90,7 @@ class BlockGroup: ObservableObject, Identifiable {
 
   var musicEngine: MusicEngine?
 
-  let id: Int
+  let id: UUID
   var allBlocks: [Block] = []
 
   var currentPlayPosX = 0
@@ -102,15 +102,8 @@ class BlockGroup: ObservableObject, Identifiable {
     allBlocks.isEmpty
   }
 
-  static var blockGroupIdCounter: Int = 0
-  static func getNextBlockGroupId() -> Int {
-    let id = blockGroupIdCounter
-    blockGroupIdCounter += 1
-    return id
-  }
-
   init() {
-    id = 0
+    id = UUID()
   }
 
   convenience init(dto: BlockGroupDTO, musicEngine: MusicEngine? = nil) {
@@ -119,7 +112,7 @@ class BlockGroup: ObservableObject, Identifiable {
   }
 
   // Add a designated initializer to allow setting `id` directly for DTO construction
-  init(id: Int, blocks: [Block] = [], musicEngine: MusicEngine? = nil) {
+  init(id: UUID, blocks: [Block] = [], musicEngine: MusicEngine? = nil) {
     self.id = id
     self.musicEngine = musicEngine
     self.allBlocks = []
@@ -130,16 +123,7 @@ class BlockGroup: ObservableObject, Identifiable {
     }
   }
 
-  func cleanup() {
-    for block in allBlocks {
-      if let loopPlayer = block.loopPlayer {
-        musicEngine?.releaseLoopPlayer(player: loopPlayer)
-      }
-    }
-    musicEngine = nil
-  }
-
-  init(id: Int, block: Block, musicEngine: MusicEngine? = nil) {
+  init(id: UUID, block: Block, musicEngine: MusicEngine? = nil) {
     self.id = id
     self.musicEngine = musicEngine
 
@@ -154,6 +138,15 @@ class BlockGroup: ObservableObject, Identifiable {
     // when creating a new group, initialize at the end so the next bar starts at 0
     currentPlayPosX = block.numBars - 1
     block.currentRelativeBar = block.numBars - 1
+  }
+
+  func cleanup() {
+    for block in allBlocks {
+      if let loopPlayer = block.loopPlayer {
+        musicEngine?.releaseLoopPlayer(player: loopPlayer)
+      }
+    }
+    musicEngine = nil
   }
 
   func setMusicEngineAfterLoad(musicEngine: MusicEngine) {
@@ -343,3 +336,4 @@ class BlockGroup: ObservableObject, Identifiable {
     return BlockGroupDTO(id: id, allBlocks: blockDTOs)
   }
 }
+

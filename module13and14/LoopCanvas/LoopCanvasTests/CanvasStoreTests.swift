@@ -28,7 +28,7 @@ final class CanvasStoreTests: XCTestCase {
     canvasModel.name = "CANVAS_STORE_TEST_CANVAS"
     canvasModel.thumnail = UIImage(systemName: "photo")
 
-    let block = getFirstTestBlock()
+    let block = try getFirstTestBlock()
     canvasModel.addBlockGroup(initialBlock: block)
 
     XCTAssertEqual(canvasModel.blocksGroups.count, 1)
@@ -61,7 +61,7 @@ final class CanvasStoreTests: XCTestCase {
     canvasModel.name = "CANVAS_STORE_TEST_CANVAS"
     canvasModel.thumnail = UIImage(systemName: "photo")
 
-    let block = getFirstTestBlock()
+    let block = try getFirstTestBlock()
     canvasModel.addBlockGroup(initialBlock: block)
 
     canvasStore.saveCanvas(canvasModel: canvasModel)
@@ -74,9 +74,10 @@ final class CanvasStoreTests: XCTestCase {
     XCTAssertNotNil(firstSavedCanvas.thumnail)
   }
 
-  func getFirstTestBlock() -> Block {
+  func getFirstTestBlock() throws -> Block {
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
     return Block(
-      id: 0,
+      id: id0,
       location: CGPoint(x: 0, y: 0),
       color: .pink,
       icon: "square",

@@ -12,6 +12,8 @@ import os
 import Waveform
 import AVFoundation
 
+
+
 class CanvasViewModel: ObservableObject {
   private static let logger = Logger(
     subsystem: "ViewModels",
@@ -21,6 +23,7 @@ class CanvasViewModel: ObservableObject {
   let musicEngine: MusicEngine
   let canvasStore: CanvasStore?
   let sampleSetStore: SampleSetStore?
+  let canvasMessageStore: CanvasMessageStore?
 
   @Published var canvasModel: CanvasModel
   @Published var allBlocks: [Block]
@@ -83,8 +86,8 @@ class CanvasViewModel: ObservableObject {
     return CGPoint(x: col, y: row)
   }
 
-
   private var orienttationCancellable: AnyCancellable?
+  private var messagesCancellable: AnyCancellable?
   @Published var isLandscapeOrientation: Bool = UIDevice.current.orientation.isLandscape
 
   init(
@@ -92,16 +95,19 @@ class CanvasViewModel: ObservableObject {
     musicEngine: MusicEngine,
     canvasStore: CanvasStore?,
     sampleSetStore: SampleSetStore?,
+    canvasMessageStore: CanvasMessageStore?,
     songNameToLoad: String? = nil
   ) {
     self.musicEngine = musicEngine
     self.canvasModel = canvasModel
     self.canvasStore = canvasStore
     self.sampleSetStore = sampleSetStore
+    self.canvasMessageStore = canvasMessageStore
 
     self.allBlocks = []
     self.allBlockGroups = []
     self.canvasModel.musicEngine = musicEngine
+
     musicEngine.delegate = canvasModel
 
     orienttationCancellable = NotificationCenter.default
@@ -110,11 +116,34 @@ class CanvasViewModel: ObservableObject {
         self.isLandscapeOrientation = UIDevice.current.orientation.isLandscape
       }
 
+    // Observe canvas messages and process when they change
+    messagesCancellable = canvasMessageStore?
+      .$messages
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] messages in
+        self?.processCanvasMessages(messages)
+      }
+
     self.updateAllBlocksList()
 
     self.songNameToLoad = songNameToLoad
   }
 
+}
+
+// Canvas messages handling
+extension CanvasViewModel {
+  private func processCanvasMessages(_ messages: [CanvasMessage]) {
+    // TODO: Implement processing of incoming canvas messages
+    // For now, simply log count and refresh lists if needed
+    Self.logger.debug("Received canvas messages: \(messages.count)")
+    // Depending on message types, you might update models here; keeping minimal per request
+  }
+}
+
+// Lifecycle Events
+
+extension CanvasViewModel {
   func resetCanvasModel(newCanvasModel: CanvasModel) {
     musicEngine.stop()
     canvasModel.cleanup()
@@ -132,11 +161,7 @@ class CanvasViewModel: ObservableObject {
     musicEngine.reset()
     musicEngine.play()
   }
-}
 
-// Events from views
-
-extension CanvasViewModel {
   func onViewAppear() {
     if songNameToLoad == nil {
       canvasModel.library.loadLibraryFrom(libraryFolderName: "Funk")
@@ -156,7 +181,11 @@ extension CanvasViewModel {
       }
     }
   }
+}
 
+// Events from view interactions
+
+extension CanvasViewModel {
   func updateBlockDragLocation(block: Block, location: CGPoint) {
     if !block.dragging {
       startBlockDrag(block: block)
@@ -175,13 +204,18 @@ extension CanvasViewModel {
     updateAllBlocksList()
   }
 
-  func addBlockToCanvasOnGrid(block: Block) -> Block {
+  func addBlockToCanvasOnGrid(newBlock: Block) -> Block {
     addBlockTapGridPosition = nil
-    block.location = CanvasViewModel.quantizedPoint(for: CGPoint(
-      x: block.location.x - canvasScrollOffset.x,
-      y: block.location.y - canvasScrollOffset.y))
-    block.visible = true
-    return dropBlockOnCanvas(block: block)
+    newBlock.location = CanvasViewModel.quantizedPoint(for: CGPoint(
+      x: newBlock.location.x - canvasScrollOffset.x,
+      y: newBlock.location.y - canvasScrollOffset.y))
+    newBlock.visible = true
+
+    let (updatedBlock, newBlockGroup) = dropBlockOnCanvasWithNewGroup(block: newBlock)
+
+    canvasMessageStore?.addBlockToCanvasOnGrid(newBlock: updatedBlock, newGroup: newBlockGroup)
+
+    return updatedBlock
   }
 
   func deleteBlockFromCanvas(block: Block) {
@@ -192,6 +226,11 @@ extension CanvasViewModel {
   }
 
   func dropBlockOnCanvas(block: Block) -> Block {
+    let (newBlock, newBlockGroup) = dropBlockOnCanvasWithNewGroup(block: block)
+    return newBlock
+  }
+
+  func dropBlockOnCanvasWithNewGroup(block: Block) -> (Block, BlockGroup?) {
     let blockWasBeingDragged = block.dragging
     block.dragging = false
     draggingBlock = nil
@@ -211,8 +250,10 @@ extension CanvasViewModel {
 
     let blockAddedToGroup = canvasModel.checkBlockPositionAndAddToAvailableGroup(block: blockDroppedOnCanvas)
 
+    var newBlockGroup: BlockGroup? = nil
     if !blockAddedToGroup {
       canvasModel.addBlockGroup(initialBlock: blockDroppedOnCanvas)
+      newBlockGroup = blockDroppedOnCanvas.blockGroup
     }
 
     updateAllBlocksList()
@@ -227,7 +268,7 @@ extension CanvasViewModel {
       }
     }
 
-    return blockDroppedOnCanvas
+    return (blockDroppedOnCanvas, newBlockGroup)
   }
 
   func updateBlockGroupDragLocation(blockGroup: BlockGroup, location: CGPoint) {
@@ -538,7 +579,7 @@ extension CanvasViewModel {
 
 extension CanvasViewModel {
   func updateAllBlocksList() {
-    canvasModel.blocksGroups.sort { $0.id > $1.id }
+    canvasModel.blocksGroups.sort { $0.id.uuidString > $1.id.uuidString }
     var newAllBlocksList = canvasModel.blocksGroups.flatMap { $0.allBlocks }
     + [draggingBlock].compactMap { $0 }
 

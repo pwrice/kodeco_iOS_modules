@@ -138,7 +138,8 @@ struct LibraryPickerSheet_Previews: PreviewProvider {
         sampleSetStore: nil),
       musicEngine: MockMusicEngine(),
       canvasStore: nil,
-      sampleSetStore: nil
+      sampleSetStore: nil,
+      canvasMessageStore: nil
     )
 
 
@@ -200,7 +201,7 @@ struct LibraryBlockRow: View {
     .onTapGesture {
       if let addBlockTapPosition = addBlockTapPosition {
         _ = viewModel.addBlockToCanvasOnGrid(
-          block: blockModel.instantiateCopyWith(
+          newBlock: blockModel.instantiateCopyWith(
             location: addBlockTapPosition,
             isLibraryBlock: false))
       }
@@ -215,7 +216,8 @@ struct LibraryBlockRow: View {
     canvasModel: CanvasModel(sampleSetStore: nil),
     musicEngine: MockMusicEngine(),
     canvasStore: nil,
-    sampleSetStore: nil
+    sampleSetStore: nil,
+    canvasMessageStore: nil
   )
 
   // Create a simple Block for preview purposes

@@ -24,7 +24,7 @@ final class CanvasModelTests: XCTestCase {
   }
 
   func testAddBlockGroup() throws {
-    let block = getFirstTestBlock()
+    let block = try getFirstTestBlock()
 
     canvasModel.addBlockGroup(initialBlock: block)
 
@@ -35,11 +35,11 @@ final class CanvasModelTests: XCTestCase {
   }
 
   func testAddBlockToExistingGroup() throws {
-    let firstBlock = getFirstTestBlock()
+    let firstBlock = try getFirstTestBlock()
     canvasModel.addBlockGroup(initialBlock: firstBlock)
     let blockGroup = try XCTUnwrap(canvasModel.blocksGroups.first)
 
-    let nextBlock = getSecondTestBlock()
+    let nextBlock = try getSecondTestBlock()
 
     let slot = SlotPostion.right.getSlot(relativeTo: firstBlock.location)
     XCTAssertEqual(slot.gridPosX, 1)
@@ -61,21 +61,21 @@ final class CanvasModelTests: XCTestCase {
   }
 
   func testFindEligibleSlotForBlock_FarAway() throws {
-    let firstBlock = getFirstTestBlock()
+    let firstBlock = try getFirstTestBlock()
     canvasModel.addBlockGroup(initialBlock: firstBlock)
 
-    let nextBlock = getSecondTestBlock()
+    let nextBlock = try getSecondTestBlock()
     nextBlock.location = CGPoint(x: 1000, y: 1000)
 
     XCTAssertNil(canvasModel.findEligibleSlotForBlock(block: nextBlock))
   }
 
   func testFindEligibleSlotForBlock_RightSlot() throws {
-    let firstBlock = getFirstTestBlock()
+    let firstBlock = try getFirstTestBlock()
     canvasModel.addBlockGroup(initialBlock: firstBlock)
     let blockGroup = try XCTUnwrap(canvasModel.blocksGroups.first)
 
-    let nextBlock = getSecondTestBlock()
+    let nextBlock = try getSecondTestBlock()
     let slot = SlotPostion.right.getSlot(relativeTo: firstBlock.location)
     nextBlock.location = slot.location
 
@@ -89,12 +89,12 @@ final class CanvasModelTests: XCTestCase {
   }
 
   func testFindEligibleSlotFor2BarBlock_RightSlot() throws {
-    let firstBlock = getFirstTestBlock()
+    let firstBlock = try getFirstTestBlock()
     firstBlock.numBars = 2
     canvasModel.addBlockGroup(initialBlock: firstBlock)
     let blockGroup = try XCTUnwrap(canvasModel.blocksGroups.first)
 
-    let nextBlock = getSecondTestBlock()
+    let nextBlock = try getSecondTestBlock()
     let slot = SlotPostion.right.getSlot(relativeTo: firstBlock.location, xOffsetMultiple: 1)
     nextBlock.location = slot.location
 
@@ -111,8 +111,8 @@ final class CanvasModelTests: XCTestCase {
   }
 
   func testRemoveBlockFromBlockGroup() throws {
-    let firstBlock = getFirstTestBlock()
-    let nextBlock = getSecondTestBlock()
+    let firstBlock = try getFirstTestBlock()
+    let nextBlock = try getSecondTestBlock()
     let slot = BlockGroupSlot(
       gridPosX: 1,
       gridPosY: 0,
@@ -133,7 +133,7 @@ final class CanvasModelTests: XCTestCase {
   }
 
   func testRemoveLastBlockFromBlockGroup() throws {
-    let firstBlock = getFirstTestBlock()
+    let firstBlock = try getFirstTestBlock()
 
     canvasModel.addBlockGroup(initialBlock: firstBlock)
     let blockGroup = try XCTUnwrap(canvasModel.blocksGroups.first)
@@ -142,9 +142,10 @@ final class CanvasModelTests: XCTestCase {
     XCTAssertEqual(canvasModel.blocksGroups.count, 0)
   }
 
-  func getFirstTestBlock() -> Block {
+  func getFirstTestBlock() throws -> Block {
+    let id0 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
     return Block(
-      id: 0,
+      id: id0,
       location: CGPoint(x: 0, y: 0),
       color: .pink,
       icon: "square",
@@ -153,9 +154,10 @@ final class CanvasModelTests: XCTestCase {
     )
   }
 
-  func getSecondTestBlock() -> Block {
+  func getSecondTestBlock() throws -> Block {
+    let id1 = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
     return Block(
-      id: 1,
+      id: id1,
       location: CGPoint(x: 100, y: 100),
       color: .blue,
       icon: "circle",

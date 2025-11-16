@@ -343,15 +343,3 @@ private extension Block {
     return block
   }
 }
-
-private extension CanvasViewModel {
-  static func previewMock() -> CanvasViewModel {
-    let viewModel = CanvasViewModel(
-      canvasModel: CanvasModel(sampleSetStore: nil),
-      musicEngine: MockMusicEngine(),
-      canvasStore: nil,
-      sampleSetStore: nil)
-
-    return viewModel
-  }
-}

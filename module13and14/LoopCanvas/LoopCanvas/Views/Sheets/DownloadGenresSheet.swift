@@ -90,7 +90,8 @@ struct DownloadGenresSheet_Previews: PreviewProvider {
       canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
       musicEngine: MockMusicEngine(),
       canvasStore: CanvasStore(sampleSetStore: sampleSetStore),
-      sampleSetStore: sampleSetStore
+      sampleSetStore: sampleSetStore,
+      canvasMessageStore: nil
     )
 
     Group {

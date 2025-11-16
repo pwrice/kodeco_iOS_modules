@@ -74,7 +74,7 @@ class CanvasModel: ObservableObject {
   }
 
   func addBlockGroup(initialBlock: Block) {
-    let newBlockGroup = BlockGroup(id: BlockGroup.getNextBlockGroupId(), block: initialBlock, musicEngine: musicEngine)
+    let newBlockGroup = BlockGroup(id: UUID(), block: initialBlock, musicEngine: musicEngine)
     blocksGroups.append(newBlockGroup)
   }
 

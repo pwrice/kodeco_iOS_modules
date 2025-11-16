@@ -346,7 +346,8 @@ struct CanvasView_Previews: PreviewProvider {
       canvasModel: CanvasModel(sampleSetStore: sampleSetStore),
       musicEngine: MockMusicEngine(),
       canvasStore: CanvasStore(sampleSetStore: sampleSetStore),
-      sampleSetStore: sampleSetStore
+      sampleSetStore: sampleSetStore,
+      canvasMessageStore: nil
     )
 
     Group {
@@ -372,6 +373,18 @@ struct CanvasView_Previews: PreviewProvider {
       .previewDisplayName("Landscape Mode")
       .previewInterfaceOrientation(.landscapeLeft)
     }
+  }
+}
+
+extension CanvasViewModel {
+  static func previewMock() -> CanvasViewModel {
+    CanvasViewModel(
+      canvasModel: CanvasModel(sampleSetStore: nil),
+      musicEngine: MockMusicEngine(),
+      canvasStore: nil,
+      sampleSetStore: nil,
+      canvasMessageStore: nil
+    )
   }
 }
 
@@ -491,3 +504,4 @@ struct CanvasView_Previews: PreviewProvider {
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0
+
