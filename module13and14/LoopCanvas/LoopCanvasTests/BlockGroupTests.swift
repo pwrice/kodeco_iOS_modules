@@ -147,10 +147,11 @@ final class BlockGroupTests: XCTestCase {
     )
 
     let encoder = JSONEncoder()
-    let blockJSONData = try encoder.encode(testBlock)
+    let blockJSONData = try encoder.encode(testBlock.toDTO())
 
     let decoder = JSONDecoder()
-    let decodedTestBlock = try decoder.decode(Block.self, from: blockJSONData)
+    let decodedTestBlockDTO = try decoder.decode(BlockDTO.self, from: blockJSONData)
+    let decodedTestBlock = Block(dto: decodedTestBlockDTO)
 
     XCTAssertEqual(decodedTestBlock.id, testBlock.id)
     XCTAssertEqual(decodedTestBlock.location, testBlock.location)
@@ -186,10 +187,11 @@ final class BlockGroupTests: XCTestCase {
     blockGroup.addBlock(block: secondBlock, gridPosX: rightSlot.gridPosX, gridPosY: rightSlot.gridPosY)
 
     let encoder = JSONEncoder()
-    let blockGroupJSONData = try encoder.encode(blockGroup)
+    let blockGroupJSONData = try encoder.encode(blockGroup.toDTO())
 
     let decoder = JSONDecoder()
-    let decodedBlockGroup = try decoder.decode(BlockGroup.self, from: blockGroupJSONData)
+    let decodedBlockGroupDTO = try decoder.decode(BlockGroupDTO.self, from: blockGroupJSONData)
+    let decodedBlockGroup = BlockGroup(dto: decodedBlockGroupDTO)
 
     XCTAssertEqual(decodedBlockGroup.id, blockGroup.id)
     XCTAssertEqual(decodedBlockGroup.allBlocks.count, blockGroup.allBlocks.count)

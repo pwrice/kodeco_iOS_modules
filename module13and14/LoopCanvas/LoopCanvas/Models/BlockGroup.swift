@@ -8,6 +8,11 @@
 import Foundation
 import os
 
+struct BlockGroupDTO: Codable {
+  let id: Int
+  let allBlocks: [BlockDTO]
+}
+
 enum SlotPostion {
   case top
   case right
@@ -77,7 +82,7 @@ struct BlockGroupSlot {
   }
 }
 
-class BlockGroup: ObservableObject, Identifiable, Codable {
+class BlockGroup: ObservableObject, Identifiable {
   private static let logger = Logger(
     subsystem: "Models",
     category: String(describing: BlockGroup.self)
@@ -106,6 +111,23 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
 
   init() {
     id = 0
+  }
+
+  convenience init(dto: BlockGroupDTO, musicEngine: MusicEngine? = nil) {
+    let blocks = dto.allBlocks.map { Block(dto: $0) }
+    self.init(id: dto.id, blocks: blocks, musicEngine: musicEngine)
+  }
+
+  // Add a designated initializer to allow setting `id` directly for DTO construction
+  init(id: Int, blocks: [Block] = [], musicEngine: MusicEngine? = nil) {
+    self.id = id
+    self.musicEngine = musicEngine
+    self.allBlocks = []
+    self.currentPlayPosX = 0
+    // Attach blocks
+    for block in blocks {
+      addBlock(block: block, gridPosX: block.blockGroupGridPosX ?? 0, gridPosY: block.blockGroupGridPosY ?? 0)
+    }
   }
 
   func cleanup() {
@@ -316,21 +338,8 @@ class BlockGroup: ObservableObject, Identifiable, Codable {
       allBlocks
   }
 
-  required init(from decoder: Decoder) throws {
-    do {
-      let container = try decoder.container(keyedBy: CodingKeys.self)
-      id = try container.decode(Int.self, forKey: .id)
-      allBlocks = try container.decode([Block].self, forKey: .allBlocks)
-      currentPlayPosX = 0
-    } catch {
-      Self.logger.error("BlockGroup decode error \(error)")
-      throw error
-    }
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(id, forKey: .id)
-    try container.encode(allBlocks, forKey: .allBlocks)
+  func toDTO() -> BlockGroupDTO {
+    let blockDTOs = allBlocks.map { $0.toDTO() }
+    return BlockGroupDTO(id: id, allBlocks: blockDTOs)
   }
 }

@@ -124,7 +124,7 @@ class CanvasStore: ObservableObject {
 
     let encoder = JSONEncoder()
     do {
-      let canvasJSONData = try encoder.encode(canvasModel.data)
+      let canvasJSONData = try encoder.encode(canvasModel.toDTO())
       try canvasJSONData.write(to: jsonFileURL, options: .atomicWrite)
       Self.logger.info("writing canvas to \(jsonFileURL)")
     } catch {
@@ -168,8 +168,8 @@ class CanvasStore: ObservableObject {
         return nil
       }
       let canvasJSONData = try Data(contentsOf: jsonFileURL)
-      let canvasModelData = try decoder.decode(CanvasModelData.self, from: canvasJSONData)
-      let canvasModel = CanvasModel(data: canvasModelData, sampleSetStore: sampleSetStore)
+      let canvasModelData = try decoder.decode(CanvasModelDTO.self, from: canvasJSONData)
+      let canvasModel = CanvasModel(dto: canvasModelData, sampleSetStore: sampleSetStore)
 
       if FileManager.default.fileExists(atPath: thumbnailURL.path) {
         let imageData = try Data(contentsOf: thumbnailURL)

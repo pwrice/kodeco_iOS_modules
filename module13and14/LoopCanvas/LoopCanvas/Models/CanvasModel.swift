@@ -9,46 +9,10 @@ import Foundation
 import SwiftUI
 import os
 
-class CanvasModelData: Codable {
-  private static let logger = Logger(
-    subsystem: "Models",
-    category: String(describing: CanvasModelData.self)
-  )
-
-  var name: String
-  var blocksGroups: [BlockGroup]
-  var libraryData: LibraryData
-
-  enum CodingKeys: String, CodingKey {
-    case name
-    case blocksGroups
-    case library
-  }
-
-  init(name: String, blocksGroups: [BlockGroup], libraryData: LibraryData) {
-    self.name = name
-    self.blocksGroups = blocksGroups
-    self.libraryData = libraryData
-  }
-
-  required init(from decoder: Decoder) throws {
-    do {
-      let container = try decoder.container(keyedBy: CodingKeys.self)
-      name = try container.decode(String.self, forKey: .name)
-      blocksGroups = try container.decode([BlockGroup].self, forKey: .blocksGroups)
-      libraryData = try container.decode(LibraryData.self, forKey: .library)
-    } catch {
-      Self.logger.error("CanvasModelData decode error \(error)")
-      throw error
-    }
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(name, forKey: .name)
-    try container.encode(blocksGroups, forKey: .blocksGroups)
-    try container.encode(libraryData, forKey: .library)
-  }
+struct CanvasModelDTO: Codable {
+  let name: String
+  let blocksGroups: [BlockGroupDTO]
+  let library: LibraryDTO
 }
 
 class CanvasModel: ObservableObject {
@@ -65,22 +29,22 @@ class CanvasModel: ObservableObject {
   @Published var blocksGroups: [BlockGroup] = []
   @Published var library: Library
 
-  var data: CanvasModelData {
-    return CanvasModelData(
-      name: name,
-      blocksGroups: blocksGroups,
-      libraryData: library.data
-    )
+  func toDTO() -> CanvasModelDTO {
+    let groupDTOs = blocksGroups.map { $0.toDTO() }
+    return CanvasModelDTO(name: name, blocksGroups: groupDTOs, library: library.data)
   }
 
   init(sampleSetStore: SampleSetStore?) {
     library = Library(sampleSetStore: sampleSetStore)
   }
 
-  init(data: CanvasModelData, sampleSetStore: SampleSetStore?) {
-    name = data.name
-    blocksGroups = data.blocksGroups
-    library = Library(libraryData: data.libraryData, sampleSetStore: sampleSetStore)
+  convenience init(dto: CanvasModelDTO, sampleSetStore: SampleSetStore?) {
+    self.init(sampleSetStore: sampleSetStore)
+    self.name = dto.name
+    // Build Library from LibraryData
+    self.library = Library(libraryData: dto.library, sampleSetStore: sampleSetStore)
+    // Build BlockGroups from DTOs; musicEngine will be attached later via setMusicEngineAfterLoad
+    self.blocksGroups = dto.blocksGroups.map { BlockGroup(dto: $0) }
   }
 
   func cleanup() {

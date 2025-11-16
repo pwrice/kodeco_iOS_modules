@@ -27,7 +27,7 @@ class Category: ObservableObject, Identifiable {
   }
 }
 
-class LibraryData: Codable {
+class LibraryDTO: Codable {
   var name: String
 
   enum CodingKeys: String, CodingKey {
@@ -64,8 +64,8 @@ class Library: ObservableObject {
 
   let sampleSetStore: SampleSetStore?
 
-  var data: LibraryData {
-    LibraryData(name: name)
+  var data: LibraryDTO {
+    LibraryDTO(name: name)
   }
 
   init(sampleSetStore: SampleSetStore?) {
@@ -73,7 +73,7 @@ class Library: ObservableObject {
     self.sampleSetStore = sampleSetStore
   }
 
-  init(libraryData: LibraryData, sampleSetStore: SampleSetStore?) {
+  init(libraryData: LibraryDTO, sampleSetStore: SampleSetStore?) {
     name = libraryData.name
     self.sampleSetStore = sampleSetStore
   }

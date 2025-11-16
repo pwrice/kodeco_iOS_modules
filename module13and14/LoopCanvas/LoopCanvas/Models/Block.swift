@@ -9,7 +9,21 @@ import Foundation
 import SwiftUI
 import os
 
-class Block: ObservableObject, Identifiable, Codable {
+struct BlockDTO: Codable {
+  let id: Int
+  let location: CGPoint
+  let color: Block.Colors
+  let relativePath: String?
+  let icon: String
+  let blockGroupGridPosX: Int?
+  let blockGroupGridPosY: Int?
+  let startOffset: Int
+  let volume: Double
+  let numBars: Int
+  let isMuted: Bool
+}
+
+class Block: ObservableObject, Identifiable {
   private static let logger = Logger(
     subsystem: "Models",
     category: String(describing: Block.self)
@@ -133,6 +147,41 @@ class Block: ObservableObject, Identifiable, Codable {
     self.isLibraryBlock = isLibraryBlock
   }
 
+  convenience init(dto: BlockDTO) {
+    self.init(
+      id: dto.id,
+      location: dto.location,
+      color: dto.color.color,
+      icon: dto.icon,
+      visible: true,
+      loopURL: dto.relativePath != nil ? URL(fileURLWithPath: dto.relativePath!, relativeTo: Bundle.main.bundleURL) : nil,
+      relativePath: dto.relativePath,
+      isLibraryBlock: false
+    )
+    self.blockGroupGridPosX = dto.blockGroupGridPosX
+    self.blockGroupGridPosY = dto.blockGroupGridPosY
+    self.startOffset = dto.startOffset
+    self.volume = dto.volume
+    self.numBars = dto.numBars
+    self.isMuted = dto.isMuted
+  }
+
+  func toDTO() -> BlockDTO {
+    BlockDTO(
+      id: self.id,
+      location: self.location,
+      color: Colors.from(color: self.normalColor),
+      relativePath: self.relativePath,
+      icon: self.icon,
+      blockGroupGridPosX: self.blockGroupGridPosX,
+      blockGroupGridPosY: self.blockGroupGridPosY,
+      startOffset: self.startOffset,
+      volume: self.volume,
+      numBars: self.numBars,
+      isMuted: self.isMuted
+    )
+  }
+
   func instantiateCopyWith(location: CGPoint, isLibraryBlock: Bool) -> Block {
     let copy = Block(
       id: Block.getNextBlockId(),
@@ -217,50 +266,6 @@ class Block: ObservableObject, Identifiable, Codable {
       volume,
       numBars,
       isMuted
-  }
-
-  required init(from decoder: Decoder) throws {
-    do {
-      let container = try decoder.container(keyedBy: CodingKeys.self)
-      id = try container.decode(Int.self, forKey: .id)
-      location = try container.decode(CGPoint.self, forKey: .location)
-      let colorEnum = try container.decode(Colors.self, forKey: .color)
-      icon = try container.decode(String.self, forKey: .icon)
-      relativePath = try container.decode(String.self, forKey: .relativePath)
-      blockGroupGridPosX = try container.decodeIfPresent(Int.self, forKey: .blockGroupGridPosX)
-      blockGroupGridPosY = try container.decodeIfPresent(Int.self, forKey: .blockGroupGridPosY)
-      startOffset = try container.decodeIfPresent(Int.self, forKey: .startOffset) ?? 0
-      volume = try container.decodeIfPresent(Double.self, forKey: .volume) ?? 0.75
-      numBars = try container.decodeIfPresent(Int.self, forKey: .numBars) ?? 1
-      isMuted = try container.decodeIfPresent(Bool.self, forKey: .isMuted) ?? false
-
-      color = colorEnum.color
-      normalColor = colorEnum.color
-      visible = true
-      isLibraryBlock = false
-      if let relativePath = relativePath {
-        loopURL = URL(fileURLWithPath: relativePath, relativeTo: Bundle.main.bundleURL)
-      }
-    } catch {
-      Self.logger.error("Block decode error: \(error)")
-      throw error
-    }
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(id, forKey: .id)
-    try container.encode(location, forKey: .location)
-    let colorEnum = Colors.from(color: normalColor)
-    try container.encode(colorEnum, forKey: .color)
-    try container.encode(icon, forKey: .icon)
-    try container.encode(relativePath, forKey: .relativePath)
-    try container.encode(blockGroupGridPosX, forKey: .blockGroupGridPosX)
-    try container.encode(blockGroupGridPosY, forKey: .blockGroupGridPosY)
-    try container.encode(startOffset, forKey: .startOffset)
-    try container.encode(volume, forKey: .volume)
-    try container.encode(numBars, forKey: .numBars)
-    try container.encode(isMuted, forKey: .isMuted)
   }
 }
 
