@@ -46,6 +46,13 @@ struct BlockNumBarsUpdatedMessage: CanvasMessage {
   let numBars: Int
 }
 
+struct BlockStartOffsetUpdatedMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let blockId: UUID
+  let startOffset: Int
+}
+
 
 // Manages browsing, loading, saving of canvas
 class CanvasMessageStore: ObservableObject {
@@ -107,6 +114,16 @@ class CanvasMessageStore: ObservableObject {
       viewModelId: viewModelId,
       blockId: updatedBlock.id,
       numBars: numBars)
+    messages.append(message)
+  }
+
+  func updateBlockStartOffset(viewModelId: UUID, updatedBlock: Block, startOffset: Int) {
+    canvasVersion += 1
+    let message = BlockStartOffsetUpdatedMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      blockId: updatedBlock.id,
+      startOffset: startOffset)
     messages.append(message)
   }
 }

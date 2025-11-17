@@ -209,6 +209,12 @@ extension CanvasViewModel {
           block.blockGroup?.updateBlockNumBars(block: block, newNumBars: newNumBars)
           updateAllBlocksList()
         }
+      } else if let startOffsetUpdatedMessage = message as? BlockStartOffsetUpdatedMessage {
+        if let block = allBlocks.first(where: { $0.id == startOffsetUpdatedMessage.blockId }) {
+          let newStartOffset = startOffsetUpdatedMessage.startOffset
+          block.blockGroup?.updateBlockStartOffset(block: block, newStartOffset: newStartOffset)
+          updateAllBlocksList()
+        }
       }
     }
   }
@@ -343,6 +349,7 @@ extension CanvasViewModel {
 
   func update(startOffset: Int, for block: Block) {
     block.blockGroup?.updateBlockStartOffset(block: block, newStartOffset: startOffset)
+    canvasMessageStore?.updateBlockStartOffset(viewModelId: id, updatedBlock: block, startOffset: startOffset)
   }
 
   func update(volume: Double, for block: Block) {

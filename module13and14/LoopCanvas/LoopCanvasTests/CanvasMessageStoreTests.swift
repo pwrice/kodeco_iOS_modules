@@ -256,6 +256,33 @@ final class CanvasMessageStoreTests: XCTestCase {
     let barPixelWidth = CanvasViewModel.blockSpacing + CanvasViewModel.blockSize
     XCTAssertEqual(secondBlock.location.x, originalSecondLocationX + barPixelWidth)
   }
+
+  func testUpdateBlockStartOffsetMessage() throws {
+    // Arrange: add two connected blocks in one group so we can observe start offset effects
+    let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    firstBlock.loopPlayer = nil
+    firstBlock.defaultMaxNumBars = 2
+
+    // Capture original start offset
+    XCTAssertEqual(firstBlock.startOffset, 0)
+
+    // Act: simulate an external VM updating firstBlock startOffset to 1
+    let (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+
+    // Build a DTO-based copy to represent the message subject
+    let updatedFirstCopy = Block(dto: firstBlock.toDTO())
+    let newStartOffset = 1
+
+    // Send the update message
+    canvasMessageStore.updateBlockStartOffset(viewModelId: otherViewModelId, updatedBlock: updatedFirstCopy, startOffset: newStartOffset)
+
+    // Wait for processing
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Assert: start offset updated and clamped appropriately by group logic
+    XCTAssertEqual(firstBlock.startOffset, newStartOffset)
+  }
 }
 
 // Test Helpers
