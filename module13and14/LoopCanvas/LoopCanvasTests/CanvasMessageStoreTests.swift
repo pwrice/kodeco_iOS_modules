@@ -314,7 +314,7 @@ final class CanvasMessageStoreTests: XCTestCase {
     let originalMuted = block.isMuted
 
     // Act: simulate external VM updating isMuted
-    var (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
     let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
 
     let updatedCopy = Block(dto: block.toDTO())
@@ -325,6 +325,41 @@ final class CanvasMessageStoreTests: XCTestCase {
 
     // Assert
     XCTAssertEqual(block.isMuted, newMuted)
+  }
+
+  func testDuplicateBlockMessage() throws {
+    // Arrange: add a single block to create an initial group
+    let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let group = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertEqual(group.allBlocks.count, 1)
+
+    // Act: simulate external VM duplicating the block
+    let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+
+    // TODO - refactor this into canvas model
+    let spacing = CanvasViewModel.gridSpacing()
+    let newLocation = CGPoint(x: firstBlock.location.x + spacing, y: firstBlock.location.y)
+    let duplicatedBlock = firstBlock.instantiateCopyWith(location: newLocation, isLibraryBlock: false)
+    duplicatedBlock.visible = true
+    let (updatedBlock, _) = canvasModel.addBlockToExistingOrNewGroup(block: duplicatedBlock, mutateModel: false)
+
+    canvasMessageStore.duplicateBlock(viewModelId: otherViewModelId, newBlock: updatedBlock)
+
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Assert: the group should now have two blocks; the duplicate should be to the right slot
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    XCTAssertEqual(group.allBlocks.count, 2)
+
+    // Find the duplicate (the one with different id but same icon/color)
+    let duplicate = try XCTUnwrap(group.allBlocks.first { $0.id != firstBlock.id })
+
+    // It should be positioned to the right by one grid spacing
+    let expectedX = firstBlock.location.x + CanvasViewModel.gridSpacing()
+    XCTAssertEqual(duplicate.location.y, firstBlock.location.y, accuracy: 0.5)
+    XCTAssertEqual(duplicate.location.x, expectedX, accuracy: 0.5)
   }
 }
 

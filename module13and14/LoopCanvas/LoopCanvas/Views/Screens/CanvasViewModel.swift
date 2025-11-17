@@ -226,6 +226,10 @@ extension CanvasViewModel {
           block.isMuted = isMutedUpdatedMessage.isMuted
           updateAllBlocksList()
         }
+      } else if let duplicateMessage = message as? BlockDuplicatedMessage {
+        let newBlock = Block(dto: duplicateMessage.block)
+        canvasModel.addBlockToExistingOrNewGroup(block: newBlock)
+        updateAllBlocksList()
       }
     }
   }
@@ -402,7 +406,9 @@ extension CanvasViewModel {
     let newLocation = CGPoint(x: block.location.x + spacing, y: block.location.y)
     let newBlock = block.instantiateCopyWith(location: newLocation, isLibraryBlock: false)
     newBlock.visible = true
-    return dropBlockOnCanvas(block: newBlock)
+    let (updatedBlock, _) = dropBlockOnCanvasWithNewGroup(block: newBlock)
+    canvasMessageStore?.duplicateBlock(viewModelId: id, newBlock: block)
+    return updatedBlock
   }
 }
 
@@ -683,4 +689,3 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
-

@@ -87,12 +87,13 @@ class CanvasModel: ObservableObject {
     blocksGroups.append(newBlockGroup)
   }
 
-  func addBlockToExistingBlockGroup(blockGroup: BlockGroup, block: Block, slot: BlockGroupSlot) {
+  func addBlockToExistingBlockGroup(blockGroup: BlockGroup, block: Block, slot: BlockGroupSlot, mutateModel: Bool = true) {
     block.location = slot.location
     blockGroup.addBlock(
       block: block,
       gridPosX: slot.gridPosX,
-      gridPosY: slot.gridPosY)
+      gridPosY: slot.gridPosY,
+      mutateModel: mutateModel)
   }
 
   func removeBlockGroup(blockGroup: BlockGroup) {
@@ -153,6 +154,7 @@ class CanvasModel: ObservableObject {
     return nil
   }
 
+  @discardableResult
   func addBlockToExistingOrNewGroup(block: Block, mutateModel: Bool = true) -> (Block, BlockGroup?) {
     var newBlockGroup: BlockGroup?
     var existingBlockGroup: BlockGroup?
@@ -160,7 +162,7 @@ class CanvasModel: ObservableObject {
     // Check all slots around all blocks to see if there is a connection
     if let (blockGroup, slot) = findEligibleSlotForBlock(block: block) {
       existingBlockGroup = mutateModel ? blockGroup : BlockGroup(dto: blockGroup.toDTO())
-      addBlockToExistingBlockGroup(blockGroup: blockGroup, block: block, slot: slot)
+      addBlockToExistingBlockGroup(blockGroup: blockGroup, block: block, slot: slot, mutateModel: mutateModel)
     }
 
     if existingBlockGroup == nil {

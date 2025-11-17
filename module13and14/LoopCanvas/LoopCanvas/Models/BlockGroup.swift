@@ -156,19 +156,21 @@ class BlockGroup: ObservableObject, Identifiable {
     }
   }
 
-  func addBlock(block: Block, gridPosX: Int, gridPosY: Int) {
+  func addBlock(block: Block, gridPosX: Int, gridPosY: Int, mutateModel: Bool = true) {
     block.blockGroupGridPosX = gridPosX
     block.blockGroupGridPosY = gridPosY
     block.blockGroup = self
     block.loopPlayer = musicEngine?.getAvailableLoopPlayer(loopURL: block.loopURL, numBars: block.numBars)
     block.isPlaying = false
     block.triggerBlockLoadingAnimation = true
-    if allBlocks.isEmpty {
-      // when creating a new group, initialize at the end so the next bar starts at 0
-      currentPlayPosX = block.numBars - 1
-      block.currentRelativeBar = block.numBars - 1
+    if mutateModel {
+      if allBlocks.isEmpty {
+        // when creating a new group, initialize at the end so the next bar starts at 0
+        currentPlayPosX = block.numBars - 1
+        block.currentRelativeBar = block.numBars - 1
+      }
+      allBlocks.append(block)
     }
-    allBlocks.append(block)
   }
 
   func removeBlock(block: Block) {

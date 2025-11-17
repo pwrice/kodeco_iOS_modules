@@ -67,6 +67,12 @@ struct BlockIsMutedUpdatedMessage: CanvasMessage {
   let isMuted: Bool
 }
 
+struct BlockDuplicatedMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let block: BlockDTO
+}
+
 
 // Manages browsing, loading, saving of canvas
 class CanvasMessageStore: ObservableObject {
@@ -158,6 +164,15 @@ class CanvasMessageStore: ObservableObject {
       viewModelId: viewModelId,
       blockId: updatedBlock.id,
       isMuted: isMuted)
+    messages.append(message)
+  }
+  
+  func duplicateBlock(viewModelId: UUID, newBlock: Block) {
+    canvasVersion += 1
+    let message = BlockDuplicatedMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      block: newBlock.toDTO())
     messages.append(message)
   }
 }
