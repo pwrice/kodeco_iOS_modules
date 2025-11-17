@@ -283,6 +283,49 @@ final class CanvasMessageStoreTests: XCTestCase {
     // Assert: start offset updated and clamped appropriately by group logic
     XCTAssertEqual(firstBlock.startOffset, newStartOffset)
   }
+
+  func testUpdateBlockVolumeMessage() throws {
+    // Arrange: add a single block
+    let block = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+
+    let originalVolume = block.volume
+
+    // Act: simulate external VM updating volume
+    var (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+
+    let updatedCopy = Block(dto: block.toDTO())
+    let newVolume = 0.25
+    canvasMessageStore.updateBlockVolume(viewModelId: otherViewModelId, updatedBlock: updatedCopy, volume: newVolume)
+
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Assert
+    XCTAssertNotEqual(block.volume, originalVolume)
+    XCTAssertEqual(block.volume, newVolume, accuracy: 0.0001)
+  }
+
+  func testUpdateBlockIsMutedMessage() throws {
+    // Arrange: add a single block
+    let block = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+
+    let originalMuted = block.isMuted
+
+    // Act: simulate external VM updating isMuted
+    var (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+
+    let updatedCopy = Block(dto: block.toDTO())
+    let newMuted = !originalMuted
+    canvasMessageStore.updateBlockIsMuted(viewModelId: otherViewModelId, updatedBlock: updatedCopy, isMuted: newMuted)
+
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Assert
+    XCTAssertEqual(block.isMuted, newMuted)
+  }
 }
 
 // Test Helpers
@@ -322,3 +365,4 @@ extension CanvasMessageStoreTests {
     return (messagesExpectation, allBlocksExpectation)
   }
 }
+

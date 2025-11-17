@@ -215,6 +215,17 @@ extension CanvasViewModel {
           block.blockGroup?.updateBlockStartOffset(block: block, newStartOffset: newStartOffset)
           updateAllBlocksList()
         }
+      } else if let volumeUpdatedMessage = message as? BlockVolumeUpdatedMessage {
+        if let block = allBlocks.first(where: { $0.id == volumeUpdatedMessage.blockId }) {
+          let clamped = max(0.0, min(1.0, volumeUpdatedMessage.volume))
+          block.volume = clamped
+          updateAllBlocksList()
+        }
+      } else if let isMutedUpdatedMessage = message as? BlockIsMutedUpdatedMessage {
+        if let block = allBlocks.first(where: { $0.id == isMutedUpdatedMessage.blockId }) {
+          block.isMuted = isMutedUpdatedMessage.isMuted
+          updateAllBlocksList()
+        }
       }
     }
   }
@@ -343,6 +354,7 @@ extension CanvasViewModel {
 
   func toggleMute(block: Block) {
     block.isMuted.toggle()
+    canvasMessageStore?.updateBlockIsMuted(viewModelId: id, updatedBlock: block, isMuted: block.isMuted)
   }
 
   // New updates for details sheet
@@ -355,6 +367,7 @@ extension CanvasViewModel {
   func update(volume: Double, for block: Block) {
     let clamped = max(0.0, min(1.0, volume))
     block.volume = clamped
+    canvasMessageStore?.updateBlockVolume(viewModelId: id, updatedBlock: block, volume: clamped)
   }
 
   func update(numBars: Int, for block: Block) {
@@ -395,6 +408,22 @@ extension CanvasViewModel {
 
 // Block Group events
 extension CanvasViewModel {
+  func selectBlockGroup(group: BlockGroup) {
+    // Unselect any previously selected group
+    if let prev = selectedBlockGroup, prev.id != group.id {
+      unselectBlockGroup(group: prev)
+    }
+    selectedBlockGroup = group
+    group.isSelected = true
+    for block in group.allBlocks { block.isSelected = true }
+  }
+
+  func unselectCurrentlySelectedBlockGroup() {
+    if let group = selectedBlockGroup {
+      unselectBlockGroup(group: group)
+    }
+  }
+  
   func updateBlockGroupDragLocation(blockGroup: BlockGroup, location: CGPoint) {
     // Move the entire group's blocks by the delta from the left-most block anchor
     guard let anchor = blockGroup.leftMostBlock?.location else { return }
@@ -423,22 +452,6 @@ extension CanvasViewModel {
 
     updateAllBlocksList()
     return blockGroup
-  }
-
-  func selectBlockGroup(group: BlockGroup) {
-    // Unselect any previously selected group
-    if let prev = selectedBlockGroup, prev.id != group.id {
-      unselectBlockGroup(group: prev)
-    }
-    selectedBlockGroup = group
-    group.isSelected = true
-    for block in group.allBlocks { block.isSelected = true }
-  }
-
-  func unselectCurrentlySelectedBlockGroup() {
-    if let group = selectedBlockGroup {
-      unselectBlockGroup(group: group)
-    }
   }
 
   func unselectBlockGroup(group: BlockGroup) {
@@ -670,3 +683,4 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
+

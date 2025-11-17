@@ -53,6 +53,20 @@ struct BlockStartOffsetUpdatedMessage: CanvasMessage {
   let startOffset: Int
 }
 
+struct BlockVolumeUpdatedMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let blockId: UUID
+  let volume: Double
+}
+
+struct BlockIsMutedUpdatedMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let blockId: UUID
+  let isMuted: Bool
+}
+
 
 // Manages browsing, loading, saving of canvas
 class CanvasMessageStore: ObservableObject {
@@ -124,6 +138,26 @@ class CanvasMessageStore: ObservableObject {
       viewModelId: viewModelId,
       blockId: updatedBlock.id,
       startOffset: startOffset)
+    messages.append(message)
+  }
+
+  func updateBlockVolume(viewModelId: UUID, updatedBlock: Block, volume: Double) {
+    canvasVersion += 1
+    let message = BlockVolumeUpdatedMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      blockId: updatedBlock.id,
+      volume: volume)
+    messages.append(message)
+  }
+
+  func updateBlockIsMuted(viewModelId: UUID, updatedBlock: Block, isMuted: Bool) {
+    canvasVersion += 1
+    let message = BlockIsMutedUpdatedMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      blockId: updatedBlock.id,
+      isMuted: isMuted)
     messages.append(message)
   }
 }
