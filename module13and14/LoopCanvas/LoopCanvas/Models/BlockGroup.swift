@@ -96,6 +96,7 @@ class BlockGroup: ObservableObject, Identifiable {
   var currentPlayPosX = 0
 
   var isSelected = false
+  var isDragging = false
   var volume = 0.75
 
   var isEmpty: Bool {

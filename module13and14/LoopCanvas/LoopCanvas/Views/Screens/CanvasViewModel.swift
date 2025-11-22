@@ -89,6 +89,9 @@ class CanvasViewModel: ObservableObject {
   private var messagesCancellable: AnyCancellable?
   @Published var isLandscapeOrientation: Bool = UIDevice.current.orientation.isLandscape
 
+  // TODO - consolidate this into CanvasMessageStore
+  var canvasVersion = 0
+
   init(
     canvasModel: CanvasModel,
     musicEngine: MusicEngine,
@@ -181,56 +184,124 @@ extension CanvasViewModel {
     Self.logger.debug("Received canvas messages: \(messages.count)")
 
     for message in messages where message.viewModelId != self.id {
-      if let addBlockMessage = message as? BlockAddedMessage {
-        if let newBlockGroupDTO = addBlockMessage.newBlockGroup {
-          canvasModel.addBlockGroup(from: newBlockGroupDTO)
-          updateAllBlocksList()
-        }
-      } else if let moveBlockMessage = message as? BlockMovedMessage {
-        if let newBlockGroupDTO = moveBlockMessage.newBlockGroup {
-          canvasModel.addBlockGroup(from: newBlockGroupDTO)
-          updateAllBlocksList()
-        }
-      } else if let disconnectBlockMessage = message as? BlockDisconnectedFromGroupMessage {
-        if let block = allBlocks.first(where: { $0.id == disconnectBlockMessage.updatedBlock.id }),
-           let blockGroup = block.blockGroup {
-          canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
-          updateAllBlocksList()
-        }
-      } else if let deletedBlockMessage = message as? BlockDeteledMessage {
-        if let block = allBlocks.first(where: { $0.id == deletedBlockMessage.deletedBlock.id }),
-           let blockGroup = block.blockGroup {
-          canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
-          updateAllBlocksList()
-        }
-      } else if let numBarsUpdatedMessage = message as? BlockNumBarsUpdatedMessage {
-        if let block = allBlocks.first(where: { $0.id == numBarsUpdatedMessage.blockId }) {
-          let newNumBars = numBarsUpdatedMessage.numBars
-          block.blockGroup?.updateBlockNumBars(block: block, newNumBars: newNumBars)
-          updateAllBlocksList()
-        }
-      } else if let startOffsetUpdatedMessage = message as? BlockStartOffsetUpdatedMessage {
-        if let block = allBlocks.first(where: { $0.id == startOffsetUpdatedMessage.blockId }) {
-          let newStartOffset = startOffsetUpdatedMessage.startOffset
-          block.blockGroup?.updateBlockStartOffset(block: block, newStartOffset: newStartOffset)
-          updateAllBlocksList()
-        }
-      } else if let volumeUpdatedMessage = message as? BlockVolumeUpdatedMessage {
-        if let block = allBlocks.first(where: { $0.id == volumeUpdatedMessage.blockId }) {
-          let clamped = max(0.0, min(1.0, volumeUpdatedMessage.volume))
-          block.volume = clamped
-          updateAllBlocksList()
-        }
-      } else if let isMutedUpdatedMessage = message as? BlockIsMutedUpdatedMessage {
-        if let block = allBlocks.first(where: { $0.id == isMutedUpdatedMessage.blockId }) {
-          block.isMuted = isMutedUpdatedMessage.isMuted
-          updateAllBlocksList()
-        }
-      } else if let duplicateMessage = message as? BlockDuplicatedMessage {
-        let newBlock = Block(dto: duplicateMessage.block)
-        canvasModel.addBlockToExistingOrNewGroup(block: newBlock)
-        updateAllBlocksList()
+      // TODO - add some versioning logic to just process the last message
+      if canvasVersion < message.canvasVersion {
+        handle(message: message)
+        canvasVersion = message.canvasVersion
       }
+    }
+  }
+
+  private func handle(message: CanvasMessage) {
+    switch message {
+    case let add as BlockAddedMessage:
+      handleBlockAdded(add)
+    case let move as BlockMovedMessage:
+      handleBlockMoved(move)
+    case let disconnect as BlockDisconnectedFromGroupMessage:
+      handleBlockDisconnected(disconnect)
+    case let deleted as BlockDeteledMessage:
+      handleBlockDeleted(deleted)
+    case let numBars as BlockNumBarsUpdatedMessage:
+      handleNumBarsUpdated(numBars)
+    case let startOffset as BlockStartOffsetUpdatedMessage:
+      handleStartOffsetUpdated(startOffset)
+    case let volume as BlockVolumeUpdatedMessage:
+      handleVolumeUpdated(volume)
+    case let mute as BlockIsMutedUpdatedMessage:
+      handleIsMutedUpdated(mute)
+    case let duplicate as BlockDuplicatedMessage:
+      handleBlockDuplicated(duplicate)
+    case let groupStart as BlockGroupStartedMoveMessage:
+      handleBlockGroupStartedMove(groupStart)
+    case let groupMoved as BlockGroupMovedMessage:
+      handleBlockGroupMoved(groupMoved)
+    default:
+      break
+    }
+  }
+
+  private func handleBlockAdded(_ message: BlockAddedMessage) {
+    if let newBlockGroupDTO = message.newBlockGroup {
+      canvasModel.addBlockGroup(from: newBlockGroupDTO)
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleBlockMoved(_ message: BlockMovedMessage) {
+    if let newBlockGroupDTO = message.newBlockGroup {
+      canvasModel.addBlockGroup(from: newBlockGroupDTO)
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleBlockDisconnected(_ message: BlockDisconnectedFromGroupMessage) {
+    if let block = allBlocks.first(where: { $0.id == message.updatedBlock.id }),
+       let blockGroup = block.blockGroup {
+      canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleBlockDeleted(_ message: BlockDeteledMessage) {
+    if let block = allBlocks.first(where: { $0.id == message.deletedBlock.id }),
+       let blockGroup = block.blockGroup {
+      canvasModel.removeBlockFromBlockGroup(block: block, blockGroup: blockGroup)
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleNumBarsUpdated(_ message: BlockNumBarsUpdatedMessage) {
+    if let block = allBlocks.first(where: { $0.id == message.blockId }) {
+      let newNumBars = message.numBars
+      block.blockGroup?.updateBlockNumBars(block: block, newNumBars: newNumBars)
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleStartOffsetUpdated(_ message: BlockStartOffsetUpdatedMessage) {
+    if let block = allBlocks.first(where: { $0.id == message.blockId }) {
+      let newStartOffset = message.startOffset
+      block.blockGroup?.updateBlockStartOffset(block: block, newStartOffset: newStartOffset)
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleVolumeUpdated(_ message: BlockVolumeUpdatedMessage) {
+    if let block = allBlocks.first(where: { $0.id == message.blockId }) {
+      let clamped = max(0.0, min(1.0, message.volume))
+      block.volume = clamped
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleIsMutedUpdated(_ message: BlockIsMutedUpdatedMessage) {
+    if let block = allBlocks.first(where: { $0.id == message.blockId }) {
+      block.isMuted = message.isMuted
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleBlockDuplicated(_ message: BlockDuplicatedMessage) {
+    let newBlock = Block(dto: message.block)
+    canvasModel.addBlockToExistingOrNewGroup(block: newBlock)
+    updateAllBlocksList()
+  }
+
+  private func handleBlockGroupStartedMove(_ message: BlockGroupStartedMoveMessage) {
+    if let blockGroup = allBlockGroups.first(where: { $0.id == message.blockGroupId }) {
+      blockGroup.isDragging = true
+      updateAllBlocksList()
+    }
+  }
+
+  private func handleBlockGroupMoved(_ message: BlockGroupMovedMessage) {
+    if let blockGroup = allBlockGroups.first(where: { $0.id == message.blockGroupId }) {
+      blockGroup.isDragging = false
+      for block in blockGroup.allBlocks {
+        block.location = message.updatedBlockLocations[block.id] ?? block.location
+      }
+      updateAllBlocksList()
     }
   }
 }
@@ -327,8 +398,9 @@ extension CanvasViewModel {
 
     if blockWasBeingDragged {
       // Animate the block into place
-      let adjusted = CGPoint(x: blockDroppedOnCanvas.location.x - canvasScrollOffset.x,
-                             y: blockDroppedOnCanvas.location.y - canvasScrollOffset.y)
+      let adjusted = CGPoint(
+        x: blockDroppedOnCanvas.location.x - canvasScrollOffset.x,
+        y: blockDroppedOnCanvas.location.y - canvasScrollOffset.y)
       let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
       withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
         blockDroppedOnCanvas.location = quantized
@@ -401,12 +473,15 @@ extension CanvasViewModel {
 
   @discardableResult
   func duplicate(block: Block) -> Block {
+    // TODO - move this logic into CanvasModel
+
     // Attempt to place to the right by one grid
     let spacing = CanvasViewModel.gridSpacing()
     let newLocation = CGPoint(x: block.location.x + spacing, y: block.location.y)
     let newBlock = block.instantiateCopyWith(location: newLocation, isLibraryBlock: false)
     newBlock.visible = true
     let (updatedBlock, _) = dropBlockOnCanvasWithNewGroup(block: newBlock)
+
     canvasMessageStore?.duplicateBlock(viewModelId: id, newBlock: block)
     return updatedBlock
   }
@@ -429,8 +504,24 @@ extension CanvasViewModel {
       unselectBlockGroup(group: group)
     }
   }
-  
+
+  func unselectBlockGroup(group: BlockGroup) {
+    if selectedBlockGroup?.id == group.id { selectedBlockGroup = nil }
+    group.isSelected = false
+    for block in group.allBlocks { block.isSelected = false }
+  }
+
+  func startBlockGroupDrag(blockGroup: BlockGroup) {
+    canvasMessageStore?.startMoveBlockGroup(viewModelId: id, blockGroupId: blockGroup.id)
+  }
+
+
   func updateBlockGroupDragLocation(blockGroup: BlockGroup, location: CGPoint) {
+    if !blockGroup.isDragging {
+      blockGroup.isDragging = true
+      startBlockGroupDrag(blockGroup: blockGroup)
+    }
+
     // Move the entire group's blocks by the delta from the left-most block anchor
     guard let anchor = blockGroup.leftMostBlock?.location else { return }
 
@@ -446,24 +537,24 @@ extension CanvasViewModel {
 
   @discardableResult
   func dropBlockGroupOnCanvas(blockGroup: BlockGroup) -> BlockGroup {
+    blockGroup.isDragging = false
+
     // Quantize all blocks in the group to the grid on drop, similar to single-block behavior
     withAnimation(.spring(response: 0.25, dampingFraction: 0.85, blendDuration: 0.2)) {
       for block in blockGroup.allBlocks {
-        let adjusted = CGPoint(x: block.location.x - canvasScrollOffset.x,
-                               y: block.location.y - canvasScrollOffset.y)
+        let adjusted = CGPoint(
+          x: block.location.x - canvasScrollOffset.x,
+          y: block.location.y - canvasScrollOffset.y)
         let quantized = CanvasViewModel.quantizedPoint(for: adjusted)
         block.location = quantized
       }
     }
 
     updateAllBlocksList()
-    return blockGroup
-  }
 
-  func unselectBlockGroup(group: BlockGroup) {
-    if selectedBlockGroup?.id == group.id { selectedBlockGroup = nil }
-    group.isSelected = false
-    for block in group.allBlocks { block.isSelected = false }
+    canvasMessageStore?.moveBlockGroup(viewModelId: id, blockGroup: blockGroup)
+
+    return blockGroup
   }
 
   func update(volume: Double, for group: BlockGroup) {
@@ -689,3 +780,4 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
+

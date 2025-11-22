@@ -73,6 +73,18 @@ struct BlockDuplicatedMessage: CanvasMessage {
   let block: BlockDTO
 }
 
+struct BlockGroupStartedMoveMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let blockGroupId: UUID
+}
+
+struct BlockGroupMovedMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let blockGroupId: UUID
+  let updatedBlockLocations: [UUID: CGPoint]
+}
 
 // Manages browsing, loading, saving of canvas
 class CanvasMessageStore: ObservableObject {
@@ -166,13 +178,35 @@ class CanvasMessageStore: ObservableObject {
       isMuted: isMuted)
     messages.append(message)
   }
-  
+
   func duplicateBlock(viewModelId: UUID, newBlock: Block) {
     canvasVersion += 1
     let message = BlockDuplicatedMessage(
       canvasVersion: canvasVersion,
       viewModelId: viewModelId,
       block: newBlock.toDTO())
+    messages.append(message)
+  }
+
+  func startMoveBlockGroup(viewModelId: UUID, blockGroupId: UUID) {
+    canvasVersion += 1
+    let message = BlockGroupStartedMoveMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      blockGroupId: blockGroupId)
+    messages.append(message)
+  }
+
+  func moveBlockGroup(viewModelId: UUID, blockGroup: BlockGroup) {
+    canvasVersion += 1
+    let message = BlockGroupMovedMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      blockGroupId: blockGroup.id,
+      updatedBlockLocations: Dictionary(
+        uniqueKeysWithValues: blockGroup.allBlocks.map(
+          { ( $0.id,$0.location) }))
+    )
     messages.append(message)
   }
 }

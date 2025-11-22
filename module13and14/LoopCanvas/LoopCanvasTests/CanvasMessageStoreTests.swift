@@ -292,7 +292,7 @@ final class CanvasMessageStoreTests: XCTestCase {
     let originalVolume = block.volume
 
     // Act: simulate external VM updating volume
-    var (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
     let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
 
     let updatedCopy = Block(dto: block.toDTO())
@@ -360,6 +360,58 @@ final class CanvasMessageStoreTests: XCTestCase {
     let expectedX = firstBlock.location.x + CanvasViewModel.gridSpacing()
     XCTAssertEqual(duplicate.location.y, firstBlock.location.y, accuracy: 0.5)
     XCTAssertEqual(duplicate.location.x, expectedX, accuracy: 0.5)
+  }
+
+  func testMoveBlockGroupViaMessages() throws {
+    // Arrange: add a single block to create a group
+    let firstBlock = try addBlockToCanvas(libraryBlockIndex: 0, location: CGPoint(x: 200, y: 400))
+    XCTAssertEqual(canvasViewModel.canvasModel.blocksGroups.count, 1)
+    let group = try XCTUnwrap(canvasViewModel.canvasModel.blocksGroups.first)
+    XCTAssertFalse(group.isDragging)
+
+    // Keep a map of original locations by block id for later verification
+    var originalLocations: [UUID: CGPoint] = [:]
+    for block in group.allBlocks {
+      originalLocations[block.id] = block.location
+    }
+
+    // Act 1: start moving the group
+    var (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    let otherViewModelId = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    canvasMessageStore.startMoveBlockGroup(viewModelId: otherViewModelId, blockGroupId: group.id)
+
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Assert 1: group is marked as dragging
+    XCTAssertTrue(group.isDragging)
+
+    // Act 2: move the group by delta via DTOs
+    let deltaX: CGFloat = 30
+    let deltaY: CGFloat = -20
+    let groupCopy = BlockGroup(dto: group.toDTO())
+    for block in groupCopy.allBlocks {
+      block.location = CGPoint(x: block.location.x + deltaX, y: block.location.y + deltaY)
+    }
+
+    (messagesExpectation, allBlocksExpectation) = getMessagesAndAllBlocksExpectations()
+    canvasMessageStore.moveBlockGroup(
+      viewModelId: otherViewModelId,
+      blockGroup: groupCopy
+    )
+
+    wait(for: [allBlocksExpectation, messagesExpectation], timeout: 1.0)
+
+    // Assert 2: dragging ended and block locations updated
+    XCTAssertFalse(group.isDragging)
+
+    for block in group.allBlocks {
+      let orig = try XCTUnwrap(originalLocations[block.id])
+      XCTAssertEqual(block.location.x, orig.x + deltaX)
+      XCTAssertEqual(block.location.y, orig.y + deltaY)
+    }
+
+    // Also ensure the original block reference is still part of the group
+    XCTAssertTrue(group.allBlocks.contains(firstBlock))
   }
 }
 
