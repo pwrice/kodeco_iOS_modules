@@ -143,6 +143,10 @@ class Block: ObservableObject, Identifiable {
     self.visible = visible
     self.loopURL = loopURL
     self.isLibraryBlock = isLibraryBlock
+
+    if let relativePath, loopURL == nil {
+      self.loopURL = URL(fileURLWithPath: relativePath, relativeTo: Bundle.main.bundleURL)
+    }
   }
 
   convenience init(dto: BlockDTO) {

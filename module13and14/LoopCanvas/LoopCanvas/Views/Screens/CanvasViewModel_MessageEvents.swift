@@ -47,6 +47,8 @@ extension CanvasViewModel {
       handleBlockGroupStartedMove(groupStart)
     case let groupMoved as BlockGroupMovedMessage:
       handleBlockGroupMoved(groupMoved)
+    case let canvasSnapshot as CanvasSnapshotMessage:
+      handleCanvasSnapshot(canvasSnapshot)
     default:
       break
     }
@@ -137,5 +139,10 @@ extension CanvasViewModel {
       updateAllBlocksList()
     }
   }
-}
 
+  private func handleCanvasSnapshot(_ message: CanvasSnapshotMessage) {
+    let newCanvasModel = CanvasModel(dto: message.canvasModel, sampleSetStore: sampleSetStore)
+    // TODO - sync up the play position / bar to where the master is
+    resetCanvasModel(newCanvasModel: newCanvasModel)
+  }
+}

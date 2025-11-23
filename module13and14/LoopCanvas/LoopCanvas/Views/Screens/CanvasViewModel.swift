@@ -191,9 +191,6 @@ extension CanvasViewModel {
 }
 
 
-
-
-
 // Canvas managmeent events
 
 extension CanvasViewModel {
@@ -207,6 +204,10 @@ extension CanvasViewModel {
     canvasModel.thumnail = thunbnail
 
     saveSong()
+  }
+
+  func sendCanvasSnapshot() {
+    canvasMessageStore?.canvasSnapShot(viewModelId: id, canvasVersion: canvasVersion, canvasModel: canvasModel)
   }
 
   func saveSong() {
@@ -363,4 +364,3 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
-

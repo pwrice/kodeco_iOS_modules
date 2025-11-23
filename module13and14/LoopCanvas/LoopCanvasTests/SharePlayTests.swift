@@ -12,7 +12,7 @@ import Combine
 @testable import LoopCanvas
 
 @MainActor
-final class SharePlayTests: XCTestCase {
+class SharePlayTestsBase: XCTestCase {
   var canvasModel1: CanvasModel!
   var canvasViewModel1: CanvasViewModel!
   var musicEngine1: MockMusicEngine!
@@ -98,8 +98,48 @@ final class SharePlayTests: XCTestCase {
     // broadcasts to session wrapper 2
     mockGroupSessionWrapper1.linkedMockGroupSessionWrapper = mockGroupSessionWrapper2
   }
+}
 
+// Test Helpers
 
+extension SharePlayTestsBase {
+  func addBlockToCanvas(viewModel: CanvasViewModel, libraryBlockIndex: Int, location: CGPoint) throws -> Block {
+    let blockToAdd = testBlocks[libraryBlockIndex]
+    let newBlock = viewModel.addBlockToCanvasOnGrid(
+      newBlock: blockToAdd.instantiateCopyWith(
+        location: location, isLibraryBlock: false))
+    return newBlock
+  }
+
+  func getCanvasVersionExpectations(viewModel: CanvasViewModel, expectedCanvasVersion: Int = 1) -> XCTestExpectation {
+    cancellables.forEach { $0.cancel() }
+
+    let versionExpectation = self.expectation(
+      description: "Waiting canvasViewModel.canvasVersion to update"
+    )
+
+    viewModel.$canvasVersion
+      .dropFirst()
+      .sink { version in
+        if version == expectedCanvasVersion {
+          versionExpectation.fulfill()
+        }
+      }
+      .store(in: &cancellables)
+
+    return versionExpectation
+  }
+
+  func validateBlockPropertiesMatch(_ firstBlock: Block, _ blockToAdd: Block) {
+    XCTAssertEqual(firstBlock.color, blockToAdd.color)
+    XCTAssertEqual(firstBlock.relativePath, blockToAdd.relativePath)
+    XCTAssertEqual(firstBlock.loopURL, blockToAdd.loopURL)
+    XCTAssertFalse(firstBlock.isLibraryBlock)
+    XCTAssertEqual(firstBlock.icon, blockToAdd.icon)
+  }
+}
+
+final class SharePlayTests: SharePlayTestsBase {
   func testAddFirstBlockToCanvas() throws {
     // Initially neither viewmodel has any blockgroups
     XCTAssertEqual(canvasViewModel1.canvasModel.blocksGroups.count, 0)
@@ -464,44 +504,88 @@ final class SharePlayTests: XCTestCase {
       XCTAssertEqual(block.location.y, quantized.y)
     }
   }
-}
 
-// Test Helpers
-
-extension SharePlayTests {
-  func addBlockToCanvas(viewModel: CanvasViewModel, libraryBlockIndex: Int, location: CGPoint) throws -> Block {
-    let blockToAdd = testBlocks[libraryBlockIndex]
-    let newBlock = viewModel.addBlockToCanvasOnGrid(
-      newBlock: blockToAdd.instantiateCopyWith(
-        location: location, isLibraryBlock: false))
-    return newBlock
-  }
-
-  func getCanvasVersionExpectations(viewModel: CanvasViewModel, expectedCanvasVersion: Int = 1) -> XCTestExpectation {
-    cancellables.forEach { $0.cancel() }
-
-    let versionExpectation = self.expectation(
-      description: "Waiting canvasViewModel.canvasVersion to update"
+  func testCanvasSnapshotMessageSetsUpRemoteState() throws {
+    // Arrange: add three connected blocks on device 1 making an L-shape
+    let first = try addBlockToCanvas(
+      viewModel: canvasViewModel1,
+      libraryBlockIndex: 0,
+      location: CGPoint(x: 200, y: 400)
     )
 
-    viewModel.$canvasVersion
-      .dropFirst()
-      .sink { version in
-        if version == expectedCanvasVersion {
-          versionExpectation.fulfill()
-        }
-      }
-      .store(in: &cancellables)
+    let rightOfFirst = CGPoint(
+      x: first.location.x + CanvasViewModel.gridSpacing(),
+      y: first.location.y
+    )
+    let second = try addBlockToCanvas(
+      viewModel: canvasViewModel1,
+      libraryBlockIndex: 1,
+      location: rightOfFirst
+    )
 
-    return versionExpectation
-  }
+    let belowFirst = CGPoint(
+      x: first.location.x,
+      y: first.location.y + CanvasViewModel.gridSpacing()
+    )
+    let third = try addBlockToCanvas(
+      viewModel: canvasViewModel1,
+      libraryBlockIndex: 2,
+      location: belowFirst
+    )
 
-  func validateBlockPropertiesMatch(_ firstBlock: Block, _ blockToAdd: Block) {
-    XCTAssertEqual(firstBlock.color, blockToAdd.color)
-    XCTAssertEqual(firstBlock.loopURL, blockToAdd.loopURL)
-    XCTAssertFalse(firstBlock.isLibraryBlock)
-    XCTAssertEqual(firstBlock.relativePath, blockToAdd.relativePath)
-    XCTAssertEqual(firstBlock.icon, blockToAdd.icon)
+    // Tweak some properties to ensure snapshot carries configuration
+    first.numBars = 2
+    second.startOffset = 1
+    canvasViewModel1.toggleMute(block: third)
+
+    // Local assertions on device 1
+    XCTAssertEqual(canvasViewModel1.canvasModel.blocksGroups.count, 1)
+    let group1 = try XCTUnwrap(canvasViewModel1.canvasModel.blocksGroups.first)
+    XCTAssertEqual(group1.allBlocks.count, 3)
+
+    // Clear any queued messages before sending the snapshot
+    mockGroupSessionWrapper1.debugClearMessageQueue()
+
+    // Act: send snapshot so only CanvasSnapshotMessage is broadcast
+    canvasViewModel1.sendCanvasSnapshot()
+
+    // Expect canvasVersion to update on device 2 to match device 1
+    let expectedVersion = canvasViewModel1.canvasVersion
+    let versionExpectation = getCanvasVersionExpectations(
+      viewModel: canvasViewModel2,
+      expectedCanvasVersion: expectedVersion
+    )
+
+    // Broadcast queued messages (only the snapshot)
+    mockGroupSessionWrapper1.debugBroadCastMessages()
+    wait(for: [versionExpectation], timeout: 1.0)
+
+    // Mirror assertions on device 2
+    XCTAssertEqual(canvasViewModel2.canvasModel.blocksGroups.count, 1)
+    let group2 = try XCTUnwrap(canvasViewModel2.canvasModel.blocksGroups.first)
+    XCTAssertEqual(group2.allBlocks.count, 3)
+
+    // Match blocks by id
+    let first2 = try XCTUnwrap(group2.allBlocks.first { $0.id == first.id })
+    let second2 = try XCTUnwrap(group2.allBlocks.first { $0.id == second.id })
+    let third2 = try XCTUnwrap(group2.allBlocks.first { $0.id == third.id })
+
+    // Validate properties replicated
+    XCTAssertEqual(first2.numBars, 2)
+    XCTAssertEqual(second2.startOffset, 1)
+    XCTAssertEqual(third2.isMuted, true)
+
+    // Validate common block properties via helper
+    validateBlockPropertiesMatch(first2, first)
+    validateBlockPropertiesMatch(second2, second)
+    validateBlockPropertiesMatch(third2, third)
+
+    // Validate locations quantized to grid positions we expect
+    XCTAssertEqual(first2.location.x, first.location.x)
+    XCTAssertEqual(first2.location.y, first.location.y)
+    XCTAssertEqual(second2.location.x, second.location.x)
+    XCTAssertEqual(second2.location.y, second.location.y)
+    XCTAssertEqual(third2.location.x, third.location.x)
+    XCTAssertEqual(third2.location.y, third.location.y)
   }
 }
-

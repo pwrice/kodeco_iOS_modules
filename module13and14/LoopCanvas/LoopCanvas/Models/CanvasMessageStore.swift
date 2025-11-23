@@ -120,11 +120,11 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
 
     // ... add similar tasks for other message types ...
 
-    //    sessionTasks.insert(Task {
-    //      for await (message, _) in messenger.messages(of: LoopCanvasSnapshotMessage.self) {
-    //        await MainActor.run { self.receive(message) }
-    //      }
-    //    })
+    sessionTasks.insert(Task {
+      for await (message, _) in messenger.messages(of: CanvasSnapshotMessage.self) {
+        await MainActor.run { self.delegate?.receive(message) }
+      }
+    })
 
     // 2) Watch for new participants to send snapshots to
     //    session.$activeParticipants
@@ -192,6 +192,10 @@ class MockGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObject 
     for message in messageQueue {
       linkedMockGroupSessionWrapper?.recieve(message)
     }
+    messageQueue = []
+  }
+
+  func debugClearMessageQueue() {
     messageQueue = []
   }
 }
@@ -270,6 +274,12 @@ struct BlockGroupMovedMessage: CanvasMessage {
   var viewModelId: UUID
   let blockGroupId: UUID
   let updatedBlockLocations: [UUID: CGPoint]
+}
+
+struct CanvasSnapshotMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  let canvasModel: CanvasModelDTO
 }
 
 extension CanvasMessageStore {
@@ -366,6 +376,14 @@ extension CanvasMessageStore {
       blockGroupId: blockGroup.id,
       updatedBlockLocations: Dictionary(
         uniqueKeysWithValues: blockGroup.allBlocks.map { ( $0.id, $0.location) }))
+    send(message)
+  }
+
+  func canvasSnapShot(viewModelId: UUID, canvasVersion: Int, canvasModel: CanvasModel) {
+    let message = CanvasSnapshotMessage(
+      canvasVersion: canvasVersion,
+      viewModelId: viewModelId,
+      canvasModel: canvasModel.toDTO())
     send(message)
   }
 }

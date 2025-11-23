@@ -330,8 +330,8 @@ private extension Block {
       location: CGPoint(x: 200, y: 200),
       color: .green,
       icon: "circle",
-      loopURL: URL(fileURLWithPath: "Samples/Fink/Drums/Funky.wav", relativeTo: Bundle.main.bundleURL),
-      relativePath: "Samples/Fink/Drums/Funky.wav",
+      loopURL: URL(fileURLWithPath: "Samples/Funk/Drums/Funky.wav", relativeTo: Bundle.main.bundleURL),
+      relativePath: "Samples/Funk/Drums/Funky.wav",
       isLibraryBlock: false
     )
 

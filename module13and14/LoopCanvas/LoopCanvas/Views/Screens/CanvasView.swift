@@ -431,15 +431,29 @@ extension CanvasViewModel {
 //      - volume
 //      - duplicate group
 //   - fix animation for dragging
-// - update tests for loading and saving to make sure all block and canvas state can be serialized properly
+// [DONE]- update tests for loading and saving to make sure all block and canvas state can be serialized properly
 // - add the ability to connect block groups when dragging them next to each other
+// - update header UX
+//   - start stop transport controls
+//   - BPM setting
 
 
 // MULTI-USER
 // hook up shareplay so multiple users can edit a canvas at the same time
-// - add DTO for all objects
-// - hook up messages for actions
-//
+// [DONE]- add DTO for all objects
+// [DONE]- hook up messages for actions
+// [DONE]- setup robust testing framework w mocks
+// - do catchup action for when participants join
+// - do start / stop transport control messages
+// - do UI entry point
+//   - start shareplay when elligible button
+//   - leave shareplay session
+
+// Figure out how to layer on effects
+// - maybe a painting model?
+// - or some kind of mat you drag on
+// - need to update UI w/ a tool bar to be able to add effects, loops, visuals
+
 
 // AUv3
 // make AUv3 plugin so you can record into loops from other audio apps
