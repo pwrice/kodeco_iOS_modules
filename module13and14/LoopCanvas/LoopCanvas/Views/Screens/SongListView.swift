@@ -61,7 +61,8 @@ struct CanvasesGridView: View {
         musicEngine: AudioKitMusicEngine(),
         canvasStore: canvasStore,
         sampleSetStore: sampleSetStore,
-        canvasMessageStore: nil,
+        canvasMessageStore: CanvasMessageStore(
+            groupSessionWrapper: ConcreteGroupSessionWrapper()),
         songNameToLoad: savedCanvas.name)
       CanvasView(viewModel: canvasViewModel)
     }

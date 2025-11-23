@@ -66,7 +66,8 @@ struct HomeView: View {
             musicEngine: AudioKitMusicEngine(),
             canvasStore: canvasStore,
             sampleSetStore: canvasStore.sampleSetStore,
-            canvasMessageStore: nil
+            canvasMessageStore: CanvasMessageStore(
+              groupSessionWrapper: ConcreteGroupSessionWrapper())
           )
           CanvasView(viewModel: canvasViewModel)
         case .allSongs:

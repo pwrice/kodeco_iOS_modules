@@ -74,88 +74,42 @@ struct CanvasView: View {
       }
     }
     .navigationBarItems(
-      trailing: Menu {
-        Button("Rename ...") {
-          if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
-            viewModel.canvasSnapshot = snapshotImage
-            showingRenameSongView = true
+      trailing: HStack {
+        if viewModel.canvasMessageStore?.eligibleToStartSharing == true {
+          Button {
+            viewModel.startSharing()
+          } label: {
+            Image(systemName: "shareplay")
           }
         }
-        Button("Save") {
-          // If the song hasnt been saved yet, get its thumbnail and make the user
-          // name it.
-          if viewModel.canvasModel.thumnail == nil {
-            if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
-              viewModel.canvasSnapshot = snapshotImage
-              showingRenameSongView = true
-            }
-          } else {
-            viewModel.saveSong()
-          }
-        }
-        Button("Reload") {
-          viewModel.loadSong()
-        }
-        Menu {
-          // Current selection shown as a disabled item
-          Button(action: {}, label: {
-            HStack {
-              Text("Current: \(viewModel.selectedSampleSetName)")
-              Spacer()
-              Image(systemName: "checkmark")
-            }
-          })
-          .disabled(true)
 
-          // List all local sample sets as selectable items
-          ForEach(localSampleSets.map { $0.name }, id: \.self) { name in
-            Button(action: {
-              if name != viewModel.selectedSampleSetName {
-                viewModel.selectedSampleSetName = name
-                viewModel.loadSampleSetAndResetCanvas(sampleSetName: name)
-              }
-            }, label: {
-              HStack {
-                Text(name)
-                if name == viewModel.selectedSampleSetName {
-                  Spacer()
-                  Image(systemName: "checkmark")
-                }
-              }
-            })
-          }
-        } label: {
-          Label("Sample Set", systemImage: "music.note.list")
+        if viewModel.canvasMessageStore?.sharePlaySessionActive == true {
+          sharePlayMenuView
         }
-        Button("Clear Canvas") {
-          viewModel.clearCanvas()
-        }
-        Button("Download Genres ...") {
-          showingDownloadGenresView = true
-        }
-      } label: {
-        Image(systemName: "ellipsis.circle")
-      })
+
+        canvasMenuView
+      }
+    )
     .sheet(isPresented: $showingRenameSongView, content: {
       RenameSongSheet(viewModel: viewModel, showingRenameSongView: $showingRenameSongView)
     })
-    .sheet(isPresented: $showingDownloadGenresView, content: {
+    .sheet(isPresented: $showingDownloadGenresView) {
       if let sampleSetStore = viewModel.sampleSetStore {
         DownloadGenresSheet(
           viewModel: viewModel,
           store: sampleSetStore,
           showingDownloadGenresView: $showingDownloadGenresView)
       }
-    })
-    .sheet(isPresented: $showingLibraryPickerView, content: {
+    }
+    .sheet(isPresented: $showingLibraryPickerView) {
       LibraryPickerSheet(
         library: viewModel.canvasModel.library,
         addBlockTapPosition: addBlockTapPosition,
         viewModel: viewModel,
         showingLibraryPickerView: $showingLibraryPickerView)
       .presentationDetents([.medium])
-    })
-    .sheet(isPresented: $showingBlockDetailsView, content: {
+    }
+    .sheet(isPresented: $showingBlockDetailsView) {
       if let blockDetailsViewModel = viewModel.blockDetailsViewModel {
         BlockDetailsSheet(
           showingBlockDetailsView: $showingBlockDetailsView,
@@ -165,8 +119,8 @@ struct CanvasView: View {
         )
         .presentationDetents([.medium])
       }
-    })
-    .sheet(isPresented: $showingBlockGroupDetailsView, content: {
+    }
+    .sheet(isPresented: $showingBlockGroupDetailsView) {
       if let selectedBlockGroup = viewModel.selectedBlockGroup {
         BlockGroupDetailsSheet(
           canvasViewModel: viewModel,
@@ -175,7 +129,95 @@ struct CanvasView: View {
         )
         .presentationDetents([.medium])
       }
-    })
+    }
+  }
+
+  var canvasMenuView: some View {
+    Menu {
+      Button("Rename ...") {
+        if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
+          viewModel.canvasSnapshot = snapshotImage
+          showingRenameSongView = true
+        }
+      }
+      Button("Save") {
+        // If the song hasnt been saved yet, get its thumbnail and make the user
+        // name it.
+        if viewModel.canvasModel.thumnail == nil {
+          if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
+            viewModel.canvasSnapshot = snapshotImage
+            showingRenameSongView = true
+          }
+        } else {
+          viewModel.saveSong()
+        }
+      }
+      Button("Reload") {
+        viewModel.loadSong()
+      }
+      Menu {
+        // List all local sample sets as selectable items
+        ForEach(localSampleSets.map { $0.name }, id: \.self) { name in
+          Button(action: {
+            if name != viewModel.selectedSampleSetName {
+              viewModel.selectedSampleSetName = name
+              viewModel.loadSampleSetAndResetCanvas(sampleSetName: name)
+            }
+          }, label: {
+            HStack {
+              Text(name)
+              if name == viewModel.selectedSampleSetName {
+                Spacer()
+                Image(systemName: "checkmark")
+              }
+            }
+          })
+        }
+      } label: {
+        Label("Sample Set", systemImage: "music.note.list")
+      }
+      Button("Clear Canvas") {
+        viewModel.clearCanvas()
+      }
+      Button("Download Genres ...") {
+        showingDownloadGenresView = true
+      }
+    } label: {
+      Image(systemName: "ellipsis.circle")
+    }
+  }
+
+  var sharePlayMenuView: some View {
+    Menu {
+      if let sharePlayUsers = viewModel.sharePlayUsers {
+        ForEach(sharePlayUsers, id: \.id) { sharePlayUser in
+          // list share play users as disabled epople
+          Button(action: {}, label: {
+            HStack {
+              Text(sharePlayUser.name)
+              Spacer()
+              Image(systemName: "person")
+            }
+          })
+          .disabled(true)
+        }
+      }
+
+      Button("Push Snapshot") {
+        viewModel.sendCanvasModelSnapshot()
+      }
+
+      Button("Request Snapshot") {
+        //        viewModel.sendCanvasModelSnapshot()
+        // TODO - add this - so request a snapshot from the host
+      }
+
+      Button("Reset Session") {
+        viewModel.resetSharePlaySession()
+      }
+    } label: {
+      Image(systemName: "person.2.fill")
+    }
   }
 
   var localSampleSets: [LocalSampleSet] {
@@ -294,7 +336,7 @@ struct BackgroundDots: View {
 
   func highlightBlock(x: Int, y: Int) -> Bool {
     return (addBlockTapGridPosition?.x == CGFloat(x) &&
-      addBlockTapGridPosition?.y == CGFloat(y))
+            addBlockTapGridPosition?.y == CGFloat(y))
   }
 
   var body: some View {
@@ -436,7 +478,7 @@ extension CanvasViewModel {
 // - update header UX
 //   - start stop transport controls
 //   - BPM setting
-
+// - audit cleanup to make sure all subscriptions are cleaned up properly etc..
 
 // MULTI-USER
 // hook up shareplay so multiple users can edit a canvas at the same time

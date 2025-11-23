@@ -29,7 +29,7 @@ extension CanvasViewModel {
   func handleSharePlayUsersUpdated(_ sharePlayUsers: [SharePlayUser]) {
     self.sharePlayUsers = sharePlayUsers
     if let mySharePlayUser {
-       if sharePlayHostUserId == nil, sharePlayUsers == [mySharePlayUser] {
+      if sharePlayHostUserId == nil, sharePlayUsers == [mySharePlayUser] {
         // if we are the first participant, set ourselves as the host
         self.sharePlayHostUserId = mySharePlayUser.id
       }

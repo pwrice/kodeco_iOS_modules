@@ -202,6 +202,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		C18B9B802ED3BCFE006799EE /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */,
+				C1015DC52ED21464000B69CD /* CanvasViewModel_BlockEvents.swift */,
+				C1015DC72ED214CC000B69CD /* CanvasViewModel_BlockGroupEvents.swift */,
+				C1015DC92ED2151E000B69CD /* CanvasViewModel_MessageEvents.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		C19D853C2C08AE5900477545 = {
 			isa = PBXGroup;
 			children = (
@@ -232,6 +243,7 @@
 				C1B564C22C0CC77A002FDDD4 /* Info.plist */,
 				C19D85752C08AF2B00477545 /* App */,
 				C19D85742C08AF2400477545 /* Views */,
+				C18B9B802ED3BCFE006799EE /* ViewModels */,
 				C19D85732C08AF1A00477545 /* Models */,
 				C1F5EEEA2C14C62500298B00 /* Music */,
 				C10DE2082D1F386700466C0C /* Networking */,
@@ -314,10 +326,6 @@
 				C1706DDA2C6CE4E000DAC858 /* SongListView.swift */,
 				C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */,
 				C12C6E8A2C2AF39300B01C58 /* HomeView.swift */,
-				C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */,
-				C1015DC52ED21464000B69CD /* CanvasViewModel_BlockEvents.swift */,
-				C1015DC72ED214CC000B69CD /* CanvasViewModel_BlockGroupEvents.swift */,
-				C1015DC92ED2151E000B69CD /* CanvasViewModel_MessageEvents.swift */,
 				C19D85762C08B00C00477545 /* CanvasView.swift */,
 			);
 			path = Screens;

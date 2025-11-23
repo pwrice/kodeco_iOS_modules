@@ -29,6 +29,7 @@ class CanvasMessageStore: GroupSessionWrapperDelegate, ObservableObject {
   @Published var sharePlayUsers: [SharePlayUser]
   @Published var mySharePlayUser: SharePlayUser?
   @Published var eligibleToStartSharing = false
+  @Published var sharePlaySessionActive = false
 
   // Message State
   @Published var messages: [CanvasMessage]
@@ -53,6 +54,10 @@ class CanvasMessageStore: GroupSessionWrapperDelegate, ObservableObject {
     self.groupSessionWrapper?.startSharing()
   }
 
+  func resetSession() {
+    self.groupSessionWrapper?.reset()
+  }
+
   func receive(_ message: any CanvasMessage) {
     messages.append(message)
   }
@@ -72,6 +77,10 @@ class CanvasMessageStore: GroupSessionWrapperDelegate, ObservableObject {
   func setEligableToStartSharing(_ eligble: Bool) {
     eligibleToStartSharing = eligble && groupSessionWrapper?.hasActiveSession() == false
   }
+
+  func setHasActiveSession(_ activeSession: Bool) {
+    sharePlaySessionActive = activeSession
+  }
 }
 
 struct LoopCanvasSession: GroupActivity {
@@ -88,11 +97,13 @@ protocol GroupSessionWrapperDelegate: AnyObject {
   func activeParticipantsChanged(sharePlayUsers: [SharePlayUser])
   func setLocalSharePlayUser(user: SharePlayUser)
   func setEligableToStartSharing(_: Bool)
+  func setHasActiveSession(_: Bool)
 }
 
 protocol GroupSessionWrapper: ObservableObject {
   func observeLoopCanvasSessions()
   func startSharing()
+  func reset()
   func teardownSession()
   func send(_ message: any CanvasMessage)
   func hasActiveSession() -> Bool
@@ -125,7 +136,6 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
         await MainActor.run {
           self.configureGroupSession(session)
         }
-        session.join()
       }
     }
   }
@@ -183,7 +193,9 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
       }
       .store(in: &sessionCancellables)
 
-    groupSession?.join()
+    session.join()
+
+    delegate?.setHasActiveSession(true)
   }
 
   @MainActor
@@ -192,6 +204,7 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
       groupSession?.leave()
       groupSession = nil
       self.startSharing()
+      delegate?.setHasActiveSession(false)
     }
     messenger = nil
     groupSession = nil
@@ -206,6 +219,7 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
     if groupSession != nil {
       groupSession?.leave()
       groupSession = nil
+      delegate?.setHasActiveSession(false)
     }
     messenger = nil
     groupSession = nil
@@ -268,6 +282,9 @@ class MockGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObject 
 
   func hasActiveSession() -> Bool {
     return activeSession
+  }
+
+  func reset() {
   }
 
   func debugBroadCastMessages() {

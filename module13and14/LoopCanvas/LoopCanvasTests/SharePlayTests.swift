@@ -693,7 +693,7 @@ final class SharePlayLifeCycleTests: SharePlayTestsBase {
 
     // Validate that we now have 2 SharePlayUsers, that it is us, and that it is the host
     XCTAssertEqual(canvasViewModel2.sharePlayUsers?.count, 2)
-    let newUser = try XCTUnwrap(canvasViewModel2.sharePlayUsers?.first(where: { $0.id == localUser2.id }))
+    let newUser = try XCTUnwrap(canvasViewModel2.sharePlayUsers?.first { $0.id == localUser2.id })
     XCTAssertEqual(canvasViewModel2.mySharePlayUser, newUser)
 
     // The host user id has not been set yet
