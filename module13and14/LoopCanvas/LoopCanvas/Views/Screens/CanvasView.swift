@@ -73,23 +73,49 @@ struct CanvasView: View {
         viewModel.unselectCurrentlySelectedBlock()
       }
     }
-    .navigationBarItems(
-      trailing: HStack {
-        if viewModel.canvasMessageStore?.eligibleToStartSharing == true {
-          Button {
-            viewModel.startSharing()
-          } label: {
-            Image(systemName: "shareplay")
+    .toolbar {
+      ToolbarItem(placement: .principal) {
+        HStack(spacing: 12) {
+          Button(action: { viewModel.togglePlayback() }) {
+            ZStack {
+              if viewModel.isPlaying {
+                Image(systemName: "stop.fill")
+              } else {
+                Image(systemName: "play.fill")
+              }
+            }
+            .frame(width: 22, height: 22)
           }
+          .buttonStyle(.plain)
+          .accessibilityLabel(viewModel.isPlaying ? "Stop" : "Play")
+          Divider()
+          Text("Set: \(viewModel.canvasTitle)")
+            .font(.headline)
+            .lineLimit(1)
+          Divider()
+            Text("\(viewModel.canvasBPM) BPM")
+          .font(.subheadline)
         }
-
-        if viewModel.canvasMessageStore?.sharePlaySessionActive == true {
-          sharePlayMenuView
-        }
-
-        canvasMenuView
       }
-    )
+
+      ToolbarItem(placement: .navigationBarTrailing) {
+        HStack {
+          if viewModel.canvasMessageStore?.eligibleToStartSharing == true {
+            Button {
+              viewModel.startSharing()
+            } label: {
+              Image(systemName: "shareplay")
+            }
+          }
+
+          if viewModel.canvasMessageStore?.sharePlaySessionActive == true {
+            sharePlayMenuView
+          }
+
+          canvasMenuView
+        }
+      }
+    }
     .sheet(isPresented: $showingRenameSongView, content: {
       RenameSongSheet(viewModel: viewModel, showingRenameSongView: $showingRenameSongView)
     })
@@ -558,3 +584,5 @@ extension CanvasViewModel {
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0
+
+

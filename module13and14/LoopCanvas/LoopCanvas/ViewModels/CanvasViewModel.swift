@@ -28,6 +28,7 @@ class CanvasViewModel: ObservableObject {
   @Published var allBlockGroups: [BlockGroup]
   @Published var selectedSampleSetName: String = ""
   @Published var canvasSnapshot: UIImage?
+  @Published var isPlaying: Bool = false
 
   var id: UUID
   var addBlockTapGridPosition: CGPoint?
@@ -39,6 +40,14 @@ class CanvasViewModel: ObservableObject {
   var songNameToLoad: String?
 
   var blockDetailsViewModel: BlockDetailsViewModel?
+
+  var canvasTitle: String {
+    canvasModel.library.name
+  }
+
+  var canvasBPM: String {
+    String(canvasModel.library.tempo)
+  }
 
   static let blockSize: CGFloat = 70.0
   static let blockSpacing: CGFloat = 10.0
@@ -178,6 +187,7 @@ extension CanvasViewModel {
     canvasModel.setMusicEngineAfterLoad(musicEngine: musicEngine)
     musicEngine.reset()
     musicEngine.play()
+    isPlaying = true
   }
 
   func onViewAppear() {
@@ -191,6 +201,7 @@ extension CanvasViewModel {
 
     musicEngine.initializeEngine()
     musicEngine.play()
+    isPlaying = true
 
     if let songName = songNameToLoad, let canvasStore = canvasStore {
       if let canvasModel = canvasStore.loadCanvas(name: songName) {
@@ -217,6 +228,27 @@ extension CanvasViewModel {
 // Canvas managmeent events
 
 extension CanvasViewModel {
+  // Play Controls
+
+  func startCanvasPlayback() {
+    musicEngine.play()
+    isPlaying = true
+  }
+
+  func pauseCanvasPlayback() {
+    musicEngine.stop()
+    isPlaying = false
+  }
+
+  func togglePlayback() {
+    if isPlaying {
+      pauseCanvasPlayback()
+    } else {
+      startCanvasPlayback()
+    }
+  }
+
+
   func clearCanvas() {
     canvasModel.clear()
     updateAllBlocksList()
@@ -396,3 +428,4 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
+
