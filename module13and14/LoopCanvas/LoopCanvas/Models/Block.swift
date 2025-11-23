@@ -20,6 +20,7 @@ struct BlockDTO: Codable {
   let startOffset: Int
   let volume: Double
   let numBars: Int
+  let defaultMaxNumBars: Int
   let isMuted: Bool
 }
 
@@ -160,6 +161,7 @@ class Block: ObservableObject, Identifiable {
     self.startOffset = dto.startOffset
     self.volume = dto.volume
     self.numBars = dto.numBars
+    self.defaultMaxNumBars = dto.defaultMaxNumBars
     self.isMuted = dto.isMuted
   }
 
@@ -175,6 +177,7 @@ class Block: ObservableObject, Identifiable {
       startOffset: self.startOffset,
       volume: self.volume,
       numBars: self.numBars,
+      defaultMaxNumBars: self.defaultMaxNumBars,
       isMuted: self.isMuted
     )
   }
@@ -191,6 +194,7 @@ class Block: ObservableObject, Identifiable {
       isLibraryBlock: isLibraryBlock
     )
     copy.numBars = self.numBars
+    copy.defaultMaxNumBars = self.defaultMaxNumBars
     copy.isMuted = self.isMuted
     copy.startOffset = self.startOffset
     copy.volume = self.volume
