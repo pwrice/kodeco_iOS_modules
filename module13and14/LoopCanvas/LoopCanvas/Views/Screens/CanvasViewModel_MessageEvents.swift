@@ -10,8 +10,12 @@ import SwiftUI
 import os
 
 extension CanvasViewModel {
+  func startSharing() {
+    canvasMessageStore?.startSharing()
+  }
+
   func processCanvasMessages(_ messages: [CanvasMessage]) {
-//    Self.logger.debug("Received canvas messages: \(messages.count)")
+    //    Self.logger.debug("Received canvas messages: \(messages.count)")
 
     for message in messages where message.viewModelId != self.id {
       // TODO - add some versioning logic to just process the last message
@@ -21,6 +25,28 @@ extension CanvasViewModel {
       }
     }
   }
+
+  func handleSharePlayUsersUpdated(_ sharePlayUsers: [SharePlayUser]) {
+    self.sharePlayUsers = sharePlayUsers
+    if let mySharePlayUser {
+       if sharePlayHostUserId == nil, sharePlayUsers == [mySharePlayUser] {
+        // if we are the first participant, set ourselves as the host
+        self.sharePlayHostUserId = mySharePlayUser.id
+      }
+
+      if self.sharePlayHostUserId == mySharePlayUser.id {
+        // when new users join, only the host sends the snapshot to them
+        sendCanvasModelSnapshot()
+      }
+    }
+  }
+
+  func handleMySharePlayUsersUpdated(_ mySharePlayUser: SharePlayUser?) {
+    if let mySharePlayUser {
+      self.mySharePlayUser = mySharePlayUser
+    }
+  }
+
 
   private func handle(message: CanvasMessage) {
     Self.logger.debug("Received canvas message: \(message.canvasVersion) \(String(describing: message.self))")
@@ -47,7 +73,7 @@ extension CanvasViewModel {
       handleBlockGroupStartedMove(groupStart)
     case let groupMoved as BlockGroupMovedMessage:
       handleBlockGroupMoved(groupMoved)
-    case let canvasSnapshot as CanvasSnapshotMessage:
+    case let canvasSnapshot as CanvasModelSnapshotMessage:
       handleCanvasSnapshot(canvasSnapshot)
     default:
       break
@@ -140,9 +166,10 @@ extension CanvasViewModel {
     }
   }
 
-  private func handleCanvasSnapshot(_ message: CanvasSnapshotMessage) {
+  private func handleCanvasSnapshot(_ message: CanvasModelSnapshotMessage) {
     let newCanvasModel = CanvasModel(dto: message.canvasModel, sampleSetStore: sampleSetStore)
     // TODO - sync up the play position / bar to where the master is
     resetCanvasModel(newCanvasModel: newCanvasModel)
+    sharePlayHostUserId = message.hostUserId
   }
 }

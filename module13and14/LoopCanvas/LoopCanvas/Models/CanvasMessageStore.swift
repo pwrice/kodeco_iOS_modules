@@ -15,30 +15,42 @@ protocol CanvasMessage: Codable {
   var viewModelId: UUID { get }
 }
 
+struct SharePlayUser: Codable, Equatable {
+  let id: UUID
+  let name: String = "Anonymous"
+}
+
 class CanvasMessageStore: GroupSessionWrapperDelegate, ObservableObject {
   private static let logger = Logger(
     subsystem: "Models",
     category: String(describing: CanvasMessageStore.self)
   )
 
+  @Published var sharePlayUsers: [SharePlayUser]
+  @Published var mySharePlayUser: SharePlayUser?
+  @Published var eligibleToStartSharing = false
+
   // Message State
   @Published var messages: [CanvasMessage]
 
   var groupSessionWrapper: GroupSessionWrapper?
 
-  // Share Play Properties
-  @Published var groupSession: GroupSession<LoopCanvasSession>?
   private var messenger: GroupSessionMessenger?
   private var sessionTasks = Set<Task<Void, Never>>()
   private var sessionCancellables = Set<AnyCancellable>()
 
   init(groupSessionWrapper: GroupSessionWrapper? = nil) {
+    self.sharePlayUsers = []
     self.messages = []
 
     self.groupSessionWrapper = groupSessionWrapper
     self.groupSessionWrapper?.delegate = self
 
     self.groupSessionWrapper?.observeLoopCanvasSessions()
+  }
+
+  func startSharing() {
+    self.groupSessionWrapper?.startSharing()
   }
 
   func receive(_ message: any CanvasMessage) {
@@ -49,8 +61,16 @@ class CanvasMessageStore: GroupSessionWrapperDelegate, ObservableObject {
     groupSessionWrapper?.send(message)
   }
 
-  func startSharing() {
-    self.groupSessionWrapper?.startSharing()
+  func setLocalSharePlayUser(user: SharePlayUser) {
+    mySharePlayUser = user
+  }
+
+  func activeParticipantsChanged(sharePlayUsers: [SharePlayUser]) {
+    self.sharePlayUsers = sharePlayUsers
+  }
+
+  func setEligableToStartSharing(_ eligble: Bool) {
+    eligibleToStartSharing = eligble && groupSessionWrapper?.hasActiveSession() == false
   }
 }
 
@@ -63,8 +83,11 @@ struct LoopCanvasSession: GroupActivity {
   }
 }
 
-protocol GroupSessionWrapperDelegate {
+protocol GroupSessionWrapperDelegate: AnyObject {
   func receive(_ message: CanvasMessage)
+  func activeParticipantsChanged(sharePlayUsers: [SharePlayUser])
+  func setLocalSharePlayUser(user: SharePlayUser)
+  func setEligableToStartSharing(_: Bool)
 }
 
 protocol GroupSessionWrapper: ObservableObject {
@@ -72,6 +95,7 @@ protocol GroupSessionWrapper: ObservableObject {
   func startSharing()
   func teardownSession()
   func send(_ message: any CanvasMessage)
+  func hasActiveSession() -> Bool
   var delegate: GroupSessionWrapperDelegate? { get set }
 }
 
@@ -80,12 +104,22 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
 
   // Share Play Properties
   var groupSession: GroupSession<LoopCanvasSession>?
+  @Published var groupStateObserver = GroupStateObserver()
   private var messenger: GroupSessionMessenger?
   private var sessionTasks = Set<Task<Void, Never>>()
   private var sessionCancellables = Set<AnyCancellable>()
   private var canvasVersion: Int = 0  // increments on major changes
 
   func observeLoopCanvasSessions() {
+    $groupStateObserver
+      .sink { [weak self] groupState in
+        guard let self else { return }
+        Task { @MainActor in
+          self.delegate?.setEligableToStartSharing(groupState.isEligibleForGroupSession)
+        }
+      }
+      .store(in: &sessionCancellables)
+
     Task {
       for await session in LoopCanvasSession.sessions() {
         await MainActor.run {
@@ -105,6 +139,18 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
     let messenger = GroupSessionMessenger(session: session)
     self.messenger = messenger
 
+    self.delegate?.setLocalSharePlayUser(user: SharePlayUser(id: session.localParticipant.id))
+
+    session.$state
+      .sink { state in
+        if case .invalidated = state {
+          self.groupSession = nil
+          self.reset()
+        }
+      }
+      .store(in: &sessionCancellables)
+
+
     // 1) Listen for block messages
     sessionTasks.insert(Task {
       for await (message, _) in messenger.messages(of: BlockAddedMessage.self) {
@@ -121,22 +167,46 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
     // ... add similar tasks for other message types ...
 
     sessionTasks.insert(Task {
-      for await (message, _) in messenger.messages(of: CanvasSnapshotMessage.self) {
+      for await (message, _) in messenger.messages(of: CanvasModelSnapshotMessage.self) {
         await MainActor.run { self.delegate?.receive(message) }
       }
     })
 
     // 2) Watch for new participants to send snapshots to
-    //    session.$activeParticipants
-    //      .sink { [weak self, weak session] participants in
-    //        guard let self, let session else { return }
-    //        self.handleActiveParticipantsChanged(participants, in: session)
-    //      }
-    //      .store(in: &sessionCancellables)
+    session.$activeParticipants
+      .sink { [weak self] participants in
+        guard let self else { return }
+        Task { @MainActor in
+          let users = Array(participants).map { SharePlayUser(id: $0.id) }
+          self.delegate?.activeParticipantsChanged(sharePlayUsers: users)
+        }
+      }
+      .store(in: &sessionCancellables)
+
+    groupSession?.join()
   }
 
   @MainActor
+  func reset() {
+    if groupSession != nil {
+      groupSession?.leave()
+      groupSession = nil
+      self.startSharing()
+    }
+    messenger = nil
+    groupSession = nil
+    sessionTasks.forEach { $0.cancel() }
+    sessionTasks.removeAll()
+    sessionCancellables.removeAll()
+  }
+
+  // TODO - combine this w/ above
+  @MainActor
   func teardownSession() {
+    if groupSession != nil {
+      groupSession?.leave()
+      groupSession = nil
+    }
     messenger = nil
     groupSession = nil
     sessionTasks.forEach { $0.cancel() }
@@ -163,6 +233,10 @@ class ConcreteGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObj
       }
     }
   }
+
+  func hasActiveSession() -> Bool {
+    return groupSession == nil
+  }
 }
 
 class MockGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObject {
@@ -170,11 +244,15 @@ class MockGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObject 
 
   var linkedMockGroupSessionWrapper: MockGroupSessionWrapper?
   var messageQueue: [any CanvasMessage] = []
+  var activeSession = false
 
   func observeLoopCanvasSessions() {
   }
 
   func startSharing() {
+    // would trigger an update that would eventually call configureGroupSession() above
+    // and setup the current session
+    activeSession = true
   }
 
   func teardownSession() {
@@ -188,6 +266,10 @@ class MockGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObject 
     delegate?.receive(message)
   }
 
+  func hasActiveSession() -> Bool {
+    return activeSession
+  }
+
   func debugBroadCastMessages() {
     for message in messageQueue {
       linkedMockGroupSessionWrapper?.recieve(message)
@@ -197,6 +279,14 @@ class MockGroupSessionWrapper: @MainActor GroupSessionWrapper, ObservableObject 
 
   func debugClearMessageQueue() {
     messageQueue = []
+  }
+
+  func debugSetLocalSharePlayUser(user: SharePlayUser) {
+    self.delegate?.setLocalSharePlayUser(user: user)
+  }
+
+  func debugUpdateActiveParticipans(users: [SharePlayUser]) {
+    self.delegate?.activeParticipantsChanged(sharePlayUsers: users)
   }
 }
 
@@ -276,11 +366,20 @@ struct BlockGroupMovedMessage: CanvasMessage {
   let updatedBlockLocations: [UUID: CGPoint]
 }
 
-struct CanvasSnapshotMessage: CanvasMessage {
+struct CanvasModelSnapshotMessage: CanvasMessage {
   var canvasVersion: Int
   var viewModelId: UUID
+  var hostUserId: UUID
   let canvasModel: CanvasModelDTO
 }
+
+// Sent when a user becomes a host
+struct SetHostMessage: CanvasMessage {
+  var canvasVersion: Int
+  var viewModelId: UUID
+  var sharePlayUser: UUID
+}
+
 
 extension CanvasMessageStore {
   func addBlockToCanvasOnGrid(viewModelId: UUID, canvasVersion: Int, newBlock: Block, newGroup: BlockGroup?) {
@@ -379,10 +478,11 @@ extension CanvasMessageStore {
     send(message)
   }
 
-  func canvasSnapShot(viewModelId: UUID, canvasVersion: Int, canvasModel: CanvasModel) {
-    let message = CanvasSnapshotMessage(
+  func canvasModelSnapShot(viewModelId: UUID, canvasVersion: Int, hostUserId: UUID, canvasModel: CanvasModel) {
+    let message = CanvasModelSnapshotMessage(
       canvasVersion: canvasVersion,
       viewModelId: viewModelId,
+      hostUserId: hostUserId,
       canvasModel: canvasModel.toDTO())
     send(message)
   }

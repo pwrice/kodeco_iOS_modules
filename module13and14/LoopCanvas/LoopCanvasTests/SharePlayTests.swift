@@ -130,6 +130,27 @@ extension SharePlayTestsBase {
     return versionExpectation
   }
 
+  func getSharePlayUserExpectations(viewModel: CanvasViewModel) -> (XCTestExpectation, XCTestExpectation) {
+    cancellables.forEach { $0.cancel() }
+
+    let expectation1 = self.expectation(description: "Waiting $sharePlayUsers to update")
+    viewModel.$sharePlayUsers
+      .dropFirst()
+      .sink { _ in
+        expectation1.fulfill()
+      }
+      .store(in: &cancellables)
+    let expectation2 = self.expectation(description: "Waiting $mySharePlayUser to update")
+    viewModel.$mySharePlayUser
+      .dropFirst()
+      .sink { _ in
+        expectation2.fulfill()
+      }
+      .store(in: &cancellables)
+
+    return (expectation1, expectation2)
+  }
+
   func validateBlockPropertiesMatch(_ firstBlock: Block, _ blockToAdd: Block) {
     XCTAssertEqual(firstBlock.color, blockToAdd.color)
     XCTAssertEqual(firstBlock.relativePath, blockToAdd.relativePath)
@@ -139,7 +160,7 @@ extension SharePlayTestsBase {
   }
 }
 
-final class SharePlayTests: SharePlayTestsBase {
+final class SharePlayBlockMessageTests: SharePlayTestsBase {
   func testAddFirstBlockToCanvas() throws {
     // Initially neither viewmodel has any blockgroups
     XCTAssertEqual(canvasViewModel1.canvasModel.blocksGroups.count, 0)
@@ -449,7 +470,9 @@ final class SharePlayTests: SharePlayTestsBase {
     XCTAssertEqual(duplicate2.location.y, firstBlock.location.y)
     XCTAssertEqual(duplicate2.location.x, expectedX)
   }
+}
 
+final class SharePlayBlockGroupMessageTests: SharePlayTestsBase {
   func testMoveBlockGroupViaMessages() throws {
     // Arrange: add a single block to create a group on device 1
     let firstBlock = try addBlockToCanvas(
@@ -504,8 +527,14 @@ final class SharePlayTests: SharePlayTestsBase {
       XCTAssertEqual(block.location.y, quantized.y)
     }
   }
+}
 
+
+final class SharePlayLifeCycleTests: SharePlayTestsBase {
   func testCanvasSnapshotMessageSetsUpRemoteState() throws {
+    let localUser = SharePlayUser(id: try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000011")))
+    canvasViewModel1.sharePlayHostUserId = localUser.id
+
     // Arrange: add three connected blocks on device 1 making an L-shape
     let first = try addBlockToCanvas(
       viewModel: canvasViewModel1,
@@ -547,7 +576,7 @@ final class SharePlayTests: SharePlayTestsBase {
     mockGroupSessionWrapper1.debugClearMessageQueue()
 
     // Act: send snapshot so only CanvasSnapshotMessage is broadcast
-    canvasViewModel1.sendCanvasSnapshot()
+    canvasViewModel1.sendCanvasModelSnapshot()
 
     // Expect canvasVersion to update on device 2 to match device 1
     let expectedVersion = canvasViewModel1.canvasVersion
@@ -587,5 +616,104 @@ final class SharePlayTests: SharePlayTestsBase {
     XCTAssertEqual(second2.location.y, second.location.y)
     XCTAssertEqual(third2.location.x, third.location.x)
     XCTAssertEqual(third2.location.y, third.location.y)
+  }
+
+  func testSharePlaySetupAndParticipantJoin() throws {
+    // By defualt, not eligible to share by default
+    XCTAssertFalse(canvasViewModel1.canvasMessageStore?.eligibleToStartSharing ?? false)
+
+    // No SharePlayUser stuff setup
+    XCTAssertNil(canvasViewModel1.mySharePlayUser)
+    XCTAssertNil(canvasViewModel1.sharePlayUsers)
+    XCTAssertNil(canvasViewModel1.sharePlayHostUserId)
+
+    // Simulate connecting over facetime
+    canvasViewModel1.canvasMessageStore?.setEligableToStartSharing(true)
+
+    // Now we can show the share button
+    XCTAssertTrue(canvasViewModel1.canvasMessageStore?.eligibleToStartSharing ?? false)
+
+    let (expectation1, expectation2) = getSharePlayUserExpectations(viewModel: canvasViewModel1)
+
+    // User taps the share button
+    canvasViewModel1.startSharing()
+
+    // These would be called by the SharePlay infra setting up the session
+    canvasViewModel1.canvasMessageStore?.setEligableToStartSharing(true)
+    let localUser = SharePlayUser(id: try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000011")))
+    canvasViewModel1.canvasMessageStore?.setLocalSharePlayUser(user: localUser)
+    canvasViewModel1.canvasMessageStore?.activeParticipantsChanged(sharePlayUsers: [localUser])
+
+    // Wait for the state to propagte
+    wait(for: [expectation1, expectation2], timeout: 1.0)
+
+    // Once we start sharing, the share button goes away again b/c we have an active session
+    XCTAssertFalse(canvasViewModel1.canvasMessageStore?.eligibleToStartSharing ?? false)
+
+    // Validate that we have 1 SharePlayUser, that it is us, and that it is the host
+    XCTAssertEqual(canvasViewModel1.sharePlayUsers?.count, 1)
+    let firstUser = try XCTUnwrap(canvasViewModel1.sharePlayUsers?.first)
+    XCTAssertEqual(canvasViewModel1.mySharePlayUser, firstUser)
+    XCTAssertEqual(canvasViewModel1.sharePlayHostUserId, firstUser.id)
+
+    // Now simulate someone else joining
+
+    // By defualt, not eligible to share by default
+    XCTAssertFalse(canvasViewModel2.canvasMessageStore?.eligibleToStartSharing ?? false)
+
+    // No SharePlayUser stuff setup
+    XCTAssertNil(canvasViewModel2.mySharePlayUser)
+    XCTAssertNil(canvasViewModel2.sharePlayUsers)
+    XCTAssertNil(canvasViewModel2.sharePlayHostUserId)
+
+    // Simulate connecting over facetime
+    canvasViewModel2.canvasMessageStore?.setEligableToStartSharing(true)
+
+    // Now we can show the share button
+    XCTAssertTrue(canvasViewModel2.canvasMessageStore?.eligibleToStartSharing ?? false)
+
+    let (expectation3, expectation4) = getSharePlayUserExpectations(viewModel: canvasViewModel2)
+
+    // User taps the join button
+    canvasViewModel2.startSharing()
+
+    // These would be called by the SharePlay infra setting up the session
+    canvasViewModel2.canvasMessageStore?.setEligableToStartSharing(true)
+    let localUser2 = SharePlayUser(id: try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000022")))
+    canvasViewModel2.canvasMessageStore?.setLocalSharePlayUser(user: localUser2)
+
+    // Now there are 2 active particpants
+    canvasViewModel2.canvasMessageStore?.activeParticipantsChanged(sharePlayUsers: [localUser, localUser2])
+
+    // Wait for the state to propagte
+    wait(for: [expectation3, expectation4], timeout: 1.0)
+
+    // Once we start sharing, the join button goes away again b/c we have an active session
+    XCTAssertFalse(canvasViewModel2.canvasMessageStore?.eligibleToStartSharing ?? false)
+
+    // Validate that we now have 2 SharePlayUsers, that it is us, and that it is the host
+    XCTAssertEqual(canvasViewModel2.sharePlayUsers?.count, 2)
+    let newUser = try XCTUnwrap(canvasViewModel2.sharePlayUsers?.first(where: { $0.id == localUser2.id }))
+    XCTAssertEqual(canvasViewModel2.mySharePlayUser, newUser)
+
+    // The host user id has not been set yet
+    XCTAssertNil(canvasViewModel2.sharePlayHostUserId)
+
+    let expectedVersion = canvasViewModel1.canvasVersion
+    let versionExpectation = getCanvasVersionExpectations(
+      viewModel: canvasViewModel2,
+      expectedCanvasVersion: expectedVersion
+    )
+
+    // User 1 will be notified of new participants as well
+    canvasViewModel1.canvasMessageStore?.activeParticipantsChanged(sharePlayUsers: [localUser, localUser2])
+    // Which will trigger it to send a canvasModelSnapShot which will include the sharePlayHostUserId
+
+    // Broadcast queued messages (only the snapshot)
+    mockGroupSessionWrapper1.debugBroadCastMessages()
+    wait(for: [versionExpectation], timeout: 1.0)
+
+    // The host user id is now the same
+    XCTAssertEqual(canvasViewModel2.sharePlayHostUserId, canvasViewModel1.sharePlayHostUserId)
   }
 }

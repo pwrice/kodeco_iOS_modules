@@ -87,11 +87,16 @@ class CanvasViewModel: ObservableObject {
 
   private var orienttationCancellable: AnyCancellable?
   private var messagesCancellable: AnyCancellable?
+  private var sharePlayUsersCancellable: AnyCancellable?
+  private var mySharePlayUserCancellable: AnyCancellable?
   @Published var isLandscapeOrientation: Bool = UIDevice.current.orientation.isLandscape
 
   // Increment this everytime a canvas mutation is made that needs to be synced via
   // CanvasMessageStore and SharePlay to other devices.
   @Published var canvasVersion = 0
+  @Published var mySharePlayUser: SharePlayUser?
+  @Published var sharePlayUsers: [SharePlayUser]?
+  @Published var sharePlayHostUserId: UUID?
 
   init(
     canvasModel: CanvasModel,
@@ -128,6 +133,22 @@ class CanvasViewModel: ObservableObject {
       .dropFirst()
       .sink { [weak self] messages in
         self?.processCanvasMessages(messages)
+      }
+
+    sharePlayUsersCancellable = canvasMessageStore?
+      .$sharePlayUsers
+      .receive(on: DispatchQueue.main)
+      .dropFirst()
+      .sink { [weak self] sharePlayUsers in
+        self?.handleSharePlayUsersUpdated(sharePlayUsers)
+      }
+
+    mySharePlayUserCancellable = canvasMessageStore?
+      .$mySharePlayUser
+      .receive(on: DispatchQueue.main)
+      .dropFirst()
+      .sink { [weak self] mySharePlayUser in
+        self?.handleMySharePlayUsersUpdated(mySharePlayUser)
       }
 
     self.updateAllBlocksList()
@@ -206,8 +227,12 @@ extension CanvasViewModel {
     saveSong()
   }
 
-  func sendCanvasSnapshot() {
-    canvasMessageStore?.canvasSnapShot(viewModelId: id, canvasVersion: canvasVersion, canvasModel: canvasModel)
+  func sendCanvasModelSnapshot() {
+    if let sharePlayHostUserId {
+      canvasVersion += 1
+      canvasMessageStore?.canvasModelSnapShot(
+        viewModelId: id, canvasVersion: canvasVersion, hostUserId: sharePlayHostUserId, canvasModel: canvasModel)
+    }
   }
 
   func saveSong() {
