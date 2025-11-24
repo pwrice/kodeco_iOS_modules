@@ -27,7 +27,6 @@
 		C125E4DF2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */; };
 		C12C6E892C2AF2E200B01C58 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E882C2AF2E200B01C58 /* BlockView.swift */; };
 		C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8A2C2AF39300B01C58 /* HomeView.swift */; };
-		C12C6E8D2C2AFA7700B01C58 /* PlaceHolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */; };
 		C13BCD9B2C4C12380037AEF4 /* RenameSongSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */; };
 		C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */; };
 		C1498E392C18881900118C38 /* CanvasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E382C18881900118C38 /* CanvasModelTests.swift */; };
@@ -106,7 +105,6 @@
 		C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroupDetailsSheet.swift; sourceTree = "<group>"; };
 		C12C6E882C2AF2E200B01C58 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
 		C12C6E8A2C2AF39300B01C58 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceHolderView.swift; sourceTree = "<group>"; };
 		C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameSongSheet.swift; sourceTree = "<group>"; };
 		C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryPickerSheet.swift; sourceTree = "<group>"; };
 		C1498E382C18881900118C38 /* CanvasModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasModelTests.swift; sourceTree = "<group>"; };
@@ -324,7 +322,6 @@
 			isa = PBXGroup;
 			children = (
 				C1706DDA2C6CE4E000DAC858 /* SongListView.swift */,
-				C12C6E8C2C2AFA7700B01C58 /* PlaceHolderView.swift */,
 				C12C6E8A2C2AF39300B01C58 /* HomeView.swift */,
 				C19D85762C08B00C00477545 /* CanvasView.swift */,
 			);
@@ -550,7 +547,6 @@
 				C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */,
 				C19D85772C08B00C00477545 /* CanvasView.swift in Sources */,
 				C1B150FB2C9F13A300B4FAE8 /* SampleSetStore.swift in Sources */,
-				C12C6E8D2C2AFA7700B01C58 /* PlaceHolderView.swift in Sources */,
 				C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */,
 				C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */,
 				C10DE2102D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */,

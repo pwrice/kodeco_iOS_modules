@@ -17,6 +17,7 @@ struct CanvasView: View {
   @State var showingBlockDetailsView = false
   @State var showingBlockGroupDetailsView = false
   @State var addBlockTapPosition: CGPoint?
+  @State var showingSongListView = false
 
   var canvasBlocksView: some View {
     CanvasBlocksView(
@@ -74,6 +75,29 @@ struct CanvasView: View {
       }
     }
     .toolbar {
+      ToolbarItem(placement: .navigationBarLeading) {
+        Menu {
+          Button("New Canvas") {
+             viewModel.newSong()
+          }
+          Button("Load Canvas") {
+            showingSongListView = true
+          }
+          Button("Save Canvas") {
+            if viewModel.canvasModel.thumnail == nil {
+              if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
+                viewModel.canvasSnapshot = snapshotImage
+                showingRenameSongView = true
+              }
+            } else {
+              viewModel.saveSong()
+            }
+          }
+        } label: {
+          Image(systemName: "line.3.horizontal")
+        }
+      }
+
       ToolbarItem(placement: .principal) {
         HStack(spacing: 12) {
           Button(action: { viewModel.togglePlayback() }) {
@@ -127,6 +151,16 @@ struct CanvasView: View {
           showingDownloadGenresView: $showingDownloadGenresView)
       }
     }
+    .sheet(isPresented: $showingSongListView) {
+      SongListView(
+        canvasStore: viewModel.canvasStore!,
+        sampleSetStore: viewModel.sampleSetStore!,
+        isPresented: $showingSongListView,
+        onSelect: { saved in
+          viewModel.loadSong(name: saved.name)
+        }
+      )
+    }
     .sheet(isPresented: $showingLibraryPickerView) {
       LibraryPickerSheet(
         library: viewModel.canvasModel.library,
@@ -179,7 +213,7 @@ struct CanvasView: View {
         }
       }
       Button("Reload") {
-        viewModel.loadSong()
+        viewModel.reloadSong()
       }
       Menu {
         // List all local sample sets as selectable items
@@ -584,5 +618,6 @@ extension CanvasViewModel {
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0
+
 
 

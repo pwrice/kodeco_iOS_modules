@@ -10,33 +10,52 @@ import SwiftUI
 struct SongListView: View {
   @ObservedObject var canvasStore: CanvasStore
   let sampleSetStore: SampleSetStore
-  let screenName: String
+  @Binding var isPresented: Bool
+  let onSelect: (SavedCanvasModel) -> Void
+
+  init(canvasStore: CanvasStore, sampleSetStore: SampleSetStore, isPresented: Binding<Bool>, onSelect: @escaping (SavedCanvasModel) -> Void) {
+    self._canvasStore = ObservedObject(initialValue: canvasStore)
+    self.sampleSetStore = sampleSetStore
+    self._isPresented = isPresented
+    self.onSelect = onSelect
+  }
 
   var body: some View {
-    VStack {
-      if canvasStore.savedCanvases.isEmpty {
-        Spacer()
-        Text("No saved songs yet")
-        Spacer()
-        Spacer()
-      } else {
-        ScrollView {
-          VStack {
-            CanvasesGridView(canvasStore: canvasStore, sampleSetStore: sampleSetStore)
+    NavigationView {
+      VStack {
+        if canvasStore.savedCanvases.isEmpty {
+          Spacer()
+          Text("No saved songs yet")
+          Spacer()
+          Spacer()
+        } else {
+          ScrollView {
+            VStack {
+              CanvasesSelectGridView(canvasStore: canvasStore) { saved in
+                onSelect(saved)
+                isPresented = false
+              }
+            }
           }
         }
       }
-    }
-    .navigationTitle(Text(screenName))
-    .onAppear {
-      canvasStore.reloadSavedCanvases()
+      .navigationTitle("Load Canvas")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Close") { isPresented = false }
+        }
+      }
+      .onAppear {
+        canvasStore.reloadSavedCanvases()
+      }
     }
   }
 }
 
-struct CanvasesGridView: View {
+struct CanvasesSelectGridView: View {
   @ObservedObject var canvasStore: CanvasStore
-  let sampleSetStore: SampleSetStore
+  var onSelect: (SavedCanvasModel) -> Void
 
   var resultColumns: [GridItem] {
     [
@@ -48,23 +67,11 @@ struct CanvasesGridView: View {
   var body: some View {
     LazyVGrid(columns: resultColumns) {
       ForEach(canvasStore.savedCanvases) { savedCanvas in
-        NavigationLink(value: savedCanvas) {
+        Button(action: { onSelect(savedCanvas) }) {
           SavedCanvasView(savedCanvasModel: savedCanvas)
         }
+        .buttonStyle(.plain)
       }
-    }
-    .navigationDestination(for: SavedCanvasModel.self) { savedCanvas in
-      let canvasViewModel = CanvasViewModel(
-        canvasModel: CanvasModel(
-          sampleSetStore: sampleSetStore
-        ),
-        musicEngine: AudioKitMusicEngine(),
-        canvasStore: canvasStore,
-        sampleSetStore: sampleSetStore,
-        canvasMessageStore: CanvasMessageStore(
-            groupSessionWrapper: ConcreteGroupSessionWrapper()),
-        songNameToLoad: savedCanvas.name)
-      CanvasView(viewModel: canvasViewModel)
     }
   }
 }
@@ -118,56 +125,50 @@ struct SongListView_Previews: PreviewProvider {
     ]
 
     Group {
-      // Portrait Preview
-      NavigationStack {
-        SongListView(
-          canvasStore: CanvasStore(
-            debugSavedCanvases: savedCanvases,
-            sampleSetStore: sampleSetStore),
-          sampleSetStore: sampleSetStore,
-          screenName: "Saved Songs"
-        )
-      }
-      .previewDisplayName("Portrait Mode")
-      .previewInterfaceOrientation(.portrait)
+      // Non-empty sheet preview
+      SongListView(
+        canvasStore: CanvasStore(
+          debugSavedCanvases: savedCanvases,
+          sampleSetStore: sampleSetStore),
+        sampleSetStore: sampleSetStore,
+        isPresented: .constant(true),
+        onSelect: { _ in }
+      )
+      .previewDisplayName("Sheet Mode - Non-empty")
 
-      // Portrait Preview No Songs
-      NavigationStack {
-        SongListView(
-          canvasStore: CanvasStore(
-            debugSavedCanvases: [],
-            sampleSetStore: sampleSetStore),
-          sampleSetStore: sampleSetStore,
-          screenName: "Saved Songs"
-        )
-      }
-      .previewDisplayName("Portrait Mode - No Songs")
-      .previewInterfaceOrientation(.portrait)
+      // Empty sheet preview
+      SongListView(
+        canvasStore: CanvasStore(
+          debugSavedCanvases: [],
+          sampleSetStore: sampleSetStore),
+        sampleSetStore: sampleSetStore,
+        isPresented: .constant(true),
+        onSelect: { _ in }
+      )
+      .previewDisplayName("Sheet Mode - Empty")
 
-      NavigationStack {
-        SongListView(
-          canvasStore: CanvasStore(
-            debugSavedCanvases: savedCanvases,
-            sampleSetStore: sampleSetStore),
-          sampleSetStore: sampleSetStore,
-          screenName: "Saved Songs"
-        )
-      }
-      .previewDisplayName("Portrait - Dark Mode")
-      .previewInterfaceOrientation(.portrait)
+      // Dark mode sheet preview
+      SongListView(
+        canvasStore: CanvasStore(
+          debugSavedCanvases: savedCanvases,
+          sampleSetStore: sampleSetStore),
+        sampleSetStore: sampleSetStore,
+        isPresented: .constant(true),
+        onSelect: { _ in }
+      )
+      .previewDisplayName("Sheet Mode - Dark Mode")
       .preferredColorScheme(.dark)
 
-      // Landscape Preview
-      NavigationStack {
-        SongListView(
-          canvasStore: CanvasStore(
-            debugSavedCanvases: savedCanvases,
-            sampleSetStore: sampleSetStore),
-          sampleSetStore: sampleSetStore,
-          screenName: "Saved Songs"
-        )
-      }
-      .previewDisplayName("Landscape Mode")
+      // Landscape sheet preview
+      SongListView(
+        canvasStore: CanvasStore(
+          debugSavedCanvases: savedCanvases,
+          sampleSetStore: sampleSetStore),
+        sampleSetStore: sampleSetStore,
+        isPresented: .constant(true),
+        onSelect: { _ in }
+      )
+      .previewDisplayName("Sheet Mode - Landscape")
       .previewInterfaceOrientation(.landscapeLeft)
     }
   }

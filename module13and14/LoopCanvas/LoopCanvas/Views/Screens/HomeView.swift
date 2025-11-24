@@ -12,75 +12,18 @@ struct HomeView: View {
     sampleSetStore: SampleSetStore()
   )
 
-  enum HomeViewLinks {
-    case newSong
-    case allSongs
-    case recents
-    case shared
-    case favorites
-  }
-
   var body: some View {
     NavigationStack {
-      List {
-        NavigationLink(value: HomeViewLinks.newSong) {
-          HStack {
-            Text("New Song")
-              .foregroundColor(Color("TextLabelColor"))
-          }
-        }
-        NavigationLink(value: HomeViewLinks.allSongs) {
-          HStack {
-            Text("Saved Songs")
-              .foregroundColor(Color("TextLabelColor"))
-          }
-        }
-        /*  TODO - implement these screens eventually
-        NavigationLink(value: HomeViewLinks.recents) {
-          HStack {
-            Text("Recents")
-              .foregroundColor(Color("TextLabelColor"))
-          }
-        }
-        NavigationLink(value: HomeViewLinks.shared) {
-          HStack {
-            Text("Shared")
-              .foregroundColor(Color("TextLabelColor"))
-          }
-        }
-        NavigationLink(value: HomeViewLinks.favorites) {
-          HStack {
-            Text("Favorites")
-              .foregroundColor(Color("TextLabelColor"))
-          }
-        }
-         */
-      }
-      .navigationTitle(Text("Loop Canvas"))
-      .navigationDestination(for: HomeViewLinks.self) { linkValue in
-        switch linkValue {
-        case .newSong:
-          let canvasViewModel = CanvasViewModel(
-            canvasModel: CanvasModel(
-              sampleSetStore: canvasStore.sampleSetStore),
-            musicEngine: AudioKitMusicEngine(),
-            canvasStore: canvasStore,
-            sampleSetStore: canvasStore.sampleSetStore,
-            canvasMessageStore: CanvasMessageStore(
-              groupSessionWrapper: ConcreteGroupSessionWrapper())
-          )
-          CanvasView(viewModel: canvasViewModel)
-        case .allSongs:
-          if let sampleSetStore = canvasStore.sampleSetStore {
-            SongListView(
-              canvasStore: canvasStore,
-              sampleSetStore: sampleSetStore,
-              screenName: "Saved Songs")
-          }
-        default:
-          PlaceHolderView()
-        }
-      }
+      let canvasViewModel = CanvasViewModel(
+        canvasModel: CanvasModel(
+          sampleSetStore: canvasStore.sampleSetStore),
+        musicEngine: AudioKitMusicEngine(),
+        canvasStore: canvasStore,
+        sampleSetStore: canvasStore.sampleSetStore,
+        canvasMessageStore: CanvasMessageStore(
+          groupSessionWrapper: ConcreteGroupSessionWrapper())
+      )
+      CanvasView(viewModel: canvasViewModel)
     }
   }
 }

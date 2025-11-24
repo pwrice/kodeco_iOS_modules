@@ -278,8 +278,21 @@ extension CanvasViewModel {
     canvasStore?.saveCanvas(canvasModel: canvasModel)
   }
 
-  func loadSong() {
+  func reloadSong() {
     if let canvasStore = canvasStore, let canvasModel = canvasStore.loadCanvas(name: canvasModel.name) {
+      resetCanvasModel(newCanvasModel: canvasModel)
+    }
+  }
+
+  func loadSong(name: String) {
+    if let canvasStore = canvasStore, let canvasModel = canvasStore.loadCanvas(name: name) {
+      resetCanvasModel(newCanvasModel: canvasModel)
+    }
+  }
+
+  func newSong() {
+    if let canvasStore = canvasStore {
+      let canvasModel = CanvasModel(sampleSetStore: canvasStore.sampleSetStore)
       resetCanvasModel(newCanvasModel: canvasModel)
     }
   }
