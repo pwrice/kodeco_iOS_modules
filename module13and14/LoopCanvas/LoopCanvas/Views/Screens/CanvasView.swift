@@ -19,6 +19,7 @@ struct CanvasView: View {
   @State var addBlockTapPosition: CGPoint?
   @State var showingSongListView = false
 
+
   var canvasBlocksView: some View {
     CanvasBlocksView(
       viewModel: viewModel,
@@ -46,6 +47,7 @@ struct CanvasView: View {
         .background(Color("CanvasBackgroundColor"))
         .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
       }
+      .scrollDisabled(viewModel.selectedTool == .effects)
       .defaultScrollAnchor(.zero) // TODO - when setting this to 0, the initial scroll
       // view offset is incorrect until the user interacts
       .coordinateSpace(name: "CanvasCoordinateSpace")
@@ -53,12 +55,26 @@ struct CanvasView: View {
         viewModel.canvasScrollOffset = $0
       }
       .onTapGesture(coordinateSpace: .local) { location in
+        guard viewModel.selectedTool == .loop else { return }
+
+        // Only used for Loop tool; when Effects/Visuals are selected, taps would be handled differently
         addBlockTapPosition = location
         viewModel.addBlockTapGridPosition = CanvasViewModel.gridPosition(for: location)
         showingLibraryPickerView = true
       }
 
       UIOverlayView(viewModel: viewModel)
+
+      // Floating tool bar overlay
+      VStack {
+        Spacer()
+        HStack {
+          Spacer()
+          toolPicker
+          Spacer()
+        }
+        .padding(.bottom, 24)
+      }
     }
     .coordinateSpace(name: "ViewportCoorindateSpace")
     .onAppear {
@@ -76,66 +92,14 @@ struct CanvasView: View {
     }
     .toolbar {
       ToolbarItem(placement: .navigationBarLeading) {
-        Menu {
-          Button("New Canvas") {
-             viewModel.newSong()
-          }
-          Button("Load Canvas") {
-            showingSongListView = true
-          }
-          Button("Save Canvas") {
-            if viewModel.canvasModel.thumnail == nil {
-              if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
-                viewModel.canvasSnapshot = snapshotImage
-                showingRenameSongView = true
-              }
-            } else {
-              viewModel.saveSong()
-            }
-          }
-        } label: {
-          Image(systemName: "line.3.horizontal")
-        }
+        appMenuView
       }
-
       ToolbarItem(placement: .principal) {
-        HStack(spacing: 12) {
-          Button(action: { viewModel.togglePlayback() }) {
-            ZStack {
-              if viewModel.isPlaying {
-                Image(systemName: "stop.fill")
-              } else {
-                Image(systemName: "play.fill")
-              }
-            }
-            .frame(width: 22, height: 22)
-          }
-          .buttonStyle(.plain)
-          .accessibilityLabel(viewModel.isPlaying ? "Stop" : "Play")
-          Divider()
-          Text("Set: \(viewModel.canvasTitle)")
-            .font(.headline)
-            .lineLimit(1)
-          Divider()
-            Text("\(viewModel.canvasBPM) BPM")
-          .font(.subheadline)
-        }
+        topCenterControls
       }
-
       ToolbarItem(placement: .navigationBarTrailing) {
         HStack {
-          if viewModel.canvasMessageStore?.eligibleToStartSharing == true {
-            Button {
-              viewModel.startSharing()
-            } label: {
-              Image(systemName: "shareplay")
-            }
-          }
-
-          if viewModel.canvasMessageStore?.sharePlaySessionActive == true {
-            sharePlayMenuView
-          }
-
+          sharePlayControls
           canvasMenuView
         }
       }
@@ -152,14 +116,15 @@ struct CanvasView: View {
       }
     }
     .sheet(isPresented: $showingSongListView) {
-      SongListView(
-        canvasStore: viewModel.canvasStore!,
-        sampleSetStore: viewModel.sampleSetStore!,
-        isPresented: $showingSongListView,
-        onSelect: { saved in
-          viewModel.loadSong(name: saved.name)
-        }
-      )
+      if let canvasStore = viewModel.canvasStore,
+         let sampleSetStore = viewModel.sampleSetStore {
+        SongListView(
+          canvasStore: canvasStore,
+          sampleSetStore: sampleSetStore,
+          isPresented: $showingSongListView) { saved in
+            viewModel.loadSong(name: saved.name)
+          }
+      }
     }
     .sheet(isPresented: $showingLibraryPickerView) {
       LibraryPickerSheet(
@@ -188,6 +153,68 @@ struct CanvasView: View {
           isPresented: $showingBlockGroupDetailsView
         )
         .presentationDetents([.medium])
+      }
+    }
+  }
+
+  var topCenterControls: some View {
+    HStack(spacing: 12) {
+      Button(action: { viewModel.togglePlayback() }) {
+        ZStack {
+          if viewModel.isPlaying {
+            Image(systemName: "stop.fill")
+          } else {
+            Image(systemName: "play.fill")
+          }
+        }
+        .frame(width: 22, height: 22)
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(viewModel.isPlaying ? "Stop" : "Play")
+      Divider()
+      Text("Set: \(viewModel.canvasTitle)")
+        .font(.headline)
+        .lineLimit(1)
+      Divider()
+      Text("\(viewModel.canvasBPM) BPM")
+        .font(.subheadline)
+    }
+  }
+
+  var appMenuView: some View {
+    Menu {
+      Button("New Canvas") {
+        viewModel.newSong()
+      }
+      Button("Load Canvas") {
+        showingSongListView = true
+      }
+      Button("Save Canvas") {
+        if viewModel.canvasModel.thumnail == nil {
+          if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
+            viewModel.canvasSnapshot = snapshotImage
+            showingRenameSongView = true
+          }
+        } else {
+          viewModel.saveSong()
+        }
+      }
+    } label: {
+      Image(systemName: "line.3.horizontal")
+    }
+  }
+
+  var sharePlayControls: some View {
+    Group {
+      if viewModel.canvasMessageStore?.eligibleToStartSharing == true {
+        Button {
+          viewModel.startSharing()
+        } label: {
+          Image(systemName: "shareplay")
+        }
+      }
+      if viewModel.canvasMessageStore?.sharePlaySessionActive == true {
+        sharePlayMenuView
       }
     }
   }
@@ -280,6 +307,58 @@ struct CanvasView: View {
     }
   }
 
+  var toolPicker: some View {
+    HStack(spacing: 12) {
+      toolButton(for: .loop)
+      toolButton(for: .effects)
+      toolButton(for: .visuals)
+    }
+    .padding(.horizontal, 12)
+    .padding(.vertical, 10)
+    .background(
+      .ultraThinMaterial,
+      in: Capsule()
+    )
+    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 6)
+    .accessibilityElement(children: .contain)
+    .accessibilityLabel("Input Tools")
+  }
+
+  @ViewBuilder
+  func toolButton(for tool: InputTool) -> some View {
+    Button {
+      viewModel.setInputTool(tool)
+    } label: {
+      HStack(spacing: 6) {
+        Image(systemName: tool.systemImage)
+          .imageScale(.medium)
+        Text(tool.label)
+          .font(.subheadline)
+          .fontWeight(.semibold)
+      }
+      .padding(.horizontal, 10)
+      .padding(.vertical, 8)
+      .background(
+        Group {
+          if viewModel.selectedTool == tool {
+            Capsule().fill(Color.accentColor.opacity(0.2))
+          } else {
+            Capsule().fill(Color.clear)
+          }
+        }
+      )
+    }
+    .buttonStyle(.plain)
+    .foregroundStyle(viewModel.selectedTool == tool ? Color.accentColor : Color.primary)
+    .overlay(
+      Capsule()
+        .stroke(viewModel.selectedTool == tool ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: viewModel.selectedTool == tool ? 1.5 : 1)
+    )
+    .accessibilityLabel(tool.label)
+    .accessibilityAddTraits(viewModel.selectedTool == tool ? .isSelected : [])
+    .contentShape(Capsule())
+  }
+
   var localSampleSets: [LocalSampleSet] {
     viewModel.sampleSetStore?.localSampleSets ?? []
   }
@@ -316,16 +395,22 @@ struct CanvasBlocksView: View {
   func blockDragGesture(block: Block) -> some Gesture {
     DragGesture(minimumDistance: 2)
       .updating($dragStartLocation) { _, startLocation, _ in
+        guard viewModel.selectedTool == .loop else { return }
+
         // Called before onChanged
         startLocation = startLocation ?? block.location
       }
       .onChanged { value in
+        guard viewModel.selectedTool == .loop else { return }
+
         var newLocation = dragStartLocation ?? block.location
         newLocation.x += value.translation.width
         newLocation.y += value.translation.height
         viewModel.updateBlockDragLocation(block: block, location: newLocation)
       }
       .onEnded { _ in
+        guard viewModel.selectedTool == .loop else { return }
+
         _ = viewModel.dropBlockOnCanvas(block: block)
       }
   }
@@ -333,16 +418,22 @@ struct CanvasBlocksView: View {
   func blockGroupDragGesture(blockGroup: BlockGroup) -> some Gesture {
     DragGesture(minimumDistance: 2)
       .updating($groupDragStartLocation) { _, startLocation, _ in
+        guard viewModel.selectedTool == .loop else { return }
+
         // Called before onChanged
         startLocation = startLocation ?? (blockGroup.leftMostBlock?.location ?? .zero)
       }
       .onChanged { value in
+        guard viewModel.selectedTool == .loop else { return }
+
         var newLocation = groupDragStartLocation ?? (blockGroup.leftMostBlock?.location ?? .zero)
         newLocation.x += value.translation.width
         newLocation.y += value.translation.height
         viewModel.updateBlockGroupDragLocation(blockGroup: blockGroup, location: newLocation)
       }
       .onEnded { _ in
+        guard viewModel.selectedTool == .loop else { return }
+        
         _ = viewModel.dropBlockGroupOnCanvas(blockGroup: blockGroup)
       }
   }
@@ -358,6 +449,8 @@ struct CanvasBlocksView: View {
           .simultaneousGesture(
             TapGesture()
               .onEnded { _ in
+                guard viewModel.selectedTool == .loop else { return }
+
                 viewModel.selectBlock(block: blockModel)
                 showingBlockDetailsView = true
               }
@@ -381,6 +474,8 @@ struct CanvasBlocksView: View {
             .simultaneousGesture(
               TapGesture()
                 .onEnded { _ in
+                  guard viewModel.selectedTool == .loop else { return }
+
                   viewModel.selectBlockGroup(group: group)
                   showingBlockGroupDetailsView = true
                 }
@@ -535,23 +630,28 @@ extension CanvasViewModel {
 //   - fix animation for dragging
 // [DONE]- update tests for loading and saving to make sure all block and canvas state can be serialized properly
 // - add the ability to connect block groups when dragging them next to each other
-// - update header UX
-//   - start stop transport controls
-//   - BPM setting
+// [DONE]- update header UX
+//   [DONE]- start stop transport controls
+//   {DONE]- BPM setting
 // - audit cleanup to make sure all subscriptions are cleaned up properly etc..
+// - fix load song view grid layout to have proper spacing
+//   - fix missing thumbnails icon
+//   - make start / stop transport controls work better (maybe rewind to beginning?)
+
 
 // MULTI-USER
 // hook up shareplay so multiple users can edit a canvas at the same time
 // [DONE]- add DTO for all objects
 // [DONE]- hook up messages for actions
 // [DONE]- setup robust testing framework w mocks
-// - do catchup action for when participants join
-// - do start / stop transport control messages
-// - do UI entry point
-//   - start shareplay when elligible button
-//   - leave shareplay session
+// [DONE]- do catchup action for when participants join
+// [DONE]- do start / stop transport control messages
+// [DONE]- do UI entry point
+//   [DONE]- start shareplay when elligible button
+//   [DONE]- leave shareplay session
+//  - ability to update custom username
 
-// Figure out how to layer on effects
+// ***Figure out how to layer on effects
 // - maybe a painting model?
 // - or some kind of mat you drag on
 // - need to update UI w/ a tool bar to be able to add effects, loops, visuals
@@ -618,6 +718,8 @@ extension CanvasViewModel {
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0
+
+
 
 
 

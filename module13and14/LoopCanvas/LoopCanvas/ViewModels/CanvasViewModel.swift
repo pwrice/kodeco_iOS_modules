@@ -12,6 +12,30 @@ import os
 import Waveform
 import AVFoundation
 
+enum InputTool: String, CaseIterable, Identifiable {
+  case loop
+  case effects
+  case visuals
+
+  var id: String { rawValue }
+
+  var label: String {
+    switch self {
+    case .loop: return "Loop"
+    case .effects: return "Effects"
+    case .visuals: return "Visuals"
+    }
+  }
+
+  var systemImage: String {
+    switch self {
+    case .loop: return "square.grid.3x3.fill" // represents placing blocks on grid
+    case .effects: return "paintbrush.pointed" // represents painting effects
+    case .visuals: return "sparkles.rectangle.stack" // represents visuals/overlays
+    }
+  }
+}
+
 class CanvasViewModel: ObservableObject {
   static let logger = Logger(
     subsystem: "ViewModels",
@@ -31,6 +55,12 @@ class CanvasViewModel: ObservableObject {
   @Published var isPlaying: Bool = false
 
   var id: UUID
+  
+  @Published var selectedTool: InputTool = .loop
+
+
+
+
   var addBlockTapGridPosition: CGPoint?
   var selectedBlock: Block?
   var draggingBlock: Block?
@@ -248,10 +278,13 @@ extension CanvasViewModel {
     }
   }
 
-
   func clearCanvas() {
     canvasModel.clear()
     updateAllBlocksList()
+  }
+
+  func setInputTool(_ inputTool: InputTool) {
+    self.selectedTool = inputTool
   }
 
   func renameSong(newName: String, thunbnail: UIImage?) {
