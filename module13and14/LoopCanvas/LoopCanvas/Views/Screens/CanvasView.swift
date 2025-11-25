@@ -19,21 +19,17 @@ struct CanvasView: View {
   @State var addBlockTapPosition: CGPoint?
   @State var showingSongListView = false
 
-
-  var canvasBlocksView: some View {
-    CanvasBlocksView(
-      viewModel: viewModel,
-      showingBlockDetailsView: $showingBlockDetailsView,
-      showingBlockGroupDetailsView: $showingBlockGroupDetailsView)
-  }
-
   var body: some View {
     ZStack {
       ScrollView([.horizontal, .vertical]) {
         ZStack {
           BackgroundDots(addBlockTapGridPosition: viewModel.addBlockTapGridPosition)
 
+          // Blocks layer
           canvasBlocksView
+
+          // Effects layer
+          CanvasEffectsView(viewModel: viewModel)
 
           GeometryReader { proxy in
             let offset = proxy.frame(in: .named("CanvasCoordinateSpace")).origin
@@ -63,18 +59,8 @@ struct CanvasView: View {
         showingLibraryPickerView = true
       }
 
-      UIOverlayView(viewModel: viewModel)
-
       // Floating tool bar overlay
-      VStack {
-        Spacer()
-        HStack {
-          Spacer()
-          toolPicker
-          Spacer()
-        }
-        .padding(.bottom, 24)
-      }
+      FloatingToolbarOverlay(viewModel: viewModel)
     }
     .coordinateSpace(name: "ViewportCoorindateSpace")
     .onAppear {
@@ -92,15 +78,15 @@ struct CanvasView: View {
     }
     .toolbar {
       ToolbarItem(placement: .navigationBarLeading) {
-        appMenuView
+        AppMenuView(viewModel: viewModel, showingSongListView: $showingSongListView, showingRenameSongView: $showingRenameSongView, canvasBlocksView: canvasBlocksView)
       }
       ToolbarItem(placement: .principal) {
-        topCenterControls
+        TopCenterControls(viewModel: viewModel)
       }
       ToolbarItem(placement: .navigationBarTrailing) {
         HStack {
-          sharePlayControls
-          canvasMenuView
+          SharePlayControls(viewModel: viewModel)
+          CanvasMenuView(viewModel: viewModel, showingRenameSongView: $showingRenameSongView, showingDownloadGenresView: $showingDownloadGenresView, canvasBlocksView: canvasBlocksView)
         }
       }
     }
@@ -123,7 +109,7 @@ struct CanvasView: View {
           sampleSetStore: sampleSetStore,
           isPresented: $showingSongListView) { saved in
             viewModel.loadSong(name: saved.name)
-          }
+        }
       }
     }
     .sheet(isPresented: $showingLibraryPickerView) {
@@ -157,7 +143,32 @@ struct CanvasView: View {
     }
   }
 
-  var topCenterControls: some View {
+  var canvasBlocksView: some View {
+    CanvasBlocksView(
+      viewModel: viewModel,
+      showingBlockDetailsView: $showingBlockDetailsView,
+      showingBlockGroupDetailsView: $showingBlockGroupDetailsView)
+  }
+
+  var localSampleSets: [LocalSampleSet] {
+    viewModel.sampleSetStore?.localSampleSets ?? []
+  }
+
+  func snapshot(snapshotView: some View) -> UIImage? {
+    let imagerenderer = ImageRenderer(
+      content: VStack {
+        snapshotView
+      }
+        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
+    )
+    return viewModel.getThumbnailFromScreenShot(screenShotImage: imagerenderer.cgImage)
+  }
+}
+
+struct TopCenterControls: View {
+  @ObservedObject var viewModel: CanvasViewModel
+
+  var body: some View {
     HStack(spacing: 12) {
       Button(action: { viewModel.togglePlayback() }) {
         ZStack {
@@ -180,8 +191,22 @@ struct CanvasView: View {
         .font(.subheadline)
     }
   }
+}
 
-  var appMenuView: some View {
+struct AppMenuView: View {
+  @ObservedObject var viewModel: CanvasViewModel
+  @Binding var showingSongListView: Bool
+  @Binding var showingRenameSongView: Bool
+  let canvasBlocksView: AnyView
+
+  init(viewModel: CanvasViewModel, showingSongListView: Binding<Bool>, showingRenameSongView: Binding<Bool>, canvasBlocksView: some View) {
+    self._showingSongListView = showingSongListView
+    self._showingRenameSongView = showingRenameSongView
+    self.viewModel = viewModel
+    self.canvasBlocksView = AnyView(canvasBlocksView)
+  }
+
+  var body: some View {
     Menu {
       Button("New Canvas") {
         viewModel.newSong()
@@ -204,7 +229,21 @@ struct CanvasView: View {
     }
   }
 
-  var sharePlayControls: some View {
+  private func snapshot(snapshotView: some View) -> UIImage? {
+    let imagerenderer = ImageRenderer(
+      content: VStack {
+        snapshotView
+      }
+      .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
+    )
+    return viewModel.getThumbnailFromScreenShot(screenShotImage: imagerenderer.cgImage)
+  }
+}
+
+struct SharePlayControls: View {
+  @ObservedObject var viewModel: CanvasViewModel
+
+  var body: some View {
     Group {
       if viewModel.canvasMessageStore?.eligibleToStartSharing == true {
         Button {
@@ -214,12 +253,26 @@ struct CanvasView: View {
         }
       }
       if viewModel.canvasMessageStore?.sharePlaySessionActive == true {
-        sharePlayMenuView
+        SharePlayMenuView(viewModel: viewModel)
       }
     }
   }
+}
 
-  var canvasMenuView: some View {
+struct CanvasMenuView: View {
+  @ObservedObject var viewModel: CanvasViewModel
+  @Binding var showingRenameSongView: Bool
+  @Binding var showingDownloadGenresView: Bool
+  let canvasBlocksView: AnyView
+
+  init(viewModel: CanvasViewModel, showingRenameSongView: Binding<Bool>, showingDownloadGenresView: Binding<Bool>, canvasBlocksView: some View) {
+    self.viewModel = viewModel
+    self._showingRenameSongView = showingRenameSongView
+    self._showingDownloadGenresView = showingDownloadGenresView
+    self.canvasBlocksView = AnyView(canvasBlocksView)
+  }
+
+  var body: some View {
     Menu {
       Button("Rename ...") {
         if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
@@ -228,8 +281,6 @@ struct CanvasView: View {
         }
       }
       Button("Save") {
-        // If the song hasnt been saved yet, get its thumbnail and make the user
-        // name it.
         if viewModel.canvasModel.thumnail == nil {
           if let snapshotImage = snapshot(snapshotView: canvasBlocksView) {
             viewModel.canvasSnapshot = snapshotImage
@@ -243,7 +294,6 @@ struct CanvasView: View {
         viewModel.reloadSong()
       }
       Menu {
-        // List all local sample sets as selectable items
         ForEach(localSampleSets.map { $0.name }, id: \.self) { name in
           Button(action: {
             if name != viewModel.selectedSampleSetName {
@@ -274,11 +324,28 @@ struct CanvasView: View {
     }
   }
 
-  var sharePlayMenuView: some View {
+  private var localSampleSets: [LocalSampleSet] {
+    viewModel.sampleSetStore?.localSampleSets ?? []
+  }
+
+  private func snapshot(snapshotView: some View) -> UIImage? {
+    let imagerenderer = ImageRenderer(
+      content: VStack {
+        snapshotView
+      }
+      .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
+    )
+    return viewModel.getThumbnailFromScreenShot(screenShotImage: imagerenderer.cgImage)
+  }
+}
+
+struct SharePlayMenuView: View {
+  @ObservedObject var viewModel: CanvasViewModel
+
+  var body: some View {
     Menu {
       if let sharePlayUsers = viewModel.sharePlayUsers {
         ForEach(sharePlayUsers, id: \.id) { sharePlayUser in
-          // list share play users as disabled epople
           Button(action: {}, label: {
             HStack {
               Text(sharePlayUser.name)
@@ -295,7 +362,6 @@ struct CanvasView: View {
       }
 
       Button("Request Snapshot") {
-        //        viewModel.sendCanvasModelSnapshot()
         // TODO - add this - so request a snapshot from the host
       }
 
@@ -306,72 +372,6 @@ struct CanvasView: View {
       Image(systemName: "person.2.fill")
     }
   }
-
-  var toolPicker: some View {
-    HStack(spacing: 12) {
-      toolButton(for: .loop)
-      toolButton(for: .effects)
-      toolButton(for: .visuals)
-    }
-    .padding(.horizontal, 12)
-    .padding(.vertical, 10)
-    .background(
-      .ultraThinMaterial,
-      in: Capsule()
-    )
-    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 6)
-    .accessibilityElement(children: .contain)
-    .accessibilityLabel("Input Tools")
-  }
-
-  @ViewBuilder
-  func toolButton(for tool: InputTool) -> some View {
-    Button {
-      viewModel.setInputTool(tool)
-    } label: {
-      HStack(spacing: 6) {
-        Image(systemName: tool.systemImage)
-          .imageScale(.medium)
-        Text(tool.label)
-          .font(.subheadline)
-          .fontWeight(.semibold)
-      }
-      .padding(.horizontal, 10)
-      .padding(.vertical, 8)
-      .background(
-        Group {
-          if viewModel.selectedTool == tool {
-            Capsule().fill(Color.accentColor.opacity(0.2))
-          } else {
-            Capsule().fill(Color.clear)
-          }
-        }
-      )
-    }
-    .buttonStyle(.plain)
-    .foregroundStyle(viewModel.selectedTool == tool ? Color.accentColor : Color.primary)
-    .overlay(
-      Capsule()
-        .stroke(viewModel.selectedTool == tool ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: viewModel.selectedTool == tool ? 1.5 : 1)
-    )
-    .accessibilityLabel(tool.label)
-    .accessibilityAddTraits(viewModel.selectedTool == tool ? .isSelected : [])
-    .contentShape(Capsule())
-  }
-
-  var localSampleSets: [LocalSampleSet] {
-    viewModel.sampleSetStore?.localSampleSets ?? []
-  }
-
-  func snapshot(snapshotView: some View) -> UIImage? {
-    let imagerenderer = ImageRenderer(
-      content: VStack {
-        snapshotView
-      }
-        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
-    )
-    return viewModel.getThumbnailFromScreenShot(screenShotImage: imagerenderer.cgImage)
-  }
 }
 
 struct ViewOffsetKey: PreferenceKey {
@@ -379,160 +379,9 @@ struct ViewOffsetKey: PreferenceKey {
   static var defaultValue = CGPoint.zero
   static func reduce(value: inout Value, nextValue: () -> Value) {
     let next = nextValue()
-    value = CGPoint(x: value.x + next.x, y: value.y + next.y)  // value += nextValue()
+    value = CGPoint(x: value.x + next.x, y: value.y + next.y)
   }
 }
-
-struct CanvasBlocksView: View {
-  @ObservedObject var viewModel: CanvasViewModel
-  @Binding var showingBlockDetailsView: Bool
-  @Binding var showingBlockGroupDetailsView: Bool
-
-  // TODO - make work w multi-touch (this assumes just a single drag)
-  @GestureState private var dragStartLocation: CGPoint?
-  @GestureState private var groupDragStartLocation: CGPoint?
-
-  func blockDragGesture(block: Block) -> some Gesture {
-    DragGesture(minimumDistance: 2)
-      .updating($dragStartLocation) { _, startLocation, _ in
-        guard viewModel.selectedTool == .loop else { return }
-
-        // Called before onChanged
-        startLocation = startLocation ?? block.location
-      }
-      .onChanged { value in
-        guard viewModel.selectedTool == .loop else { return }
-
-        var newLocation = dragStartLocation ?? block.location
-        newLocation.x += value.translation.width
-        newLocation.y += value.translation.height
-        viewModel.updateBlockDragLocation(block: block, location: newLocation)
-      }
-      .onEnded { _ in
-        guard viewModel.selectedTool == .loop else { return }
-
-        _ = viewModel.dropBlockOnCanvas(block: block)
-      }
-  }
-
-  func blockGroupDragGesture(blockGroup: BlockGroup) -> some Gesture {
-    DragGesture(minimumDistance: 2)
-      .updating($groupDragStartLocation) { _, startLocation, _ in
-        guard viewModel.selectedTool == .loop else { return }
-
-        // Called before onChanged
-        startLocation = startLocation ?? (blockGroup.leftMostBlock?.location ?? .zero)
-      }
-      .onChanged { value in
-        guard viewModel.selectedTool == .loop else { return }
-
-        var newLocation = groupDragStartLocation ?? (blockGroup.leftMostBlock?.location ?? .zero)
-        newLocation.x += value.translation.width
-        newLocation.y += value.translation.height
-        viewModel.updateBlockGroupDragLocation(blockGroup: blockGroup, location: newLocation)
-      }
-      .onEnded { _ in
-        guard viewModel.selectedTool == .loop else { return }
-        
-        _ = viewModel.dropBlockGroupOnCanvas(blockGroup: blockGroup)
-      }
-  }
-
-  var body: some View {
-    ZStack { // This is just the blocks
-      Spacer()
-      ForEach(viewModel.allBlocks) { blockModel in
-        PositionedBlockView(model: blockModel)
-          .gesture(
-            blockDragGesture(block: blockModel)
-          )
-          .simultaneousGesture(
-            TapGesture()
-              .onEnded { _ in
-                guard viewModel.selectedTool == .loop else { return }
-
-                viewModel.selectBlock(block: blockModel)
-                showingBlockDetailsView = true
-              }
-          )
-      }
-
-      ForEach(viewModel.allBlockGroups, id: \.id) { group in
-        if group.allBlocks.count >= 2, let left = group.leftMostBlock {
-          RoundedRectangle(cornerRadius: 12)
-            .fill(Color.gray.opacity(0.2))
-            .overlay(
-              Image(systemName: "slider.vertical.3")
-                .foregroundColor(.gray)
-            )
-            .frame(width: 20, height: max(40, CGFloat(left.numBars) * (CanvasViewModel.blockSize + CanvasViewModel.blockSpacing)))
-            .position(CGPoint(
-              x: left.location.x - (CanvasViewModel.blockSize / 2) - CanvasViewModel.blockSpacing - 12,
-              y: left.location.y
-            ))
-            .gesture(blockGroupDragGesture(blockGroup: group))
-            .simultaneousGesture(
-              TapGesture()
-                .onEnded { _ in
-                  guard viewModel.selectedTool == .loop else { return }
-
-                  viewModel.selectBlockGroup(group: group)
-                  showingBlockGroupDetailsView = true
-                }
-            )
-        }
-      }
-    }
-  }
-}
-
-struct BackgroundDots: View {
-  let addBlockTapGridPosition: CGPoint?
-
-  func highlightBlock(x: Int, y: Int) -> Bool {
-    return (addBlockTapGridPosition?.x == CGFloat(x) &&
-            addBlockTapGridPosition?.y == CGFloat(y))
-  }
-
-  var body: some View {
-    ZStack { // Background dots
-      let dotSpacing = CanvasViewModel.gridSpacing()
-      let (numCols, numRows) = CanvasViewModel.gridDimensions()
-      ForEach(0..<numCols, id: \.self) { hInd in
-        ForEach(0..<numRows, id: \.self) { vInd in
-          ZStack {
-            RoundedRectangle(cornerRadius: 10) // TODO - make this a constant
-              .fill(.clear)
-              .stroke(.gray, lineWidth: 2) // TODO - put these colors into Assets
-              .opacity(highlightBlock(x: hInd, y: vInd) ? 1 : 0)
-              .frame(width: CanvasViewModel.blockSize, height: CanvasViewModel.blockSize)
-              .position(CGPoint(
-                x: (CGFloat(hInd) * dotSpacing) + (CanvasViewModel.blockSize + CanvasViewModel.blockSpacing) / 2,
-                y: (CGFloat(vInd) * dotSpacing) + (CanvasViewModel.blockSize + CanvasViewModel.blockSpacing) / 2
-              ))
-            Rectangle()
-              .foregroundColor(.gray)
-              .frame(width: 2, height: 2)
-              .position(CGPoint(
-                x: CGFloat(hInd) * dotSpacing,
-                y: CGFloat(vInd) * dotSpacing))
-          }
-        }
-      }
-    }
-  }
-}
-
-struct UIOverlayView: View {
-  @ObservedObject var viewModel: CanvasViewModel
-
-  var body: some View {
-    VStack {
-      Spacer()
-    }
-  }
-}
-
 
 struct CanvasView_Previews: PreviewProvider {
   static var previews: some View {
@@ -718,8 +567,3 @@ extension CanvasViewModel {
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0
-
-
-
-
-

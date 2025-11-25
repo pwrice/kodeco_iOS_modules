@@ -36,6 +36,10 @@
 		C161307A2D25F79700725FA0 /* DownloadableSampleSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */; };
 		C1706DDB2C6CE4E000DAC858 /* SongListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDA2C6CE4E000DAC858 /* SongListView.swift */; };
 		C1706DDD2C6CE5B700DAC858 /* CanvasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */; };
+		C17B68032ED60E2F0022DE71 /* CanvasEffectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68022ED60E2F0022DE71 /* CanvasEffectsView.swift */; };
+		C17B68052ED6369A0022DE71 /* CanvasBlocksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */; };
+		C17B68072ED6369E0022DE71 /* BackgroundDots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68062ED6369E0022DE71 /* BackgroundDots.swift */; };
+		C17B680D2ED636CE0022DE71 /* FloatingToolbarOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */; };
 		C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */; };
 		C185495E2EC431C2008E3D2C /* Waveform in Frameworks */ = {isa = PBXBuildFile; productRef = C185495D2EC431C2008E3D2C /* Waveform */; };
 		C18D4BFF2D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
@@ -114,6 +118,10 @@
 		C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadableSampleSetTests.swift; sourceTree = "<group>"; };
 		C1706DDA2C6CE4E000DAC858 /* SongListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongListView.swift; sourceTree = "<group>"; };
 		C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasStore.swift; sourceTree = "<group>"; };
+		C17B68022ED60E2F0022DE71 /* CanvasEffectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasEffectsView.swift; sourceTree = "<group>"; };
+		C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasBlocksView.swift; sourceTree = "<group>"; };
+		C17B68062ED6369E0022DE71 /* BackgroundDots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDots.swift; sourceTree = "<group>"; };
+		C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToolbarOverlay.swift; sourceTree = "<group>"; };
 		C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockDetailsSheet.swift; sourceTree = "<group>"; };
 		C18D4BFE2D17355200595432 /* FileDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManager.swift; sourceTree = "<group>"; };
 		C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadableSampleSet.swift; sourceTree = "<group>"; };
@@ -324,6 +332,9 @@
 				C1706DDA2C6CE4E000DAC858 /* SongListView.swift */,
 				C12C6E8A2C2AF39300B01C58 /* HomeView.swift */,
 				C19D85762C08B00C00477545 /* CanvasView.swift */,
+				C17B68022ED60E2F0022DE71 /* CanvasEffectsView.swift */,
+				C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */,
+				C17B68062ED6369E0022DE71 /* BackgroundDots.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -333,6 +344,7 @@
 			children = (
 				C10DE20C2D1F3C3100466C0C /* ToastModifier.swift */,
 				C12C6E882C2AF2E200B01C58 /* BlockView.swift */,
+				C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */,
 			);
 			path = SubViews;
 			sourceTree = "<group>";
@@ -536,6 +548,7 @@
 				C1F5EEE82C14AE9400298B00 /* BlockGroup.swift in Sources */,
 				C12C6E892C2AF2E200B01C58 /* BlockView.swift in Sources */,
 				C1015DC82ED214D6000B69CD /* CanvasViewModel_BlockGroupEvents.swift in Sources */,
+				C17B68052ED6369A0022DE71 /* CanvasBlocksView.swift in Sources */,
 				C1F5EEA22C133A4900298B00 /* Library.swift in Sources */,
 				C1706DDB2C6CE4E000DAC858 /* SongListView.swift in Sources */,
 				C18D4C022D17816F00595432 /* DownloadableSampleSet.swift in Sources */,
@@ -546,11 +559,14 @@
 				C13BCD9B2C4C12380037AEF4 /* RenameSongSheet.swift in Sources */,
 				C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */,
 				C19D85772C08B00C00477545 /* CanvasView.swift in Sources */,
+				C17B68072ED6369E0022DE71 /* BackgroundDots.swift in Sources */,
+				C17B680D2ED636CE0022DE71 /* FloatingToolbarOverlay.swift in Sources */,
 				C1B150FB2C9F13A300B4FAE8 /* SampleSetStore.swift in Sources */,
 				C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */,
 				C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */,
 				C10DE2102D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */,
 				C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */,
+				C17B68032ED60E2F0022DE71 /* CanvasEffectsView.swift in Sources */,
 				C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */,
 				C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */,
 				C125E4DE2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */,

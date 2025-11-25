@@ -11,6 +11,7 @@ import SwiftUI
 import os
 import Waveform
 import AVFoundation
+import UIKit
 
 enum InputTool: String, CaseIterable, Identifiable {
   case loop
@@ -36,6 +37,83 @@ enum InputTool: String, CaseIterable, Identifiable {
   }
 }
 
+enum CanvasEffect: String, CaseIterable, Identifiable {
+  case reverb
+  case delay
+  case distortion
+  case chorus
+  case flanger
+  case bitcrush
+  case filter
+  case tremolo
+
+  var id: String { rawValue }
+
+  var label: String {
+    switch self {
+    case .reverb: return "Reverb"
+    case .delay: return "Delay"
+    case .distortion: return "Distortion"
+    case .chorus: return "Chorus"
+    case .flanger: return "Flanger"
+    case .bitcrush: return "Bitcrush"
+    case .filter: return "Filter"
+    case .tremolo: return "Tremolo"
+    }
+  }
+
+  var systemImage: String {
+    switch self {
+    case .reverb: return "aqi.medium"
+    case .delay: return "forward.end.alt"
+    case .distortion: return "waveform.path.ecg"
+    case .chorus: return "dot.radiowaves.left.and.right"
+    case .flanger: return "tornado"
+    case .bitcrush: return "circle.grid.2x2"
+    case .filter: return "line.3.horizontal.decrease.circle"
+    case .tremolo: return "alternatingcurrent"
+    }
+  }
+}
+
+struct EffectStroke: Identifiable, Codable {
+  let id: UUID
+  var points: [CGPoint]
+  var color: ColorCodable
+  var lineWidth: CGFloat
+  var opacity: Double
+
+  init(id: UUID = UUID(), points: [CGPoint] = [], color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.8) {
+    self.id = id
+    self.points = points
+    self.color = ColorCodable(color)
+    self.lineWidth = lineWidth
+    self.opacity = opacity
+  }
+
+  var colorValue: Color { color.color }
+}
+
+// Helper to encode/decode Color
+struct ColorCodable: Codable {
+  var red: Double
+  var green: Double
+  var blue: Double
+  var alpha: Double
+
+  init(_ color: Color) {
+    let uiColor = UIColor(color)
+    var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+    uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+    self.red = Double(red)
+    self.green = Double(green)
+    self.blue = Double(blue)
+    self.alpha = Double(alpha)
+  }
+
+  var color: Color { Color(.sRGB, red: red, green: green, blue: blue, opacity: alpha) }
+}
+
 class CanvasViewModel: ObservableObject {
   static let logger = Logger(
     subsystem: "ViewModels",
@@ -52,13 +130,18 @@ class CanvasViewModel: ObservableObject {
   @Published var allBlockGroups: [BlockGroup]
   @Published var selectedSampleSetName: String = ""
   @Published var canvasSnapshot: UIImage?
-  @Published var isPlaying: Bool = false
+  @Published var isPlaying = false
+
+  @Published var effectStrokes: [EffectStroke] = []
+  @Published var currentEffectStroke: EffectStroke?
+
+  @Published var availableEffects: [CanvasEffect] = CanvasEffect.allCases
+  @Published var selectedEffect: CanvasEffect = .reverb
+  @Published var strokeColor: Color = .blue
 
   var id: UUID
-  
+
   @Published var selectedTool: InputTool = .loop
-
-
 
 
   var addBlockTapGridPosition: CGPoint?
@@ -254,6 +337,38 @@ extension CanvasViewModel {
   }
 }
 
+// Effect stroke drawing methods
+
+extension CanvasViewModel {
+  func beginEffectStroke(at point: CGPoint, color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.8) {
+    guard selectedTool == .effects else { return }
+    let quantized = point // keep raw for free-form; could quantize if desired
+    currentEffectStroke = EffectStroke(points: [quantized], color: strokeColor, lineWidth: lineWidth, opacity: opacity)
+  }
+
+  func updateCurrentEffectStroke(with point: CGPoint) {
+    guard selectedTool == .effects else { return }
+    guard var stroke = currentEffectStroke else { return }
+    stroke.points.append(point)
+    currentEffectStroke = stroke
+  }
+
+  func endEffectStroke(at point: CGPoint) {
+    guard selectedTool == .effects else { return }
+    guard var stroke = currentEffectStroke else { return }
+    stroke.points.append(point)
+    effectStrokes.append(stroke)
+    currentEffectStroke = nil
+  }
+
+  func clearEffectStrokes() {
+    effectStrokes.removeAll()
+  }
+
+  func setSelectedEffect(_ effect: CanvasEffect) {
+    selectedEffect = effect
+  }
+}
 
 // Canvas managmeent events
 
@@ -474,4 +589,3 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
-
