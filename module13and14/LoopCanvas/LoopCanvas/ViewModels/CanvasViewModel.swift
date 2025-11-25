@@ -74,16 +74,34 @@ enum CanvasEffect: String, CaseIterable, Identifiable {
     case .tremolo: return "alternatingcurrent"
     }
   }
+  
+  var color: Color {
+    switch self {
+    case .reverb: return Color.purple
+    case .delay: return Color.blue
+    case .distortion: return Color.red
+    case .chorus: return Color.green
+    case .flanger: return Color.cyan
+    case .bitcrush: return Color.orange
+    case .filter: return Color.yellow
+    case .tremolo: return Color.mint
+    }
+  }
 }
 
 struct EffectStroke: Identifiable, Codable {
+  struct EffectPoint: Codable, Hashable {
+    var position: CGPoint
+    var radius: CGFloat
+  }
+
   let id: UUID
-  var points: [CGPoint]
+  var points: [EffectPoint]
   var color: ColorCodable
   var lineWidth: CGFloat
   var opacity: Double
 
-  init(id: UUID = UUID(), points: [CGPoint] = [], color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.8) {
+  init(id: UUID = UUID(), points: [EffectPoint] = [], color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.8) {
     self.id = id
     self.points = points
     self.color = ColorCodable(color)
@@ -137,7 +155,7 @@ class CanvasViewModel: ObservableObject {
 
   @Published var availableEffects: [CanvasEffect] = CanvasEffect.allCases
   @Published var selectedEffect: CanvasEffect = .reverb
-  @Published var strokeColor: Color = .blue
+  @Published var strokeColor: Color = CanvasEffect.reverb.color
 
   var id: UUID
 
@@ -206,6 +224,20 @@ class CanvasViewModel: ObservableObject {
 
     return CGPoint(x: col, y: row)
   }
+
+  // Effect stroke animation parameters
+  static let effectInitialRadius: CGFloat = 18.0
+  static let effectDecayPerTick: CGFloat = 0.8
+  static let effectTimerInterval: TimeInterval = 1.0 / 30.0 // 30 FPS
+
+  // Helper to compute total decay duration for a single point
+  static var effectTotalDecayDuration: TimeInterval {
+    // Time until radius decays to zero: initialRadius / decayPerTick * interval
+    guard effectDecayPerTick > 0 else { return 0 }
+    return TimeInterval(effectInitialRadius / effectDecayPerTick) * effectTimerInterval
+  }
+
+  private var effectDecayTimer: AnyCancellable?
 
   @Published var isLandscapeOrientation: Bool = UIDevice.current.orientation.isLandscape
 
@@ -278,6 +310,7 @@ class CanvasViewModel: ObservableObject {
     self.updateAllBlocksList()
 
     self.songNameToLoad = songNameToLoad
+    self.strokeColor = selectedEffect.color
   }
 }
 
@@ -340,33 +373,98 @@ extension CanvasViewModel {
 // Effect stroke drawing methods
 
 extension CanvasViewModel {
-  func beginEffectStroke(at point: CGPoint, color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.8) {
+  func beginEffectStroke(at point: CGPoint, color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.5) {
     guard selectedTool == .effects else { return }
-    let quantized = point // keep raw for free-form; could quantize if desired
-    currentEffectStroke = EffectStroke(points: [quantized], color: strokeColor, lineWidth: lineWidth, opacity: opacity)
+    let initial = EffectStroke.EffectPoint(position: point, radius: Self.effectInitialRadius)
+    currentEffectStroke = EffectStroke(points: [initial], color: strokeColor, lineWidth: lineWidth, opacity: opacity)
+    startEffectDecayTimerIfNeeded()
   }
 
   func updateCurrentEffectStroke(with point: CGPoint) {
     guard selectedTool == .effects else { return }
     guard var stroke = currentEffectStroke else { return }
-    stroke.points.append(point)
+    stroke.points.append(.init(position: point, radius: Self.effectInitialRadius))
     currentEffectStroke = stroke
   }
 
   func endEffectStroke(at point: CGPoint) {
     guard selectedTool == .effects else { return }
     guard var stroke = currentEffectStroke else { return }
-    stroke.points.append(point)
+    stroke.points.append(.init(position: point, radius: Self.effectInitialRadius))
     effectStrokes.append(stroke)
     currentEffectStroke = nil
+    // Ensure timer is running to handle decay of newly added stroke
+    startEffectDecayTimerIfNeeded()
   }
 
   func clearEffectStrokes() {
     effectStrokes.removeAll()
+    currentEffectStroke = nil
+    stopEffectDecayTimerIfNeeded()
   }
 
   func setSelectedEffect(_ effect: CanvasEffect) {
     selectedEffect = effect
+    strokeColor = effect.color
+  }
+
+  private func startEffectDecayTimerIfNeeded() {
+    guard effectDecayTimer == nil else { return }
+    effectDecayTimer = Timer.publish(every: Self.effectTimerInterval, on: .main, in: .common)
+      .autoconnect()
+      .sink { [weak self] _ in
+        self?.handleEffectDecayTick()
+      }
+  }
+
+  private func stopEffectDecayTimerIfNeeded() {
+    effectDecayTimer?.cancel()
+    effectDecayTimer = nil
+  }
+
+  private func handleEffectDecayTick() {
+    let decay = Self.effectDecayPerTick
+
+    // Decay points in active strokes
+    var updatedStrokes: [EffectStroke] = []
+    updatedStrokes.reserveCapacity(effectStrokes.count)
+
+    for var stroke in effectStrokes {
+      // decay each point's radius
+      var remainingPoints: [EffectStroke.EffectPoint] = []
+      remainingPoints.reserveCapacity(stroke.points.count)
+      for var point in stroke.points {
+        point.radius -= decay
+        if point.radius > 0 {
+          remainingPoints.append(point)
+        }
+      }
+      stroke.points = remainingPoints
+      if !stroke.points.isEmpty {
+        updatedStrokes.append(stroke)
+      }
+    }
+
+    // If there's a current stroke being drawn, also decay its points so it stays lively
+    if var stroke = currentEffectStroke {
+      var remainingPoints: [EffectStroke.EffectPoint] = []
+      remainingPoints.reserveCapacity(stroke.points.count)
+      for var point in stroke.points {
+        point.radius -= decay
+        if point.radius > 0 {
+          remainingPoints.append(point)
+        }
+      }
+      stroke.points = remainingPoints
+      currentEffectStroke = stroke.points.isEmpty ? nil : stroke
+    }
+
+    effectStrokes = updatedStrokes
+
+    // Stop timer if no strokes left anywhere
+    if effectStrokes.isEmpty && currentEffectStroke == nil {
+      stopEffectDecayTimerIfNeeded()
+    }
   }
 }
 
@@ -589,3 +687,4 @@ class BlockDetailsViewModel: ObservableObject {
     samples = SampleBuffer(samples: stereo[0])
   }
 }
+

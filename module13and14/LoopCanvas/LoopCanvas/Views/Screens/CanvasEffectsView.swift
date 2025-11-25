@@ -13,30 +13,58 @@ struct CanvasEffectsView: View {
 
       // Render existing strokes
       ForEach(viewModel.effectStrokes) { stroke in
-        Path { path in
-          guard let first = stroke.points.first else { return }
-          path.move(to: first)
-          for point in stroke.points.dropFirst() {
-            path.addLine(to: point)
+        ZStack {
+          // Draw variable-width segments between consecutive points
+          ForEach(Array(stroke.points.enumerated()), id: \.offset) { idx, point in
+            if idx > 0 {
+              let prev = stroke.points[idx - 1]
+              // Use the smaller radius between the two points for a smooth join
+              let width = max(0.5, min(prev.radius, point.radius) * 2)
+              Path { path in
+                path.move(to: prev.position)
+                path.addLine(to: point.position)
+              }
+              .stroke(
+                stroke.colorValue.opacity(stroke.opacity),
+                style: StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round)
+              )
+            }
+          }
+
+          // Also render single-point dots so isolated points appear
+          if stroke.points.count == 1, let only = stroke.points.first {
+            Circle()
+              .fill(stroke.colorValue.opacity(stroke.opacity))
+              .frame(width: max(1, only.radius * 2), height: max(1, only.radius * 2))
+              .position(only.position)
           }
         }
-        .stroke(
-          stroke.colorValue.opacity(stroke.opacity),
-          style: StrokeStyle(lineWidth: stroke.lineWidth, lineCap: .round, lineJoin: .round))
       }
 
       // Render current in-progress stroke if any
       if let current = viewModel.currentEffectStroke {
-        Path { path in
-          guard let first = current.points.first else { return }
-          path.move(to: first)
-          for point in current.points.dropFirst() {
-            path.addLine(to: point)
+        ZStack {
+          ForEach(Array(current.points.enumerated()), id: \.offset) { idx, point in
+            if idx > 0 {
+              let prev = current.points[idx - 1]
+              let width = max(0.5, min(prev.radius, point.radius) * 2)
+              Path { path in
+                path.move(to: prev.position)
+                path.addLine(to: point.position)
+              }
+              .stroke(
+                current.colorValue.opacity(current.opacity),
+                style: StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round)
+              )
+            }
+          }
+          if current.points.count == 1, let only = current.points.first {
+            Circle()
+              .fill(current.colorValue.opacity(current.opacity))
+              .frame(width: max(1, only.radius * 2), height: max(1, only.radius * 2))
+              .position(only.position)
           }
         }
-        .stroke(
-          current.colorValue.opacity(current.opacity),
-          style: StrokeStyle(lineWidth: current.lineWidth, lineCap: .round, lineJoin: .round))
       }
     }
     .contentShape(Rectangle())
