@@ -12,6 +12,7 @@ import os
 import Waveform
 import AVFoundation
 import UIKit
+import CoreGraphics
 
 enum InputTool: String, CaseIterable, Identifiable {
   case loop
@@ -37,54 +38,84 @@ enum InputTool: String, CaseIterable, Identifiable {
   }
 }
 
-enum CanvasEffect: String, CaseIterable, Identifiable {
-  case reverb
-  case delay
-  case distortion
-  case chorus
-  case flanger
-  case bitcrush
-  case filter
-  case tremolo
+enum CanvasEffect: String, CaseIterable, Identifiable, Codable {
+  case filterDelay
+  case highPassFlanger
+  case washVerbEcho
+  case rhythmicFlangeBandpass
+  case resonantSweep
+  case tapeEcho
+  case gatedVerb
+  case subDrop
 
   var id: String { rawValue }
 
   var label: String {
     switch self {
-    case .reverb: return "Reverb"
-    case .delay: return "Delay"
-    case .distortion: return "Distortion"
-    case .chorus: return "Chorus"
-    case .flanger: return "Flanger"
-    case .bitcrush: return "Bitcrush"
-    case .filter: return "Filter"
-    case .tremolo: return "Tremolo"
+    case .filterDelay: return "Filter + Delay"
+    case .highPassFlanger: return "HighPass + Flanger"
+    case .washVerbEcho: return "Wash Verb + Echo"
+    case .rhythmicFlangeBandpass: return "Rhythmic Flange + Bandpass"
+    case .resonantSweep: return "Resonant Sweep"
+    case .tapeEcho: return "Tape Echo"
+    case .gatedVerb: return "Gated Verb"
+    case .subDrop: return "Sub Drop"
     }
   }
 
   var systemImage: String {
     switch self {
-    case .reverb: return "aqi.medium"
-    case .delay: return "forward.end.alt"
-    case .distortion: return "waveform.path.ecg"
-    case .chorus: return "dot.radiowaves.left.and.right"
-    case .flanger: return "tornado"
-    case .bitcrush: return "circle.grid.2x2"
-    case .filter: return "line.3.horizontal.decrease.circle"
-    case .tremolo: return "alternatingcurrent"
+    case .filterDelay:
+      // Low-pass sweep + delay
+      return "slider.horizontal.3"
+    case .highPassFlanger:
+      // HP sweep with modulation
+      return "waveform.path"
+    case .washVerbEcho:
+      // Lush space + echoes
+      return "sparkles"
+    case .rhythmicFlangeBandpass:
+      // Rhythmic modulation/band movement
+      return "metronome"
+    case .resonantSweep:
+      // Resonant sweeping filter
+      return "dot.radiowaves.up.forward"
+    case .tapeEcho:
+      // Tape/echo vibe
+      return "cassette"
+    case .gatedVerb:
+      // Gated reverb feel
+      return "gate"
+    case .subDrop:
+      // Sub/low-end emphasis
+      return "arrow.down.to.line.compact"
     }
   }
-  
+
   var color: Color {
     switch self {
-    case .reverb: return Color.purple
-    case .delay: return Color.blue
-    case .distortion: return Color.red
-    case .chorus: return Color.green
-    case .flanger: return Color.cyan
-    case .bitcrush: return Color.orange
-    case .filter: return Color.yellow
-    case .tremolo: return Color.mint
+    case .filterDelay: return Color.blue
+    case .highPassFlanger: return Color.cyan
+    case .washVerbEcho: return Color.purple
+    case .rhythmicFlangeBandpass: return Color.orange
+    case .resonantSweep: return Color.mint
+    case .tapeEcho: return Color.brown
+    case .gatedVerb: return Color.indigo
+    case .subDrop: return Color.teal
+    }
+  }
+
+  // Bridge to the engine's XY modes for unified control
+  var xyMode: EffectsRack.XYMode {
+    switch self {
+    case .filterDelay: return .filterDelay
+    case .highPassFlanger: return .highPassFlanger
+    case .washVerbEcho: return .washVerbEcho
+    case .rhythmicFlangeBandpass: return .rhythmicFlangeBandpass
+    case .resonantSweep: return .resonantSweep
+    case .tapeEcho: return .tapeEcho
+    case .gatedVerb: return .gatedVerb
+    case .subDrop: return .subDrop
     }
   }
 }
@@ -96,13 +127,15 @@ struct EffectStroke: Identifiable, Codable {
   }
 
   let id: UUID
+  var effect: CanvasEffect
   var points: [EffectPoint]
   var color: ColorCodable
   var lineWidth: CGFloat
   var opacity: Double
 
-  init(id: UUID = UUID(), points: [EffectPoint] = [], color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.8) {
+  init(id: UUID = UUID(), effect: CanvasEffect = .filterDelay, points: [EffectPoint] = [], color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.8) {
     self.id = id
+    self.effect = effect
     self.points = points
     self.color = ColorCodable(color)
     self.lineWidth = lineWidth
@@ -150,12 +183,13 @@ class CanvasViewModel: ObservableObject {
   @Published var canvasSnapshot: UIImage?
   @Published var isPlaying = false
 
+  var visibleEffectsRect: CGRect = .zero
   @Published var effectStrokes: [EffectStroke] = []
   @Published var currentEffectStroke: EffectStroke?
 
   @Published var availableEffects: [CanvasEffect] = CanvasEffect.allCases
-  @Published var selectedEffect: CanvasEffect = .reverb
-  @Published var strokeColor: Color = CanvasEffect.reverb.color
+  @Published var selectedEffect: CanvasEffect = .filterDelay
+  @Published var strokeColor: Color = CanvasEffect.filterDelay.color
 
   var id: UUID
 
@@ -237,6 +271,14 @@ class CanvasViewModel: ObservableObject {
     return TimeInterval(effectInitialRadius / effectDecayPerTick) * effectTimerInterval
   }
 
+  // Effect parameter ranges (min/max) used for stroke-driven modulation
+  // TODO - tune these
+  static let delayTimeRange: ClosedRange<Double> = 0.05...2.0
+  static let delayFeedbackRange: ClosedRange<Double> = 0.05...100.0
+  static let reverbMixRange: ClosedRange<Double> = 0.1...0.8
+  static let lowPassCutoffRange: ClosedRange<Double> = 500.0...12_000.0
+  static let highPassCutoffRange: ClosedRange<Double> = 20.0...1000.0
+
   private var effectDecayTimer: AnyCancellable?
 
   @Published var isLandscapeOrientation: Bool = UIDevice.current.orientation.isLandscape
@@ -312,6 +354,20 @@ class CanvasViewModel: ObservableObject {
     self.songNameToLoad = songNameToLoad
     self.strokeColor = selectedEffect.color
   }
+
+  /// Computes a normalized strength from an effect point's radius relative to the initial radius.
+  private func normalizedStrength(for point: EffectStroke.EffectPoint, lineWidth: CGFloat) -> Double {
+    let maxRadius = max(Double(Self.effectInitialRadius), 1.0)
+    let clamped = max(0.0, min(Double(point.radius), maxRadius))
+    // Weight by line width (thicker strokes feel stronger); lineWidth is typically small, so normalize by a nominal value
+    let widthFactor = max(0.2, min(Double(lineWidth) / 8.0, 2.0))
+    return min(1.0, (clamped / maxRadius) * widthFactor)
+  }
+
+  /// Linearly interpolates within a range given a 0...1 normalized value
+  private func lerp(in range: ClosedRange<Double>, val: Double) -> Float {
+    return Float(range.lowerBound + (range.upperBound - range.lowerBound) * max(0.0, min(1.0, val)))
+  }
 }
 
 // Lifecycle Events
@@ -376,7 +432,7 @@ extension CanvasViewModel {
   func beginEffectStroke(at point: CGPoint, color: Color = .blue, lineWidth: CGFloat = 8, opacity: Double = 0.5) {
     guard selectedTool == .effects else { return }
     let initial = EffectStroke.EffectPoint(position: point, radius: Self.effectInitialRadius)
-    currentEffectStroke = EffectStroke(points: [initial], color: strokeColor, lineWidth: lineWidth, opacity: opacity)
+    currentEffectStroke = EffectStroke(effect: selectedEffect, points: [initial], color: strokeColor, lineWidth: lineWidth, opacity: opacity)
     startEffectDecayTimerIfNeeded()
   }
 
@@ -461,10 +517,76 @@ extension CanvasViewModel {
 
     effectStrokes = updatedStrokes
 
+    // Apply stroke-driven modulation to EffectsRack
+    if let rack = musicEngine.effectsRack {
+      // Helper to map a point in canvas space to 0...1 normalized XY based on the visible rect
+      func normalizeXY(from point: CGPoint) -> (x: Double, y: Double) {
+        let rect = self.visibleEffectsRect
+        let width = rect.width
+        let height = rect.height
+
+        // If we have a valid visible rect, focus normalization on its center region
+        if width > 0 && height > 0 {
+          // Middle 90% of width and middle 50% of height, centered within rect
+          let focusedWidth = width * 0.90
+          let focusedHeight = height * 0.50
+          let focusedMinX = rect.minX + (width - focusedWidth) / 2.0
+          let focusedMinY = rect.minY + (height - focusedHeight) / 2.0
+
+          // Normalize within the focused sub-rect
+          let nxRaw = (point.x - focusedMinX) / focusedWidth
+          let nyRaw = (point.y - focusedMinY) / focusedHeight
+
+          let nx = max(0.0, min(1.0, Double(nxRaw)))
+          let ny = max(0.0, min(1.0, Double(nyRaw)))
+          return (nx, ny)
+        } else {
+          // Fallback to whole-canvas normalization if no visible rect available
+          let nx = max(0.0, min(1.0, Double(point.x / Self.canvasWidth)))
+          let ny = max(0.0, min(1.0, Double(point.y / Self.canvasHeight)))
+          return (nx, ny)
+        }
+      }
+
+      // Emit XY mapping calls per active stroke using the stroke's end point
+      func driveXY(for stroke: EffectStroke) {
+        guard let last = stroke.points.last else { return }
+
+
+        let amount = normalizedStrength(for: last, lineWidth: stroke.lineWidth)
+        let (x, y) = normalizeXY(from: last.position)
+        rack.mapXY(xVal: x, yVal: y, amount: amount, mode: stroke.effect.xyMode)
+      }
+
+      // Select most recent stroke per effect type so they don't compete
+      var latestByEffect: [CanvasEffect: EffectStroke] = [:]
+      // Keep the last occurrence in effectStrokes for each effect
+      for stroke in effectStrokes {
+        latestByEffect[stroke.effect] = stroke
+      }
+      // Current stroke (if any) should override for its effect type
+      if let current = currentEffectStroke {
+        latestByEffect[current.effect] = current
+      }
+      // Drive XY once per effect using the most recent stroke
+      for (_, stroke) in latestByEffect {
+        driveXY(for: stroke)
+      }
+    }
+
     // Stop timer if no strokes left anywhere
     if effectStrokes.isEmpty && currentEffectStroke == nil {
       stopEffectDecayTimerIfNeeded()
     }
+  }
+}
+
+// Effects viewport
+extension CanvasViewModel {
+  func updateVisibleEffectsRect(canvasRect: CGRect, viewPortRect: CGRect) {
+    let intersection = canvasRect.intersection(viewPortRect)
+    let visible = intersection.isNull ? .zero : intersection
+    self.visibleEffectsRect = visible
   }
 }
 

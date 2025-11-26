@@ -58,6 +58,7 @@ protocol MusicEngine: AnyObject {
   var nextBarLogicTick: Int { get set }
   var delegate: MusicEngineDelegate? { get set }
   var tempo: Double { get set }
+  var effectsRack: EffectsRack? { get }
 
   func timeUntilNextBar() -> TimeInterval
 
@@ -309,6 +310,7 @@ class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
   var sequencer = AppleSequencer()
   var clickTrackMidiCallback = MIDICallbackInstrument()
   var clickTrack: MusicTrackManager?
+  var effectsRack: EffectsRack?
 
   required init() {
     super.init()
@@ -320,7 +322,14 @@ class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
     }
 
     let allAudioPlayers = loopPlayers.compactMap { $0.audioPlayer as? AudioPlayer }
-    engine.output = Mixer(allAudioPlayers, name: "Main Mixer")
+    let playersMixer = Mixer(allAudioPlayers, name: "Main Mixer")
+    // Build effects rack on top of the players mixer
+    let rack = EffectsRack(input: playersMixer)
+    // Propagate tempo to effects rack for synced delay, etc.
+    rack.bpm = Double(self.tempo)
+    rack.delaySyncEnabled = true
+    self.effectsRack = rack
+    engine.output = rack.output
     try? engine.start()
 
     clickTrack = sequencer.newTrack("ClickTrack")
@@ -367,6 +376,8 @@ class AudioKitMusicEngine: BaseMusicEngine, MusicEngine {
 
   override func updateSequencerTempo(newTempo: BPM) {
     sequencer.setTempo(newTempo)
+    // Propagate new tempo to effects rack for synced delay, etc.
+    effectsRack?.bpm = Double(newTempo)
   }
 
   func timeUntilNextBar() -> TimeInterval {
@@ -430,4 +441,7 @@ class MockMusicEngine: BaseMusicEngine, MusicEngine {
 
   override func scheduleAudioPlaybackOnClickTrack(audioPlayer: AudioPlayer, beat: Double) {
   }
+
+  var effectsRack: EffectsRack? { nil }
 }
+

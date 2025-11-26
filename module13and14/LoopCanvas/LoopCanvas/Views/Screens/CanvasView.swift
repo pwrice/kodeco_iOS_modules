@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ImageIO
+import CoreGraphics
 
 
 struct CanvasView: View {
@@ -18,127 +19,187 @@ struct CanvasView: View {
   @State var showingBlockGroupDetailsView = false
   @State var addBlockTapPosition: CGPoint?
   @State var showingSongListView = false
+  @State private var canvasRect: CGRect = .zero
+  @State private var viewPortRect: CGRect = .zero
 
   var body: some View {
-    ZStack {
-      ScrollView([.horizontal, .vertical]) {
-        ZStack {
-          BackgroundDots(addBlockTapGridPosition: viewModel.addBlockTapGridPosition)
+    GeometryReader { screenGeo in            // <---- NEW: top-level GeometryReader
+      ZStack {
+        ScrollView([.horizontal, .vertical]) {
+          ZStack {
+            BackgroundDots(addBlockTapGridPosition: viewModel.addBlockTapGridPosition)
 
-          // Blocks layer
-          canvasBlocksView
+            // Blocks layer
+            canvasBlocksView
 
-          // Effects layer
-          CanvasEffectsView(viewModel: viewModel)
+            // Effects layer
+            CanvasEffectsView(viewModel: viewModel)
 
-          GeometryReader { proxy in
-            let offset = proxy.frame(in: .named("CanvasCoordinateSpace")).origin
-            // This prefernces method to calculate the scroll offset
-            // seems a bit hacky. Is there a better way?
-            Color.clear.preference(
-              key: ViewOffsetKey.self,
-              value: CGPoint(x: offset.x, y: offset.y))
+            // Single geometry "probe" to calculate scroll offset & viewport
+            GeometryReader { proxy in
+              let frame = proxy.frame(in: .named("CanvasCoordinateSpace"))
+
+              // frame.origin is usually (0,0) at content origin, then becomes negative as you scroll.
+              // We:
+              //  - use frame.origin as scroll offset
+              //  - build the viewport rect in canvas/content coordinates from it
+
+              let scrollOffset = frame.origin
+              let viewportRectInCanvas = CGRect(
+                origin: CGPoint(
+                  x: -scrollOffset.x,
+                  y: -scrollOffset.y
+                ),
+                size: screenGeo.size
+              )
+
+              // Full canvas rect in its own coordinates
+              let fullCanvasRect = CGRect(
+                origin: .zero,
+                size: CGSize(
+                  width: CanvasViewModel.canvasWidth,
+                  height: CanvasViewModel.canvasWidth
+                )
+              )
+
+              Color.clear
+                .preference(key: ViewOffsetKey.self, value: scrollOffset)
+                .preference(key: CanvasRectKey.self, value: fullCanvasRect)
+                .preference(key: ViewPortRectKey.self, value: viewportRectInCanvas)
+            }
+          }
+          .background(Color("CanvasBackgroundColor"))
+          .frame(
+            width: CanvasViewModel.canvasWidth,
+            height: CanvasViewModel.canvasWidth
+          )
+        }
+        .scrollDisabled(viewModel.selectedTool == .effects)
+        .defaultScrollAnchor(.zero)
+        .coordinateSpace(name: "CanvasCoordinateSpace")  // <---- coordinate space lives on ScrollView
+
+        .onPreferenceChange(ViewOffsetKey.self) { offset in
+          viewModel.canvasScrollOffset = offset
+        }
+        .onPreferenceChange(CanvasRectKey.self) { rect in
+          self.canvasRect = rect
+          viewModel.updateVisibleEffectsRect(
+            canvasRect: rect,
+            viewPortRect: self.viewPortRect,
+          )
+        }
+        .onPreferenceChange(ViewPortRectKey.self) { rect in
+          viewModel.updateVisibleEffectsRect(
+            canvasRect: self.canvasRect,
+            viewPortRect: rect,
+          )
+        }
+        .onTapGesture(coordinateSpace: .local) { location in
+          guard viewModel.selectedTool == .loop else { return }
+
+          // Only used for Loop tool; when Effects/Visuals are selected, taps would be handled differently
+          addBlockTapPosition = location
+          viewModel.addBlockTapGridPosition = CanvasViewModel.gridPosition(for: location)
+          showingLibraryPickerView = true
+        }
+
+        // Floating tool bar overlay
+        FloatingToolbarOverlay(viewModel: viewModel)
+      }
+      .coordinateSpace(name: "ViewportCoordinateSpace") // keep if you actually use this elsewhere
+      .onAppear {
+        viewModel.onViewAppear()
+      }
+      .onChange(of: showingLibraryPickerView) { _, newValue in
+        if newValue == false {
+          viewModel.addBlockTapGridPosition = nil
+        }
+      }
+      .onChange(of: showingBlockDetailsView) { _, newValue in
+        if newValue == false {
+          viewModel.unselectCurrentlySelectedBlock()
+        }
+      }
+      .toolbar {
+        ToolbarItem(placement: .navigationBarLeading) {
+          AppMenuView(
+            viewModel: viewModel,
+            showingSongListView: $showingSongListView,
+            showingRenameSongView: $showingRenameSongView,
+            canvasBlocksView: canvasBlocksView
+          )
+        }
+        ToolbarItem(placement: .principal) {
+          TopCenterControls(viewModel: viewModel)
+        }
+        ToolbarItem(placement: .navigationBarTrailing) {
+          HStack {
+            SharePlayControls(viewModel: viewModel)
+            CanvasMenuView(
+              viewModel: viewModel,
+              showingRenameSongView: $showingRenameSongView,
+              showingDownloadGenresView: $showingDownloadGenresView,
+              canvasBlocksView: canvasBlocksView
+            )
           }
         }
-        .background(Color("CanvasBackgroundColor"))
-        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
       }
-      .scrollDisabled(viewModel.selectedTool == .effects)
-      .defaultScrollAnchor(.zero) // TODO - when setting this to 0, the initial scroll
-      // view offset is incorrect until the user interacts
-      .coordinateSpace(name: "CanvasCoordinateSpace")
-      .onPreferenceChange(ViewOffsetKey.self) {
-        viewModel.canvasScrollOffset = $0
-      }
-      .onTapGesture(coordinateSpace: .local) { location in
-        guard viewModel.selectedTool == .loop else { return }
-
-        // Only used for Loop tool; when Effects/Visuals are selected, taps would be handled differently
-        addBlockTapPosition = location
-        viewModel.addBlockTapGridPosition = CanvasViewModel.gridPosition(for: location)
-        showingLibraryPickerView = true
-      }
-
-      // Floating tool bar overlay
-      FloatingToolbarOverlay(viewModel: viewModel)
-    }
-    .coordinateSpace(name: "ViewportCoorindateSpace")
-    .onAppear {
-      viewModel.onViewAppear()
-    }
-    .onChange(of: showingLibraryPickerView) { _, newValue in
-      if newValue == false {
-        viewModel.addBlockTapGridPosition = nil
-      }
-    }
-    .onChange(of: showingBlockDetailsView) { _, newValue in
-      if newValue == false {
-        viewModel.unselectCurrentlySelectedBlock()
-      }
-    }
-    .toolbar {
-      ToolbarItem(placement: .navigationBarLeading) {
-        AppMenuView(viewModel: viewModel, showingSongListView: $showingSongListView, showingRenameSongView: $showingRenameSongView, canvasBlocksView: canvasBlocksView)
-      }
-      ToolbarItem(placement: .principal) {
-        TopCenterControls(viewModel: viewModel)
-      }
-      ToolbarItem(placement: .navigationBarTrailing) {
-        HStack {
-          SharePlayControls(viewModel: viewModel)
-          CanvasMenuView(viewModel: viewModel, showingRenameSongView: $showingRenameSongView, showingDownloadGenresView: $showingDownloadGenresView, canvasBlocksView: canvasBlocksView)
-        }
-      }
-    }
-    .sheet(isPresented: $showingRenameSongView, content: {
-      RenameSongSheet(viewModel: viewModel, showingRenameSongView: $showingRenameSongView)
-    })
-    .sheet(isPresented: $showingDownloadGenresView) {
-      if let sampleSetStore = viewModel.sampleSetStore {
-        DownloadGenresSheet(
+      .sheet(isPresented: $showingRenameSongView, content: {
+        RenameSongSheet(
           viewModel: viewModel,
-          store: sampleSetStore,
-          showingDownloadGenresView: $showingDownloadGenresView)
-      }
-    }
-    .sheet(isPresented: $showingSongListView) {
-      if let canvasStore = viewModel.canvasStore,
-         let sampleSetStore = viewModel.sampleSetStore {
-        SongListView(
-          canvasStore: canvasStore,
-          sampleSetStore: sampleSetStore,
-          isPresented: $showingSongListView) { saved in
-            viewModel.loadSong(name: saved.name)
+          showingRenameSongView: $showingRenameSongView
+        )
+      })
+      .sheet(isPresented: $showingDownloadGenresView) {
+        if let sampleSetStore = viewModel.sampleSetStore {
+          DownloadGenresSheet(
+            viewModel: viewModel,
+            store: sampleSetStore,
+            showingDownloadGenresView: $showingDownloadGenresView
+          )
         }
       }
-    }
-    .sheet(isPresented: $showingLibraryPickerView) {
-      LibraryPickerSheet(
-        library: viewModel.canvasModel.library,
-        addBlockTapPosition: addBlockTapPosition,
-        viewModel: viewModel,
-        showingLibraryPickerView: $showingLibraryPickerView)
-      .presentationDetents([.medium])
-    }
-    .sheet(isPresented: $showingBlockDetailsView) {
-      if let blockDetailsViewModel = viewModel.blockDetailsViewModel {
-        BlockDetailsSheet(
-          showingBlockDetailsView: $showingBlockDetailsView,
-          canvasViewModel: viewModel,
-          viewModel: blockDetailsViewModel,
-          showLiveWaveform: true
+      .sheet(isPresented: $showingSongListView) {
+        if let canvasStore = viewModel.canvasStore,
+           let sampleSetStore = viewModel.sampleSetStore {
+          SongListView(
+            canvasStore: canvasStore,
+            sampleSetStore: sampleSetStore,
+            isPresented: $showingSongListView
+          ) { saved in
+            viewModel.loadSong(name: saved.name)
+          }
+        }
+      }
+      .sheet(isPresented: $showingLibraryPickerView) {
+        LibraryPickerSheet(
+          library: viewModel.canvasModel.library,
+          addBlockTapPosition: addBlockTapPosition,
+          viewModel: viewModel,
+          showingLibraryPickerView: $showingLibraryPickerView
         )
         .presentationDetents([.medium])
       }
-    }
-    .sheet(isPresented: $showingBlockGroupDetailsView) {
-      if let selectedBlockGroup = viewModel.selectedBlockGroup {
-        BlockGroupDetailsSheet(
-          canvasViewModel: viewModel,
-          group: selectedBlockGroup,
-          isPresented: $showingBlockGroupDetailsView
-        )
-        .presentationDetents([.medium])
+      .sheet(isPresented: $showingBlockDetailsView) {
+        if let blockDetailsViewModel = viewModel.blockDetailsViewModel {
+          BlockDetailsSheet(
+            showingBlockDetailsView: $showingBlockDetailsView,
+            canvasViewModel: viewModel,
+            viewModel: blockDetailsViewModel,
+            showLiveWaveform: true
+          )
+          .presentationDetents([.medium])
+        }
+      }
+      .sheet(isPresented: $showingBlockGroupDetailsView) {
+        if let selectedBlockGroup = viewModel.selectedBlockGroup {
+          BlockGroupDetailsSheet(
+            canvasViewModel: viewModel,
+            group: selectedBlockGroup,
+            isPresented: $showingBlockGroupDetailsView
+          )
+          .presentationDetents([.medium])
+        }
       }
     }
   }
@@ -234,7 +295,7 @@ struct AppMenuView: View {
       content: VStack {
         snapshotView
       }
-      .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
+        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
     )
     return viewModel.getThumbnailFromScreenShot(screenShotImage: imagerenderer.cgImage)
   }
@@ -333,7 +394,7 @@ struct CanvasMenuView: View {
       content: VStack {
         snapshotView
       }
-      .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
+        .frame(width: CanvasViewModel.canvasWidth, height: CanvasViewModel.canvasWidth)
     )
     return viewModel.getThumbnailFromScreenShot(screenShotImage: imagerenderer.cgImage)
   }
@@ -380,6 +441,20 @@ struct ViewOffsetKey: PreferenceKey {
   static func reduce(value: inout Value, nextValue: () -> Value) {
     let next = nextValue()
     value = CGPoint(x: value.x + next.x, y: value.y + next.y)
+  }
+}
+
+struct CanvasRectKey: PreferenceKey {
+  static var defaultValue: CGRect = .zero
+  static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+    value = nextValue()
+  }
+}
+
+struct ViewPortRectKey: PreferenceKey {
+  static var defaultValue: CGRect = .zero
+  static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+    value = nextValue()
   }
 }
 
@@ -567,3 +642,4 @@ extension CanvasViewModel {
 
 
 // GB genre BPMs - electronica - 133.0 funk - 115.0
+

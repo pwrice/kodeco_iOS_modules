@@ -40,6 +40,10 @@
 		C17B68052ED6369A0022DE71 /* CanvasBlocksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */; };
 		C17B68072ED6369E0022DE71 /* BackgroundDots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68062ED6369E0022DE71 /* BackgroundDots.swift */; };
 		C17B680D2ED636CE0022DE71 /* FloatingToolbarOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */; };
+		C17B680F2ED672310022DE71 /* EffectsRack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B680E2ED672310022DE71 /* EffectsRack.swift */; };
+		C17B68102ED672310022DE71 /* EffectsRack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B680E2ED672310022DE71 /* EffectsRack.swift */; };
+		C17B68132ED6741E0022DE71 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = C17B68122ED6741E0022DE71 /* AudioKitEX */; };
+		C17B68162ED6C3E30022DE71 /* DunneAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = C17B68152ED6C3E30022DE71 /* DunneAudioKit */; };
 		C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */; };
 		C185495E2EC431C2008E3D2C /* Waveform in Frameworks */ = {isa = PBXBuildFile; productRef = C185495D2EC431C2008E3D2C /* Waveform */; };
 		C18D4BFF2D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
@@ -122,6 +126,7 @@
 		C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasBlocksView.swift; sourceTree = "<group>"; };
 		C17B68062ED6369E0022DE71 /* BackgroundDots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDots.swift; sourceTree = "<group>"; };
 		C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToolbarOverlay.swift; sourceTree = "<group>"; };
+		C17B680E2ED672310022DE71 /* EffectsRack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectsRack.swift; sourceTree = "<group>"; };
 		C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockDetailsSheet.swift; sourceTree = "<group>"; };
 		C18D4BFE2D17355200595432 /* FileDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManager.swift; sourceTree = "<group>"; };
 		C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadableSampleSet.swift; sourceTree = "<group>"; };
@@ -157,6 +162,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C17B68132ED6741E0022DE71 /* AudioKitEX in Frameworks */,
+				C17B68162ED6C3E30022DE71 /* DunneAudioKit in Frameworks */,
 				C1B9BD0B2C14CA2C0030B733 /* AudioKit in Frameworks */,
 				C185495E2EC431C2008E3D2C /* Waveform in Frameworks */,
 			);
@@ -372,6 +379,7 @@
 			isa = PBXGroup;
 			children = (
 				C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */,
+				C17B680E2ED672310022DE71 /* EffectsRack.swift */,
 			);
 			path = Music;
 			sourceTree = "<group>";
@@ -396,6 +404,8 @@
 			packageProductDependencies = (
 				C1B9BD0A2C14CA2C0030B733 /* AudioKit */,
 				C185495D2EC431C2008E3D2C /* Waveform */,
+				C17B68122ED6741E0022DE71 /* AudioKitEX */,
+				C17B68152ED6C3E30022DE71 /* DunneAudioKit */,
 			);
 			productName = LoopCanvas;
 			productReference = C19D85452C08AE5900477545 /* LoopCanvas.app */;
@@ -472,6 +482,8 @@
 			packageReferences = (
 				C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */,
 				C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */,
+				C17B68112ED6741E0022DE71 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
+				C17B68142ED6BD6F0022DE71 /* XCRemoteSwiftPackageReference "DunneAudioKit" */,
 			);
 			productRefGroup = C19D85462C08AE5900477545 /* Products */;
 			projectDirPath = "";
@@ -555,6 +567,7 @@
 				C10DE20D2D1F3C3900466C0C /* ToastModifier.swift in Sources */,
 				C1706DDD2C6CE5B700DAC858 /* CanvasStore.swift in Sources */,
 				C18D4C002D17355B00595432 /* FileDownloadManager.swift in Sources */,
+				C17B68102ED672310022DE71 /* EffectsRack.swift in Sources */,
 				C1B564C52C0D243E002FDDD4 /* CanvasModel.swift in Sources */,
 				C13BCD9B2C4C12380037AEF4 /* RenameSongSheet.swift in Sources */,
 				C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */,
@@ -582,6 +595,7 @@
 			files = (
 				C1F5EEE62C14AE6F00298B00 /* Block.swift in Sources */,
 				C1015DCB2ED21642000B69CD /* CanvasViewModel_BlockEvents.swift in Sources */,
+				C17B680F2ED672310022DE71 /* EffectsRack.swift in Sources */,
 				C125E4D92EC8EB9A00A7A5BA /* MusicEngineTests.swift in Sources */,
 				C19A08A32C963487008CCB0E /* LibraryTests.swift in Sources */,
 				C19D855A2C08AE6500477545 /* CanvasViewModelTests.swift in Sources */,
@@ -932,6 +946,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C17B68112ED6741E0022DE71 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKitEX.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.2;
+			};
+		};
+		C17B68142ED6BD6F0022DE71 /* XCRemoteSwiftPackageReference "DunneAudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/DunneAudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.1;
+			};
+		};
 		C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/Waveform.git";
@@ -951,6 +981,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C17B68122ED6741E0022DE71 /* AudioKitEX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C17B68112ED6741E0022DE71 /* XCRemoteSwiftPackageReference "AudioKitEX" */;
+			productName = AudioKitEX;
+		};
+		C17B68152ED6C3E30022DE71 /* DunneAudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C17B68142ED6BD6F0022DE71 /* XCRemoteSwiftPackageReference "DunneAudioKit" */;
+			productName = DunneAudioKit;
+		};
 		C185495D2EC431C2008E3D2C /* Waveform */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */;

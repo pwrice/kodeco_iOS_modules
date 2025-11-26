@@ -1,5 +1,5 @@
 {
-  "originHash" : "9d44d0b74cc0d66f403e339961a0c9a5ed42e37f3f0c9fe47b7949b45231e533",
+  "originHash" : "03226c45f7a0854527113f506e9f1d3785d0986db2c8bda5fccd7368889f7fef",
   "pins" : [
     {
       "identity" : "audiokit",
@@ -8,6 +8,33 @@
       "state" : {
         "revision" : "2ebd422855e4645d3169f83d1765d1c8196b4f46",
         "version" : "5.6.4"
+      }
+    },
+    {
+      "identity" : "audiokitex",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AudioKit/AudioKitEX.git",
+      "state" : {
+        "revision" : "23e8e3bffd9fbc1dffa72f1d47c7f714dd777288",
+        "version" : "5.6.2"
+      }
+    },
+    {
+      "identity" : "dunneaudiokit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AudioKit/DunneAudioKit.git",
+      "state" : {
+        "revision" : "dd0a417239ba345e03ca8ffe936d052d6a8239ea",
+        "version" : "5.6.1"
+      }
+    },
+    {
+      "identity" : "kissfft",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AudioKit/KissFFT",
+      "state" : {
+        "revision" : "dd0636e151724b8ba2e0908eba4d99a6ff24d00c",
+        "version" : "1.0.0"
       }
     },
     {
