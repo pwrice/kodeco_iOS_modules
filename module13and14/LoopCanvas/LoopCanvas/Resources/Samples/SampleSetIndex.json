@@ -1,0 +1,332 @@
+{
+  "sampleSets": [
+    {
+      "name": "Dub",
+      "url": "SampleSetInfo.json",
+      "tempo": 80,
+      "categories": [
+        {
+          "name": "Bass",
+          "loops": [
+            {
+              "url": "Bass/Bass-3.wav"
+            },
+            {
+              "url": "Bass/Bass-4.wav"
+            },
+            {
+              "url": "Bass/Bass-5.wav"
+            },
+            {
+              "url": "Bass/Bass-6.wav"
+            },
+            {
+              "url": "Bass/Midi Bass-1.wav"
+            },
+            {
+              "url": "Bass/Midi Bass-2.wav"
+            }
+          ]
+        },
+        {
+          "name": "Drums",
+          "loops": [
+            {
+              "url": "Drums/Drums-1.wav"
+            },
+            {
+              "url": "Drums/Drums-2.wav"
+            },
+            {
+              "url": "Drums/Drums-3.wav"
+            },
+            {
+              "url": "Drums/Drums-4.wav"
+            },
+            {
+              "url": "Drums/Drums-5.wav"
+            },
+            {
+              "url": "Drums/Drums-6.wav"
+            },
+            {
+              "url": "Drums/Drums-7.wav"
+            }
+          ]
+        },
+        {
+          "name": "Guitars",
+          "loops": [
+            {
+              "url": "Guitars/guitar-1.wav"
+            },
+            {
+              "url": "Guitars/guitar-2.wav"
+            },
+            {
+              "url": "Guitars/guitar-3.wav"
+            },
+            {
+              "url": "Guitars/guitar-4.wav"
+            },
+            {
+              "url": "Guitars/guitar-5.wav"
+            },
+            {
+              "url": "Guitars/guitar-6.wav"
+            },
+            {
+              "url": "Guitars/guitar-7.wav"
+            }
+          ]
+        },
+        {
+          "name": "Horns",
+          "loops": [
+            {
+              "url": "Horns/horns-1.wav"
+            },
+            {
+              "url": "Horns/horns-2.wav"
+            },
+            {
+              "url": "Horns/horns-3.wav"
+            },
+            {
+              "url": "Horns/horns-4.wav"
+            },
+            {
+              "url": "Horns/horns-5.wav"
+            },
+            {
+              "url": "Horns/horns-6.wav"
+            },
+            {
+              "url": "Horns/horns-7.wav"
+            },
+            {
+              "url": "Horns/horns-8.wav"
+            }
+          ]
+        },
+        {
+          "name": "Keyboards",
+          "loops": [
+            {
+              "url": "Keyboards/Keys-1.wav"
+            },
+            {
+              "url": "Keyboards/Keys-2.wav"
+            },
+            {
+              "url": "Keyboards/Keys-3.wav"
+            },
+            {
+              "url": "Keyboards/Keys-4.wav"
+            },
+            {
+              "url": "Keyboards/Keys-5.wav"
+            },
+            {
+              "url": "Keyboards/Keys-6.wav"
+            },
+            {
+              "url": "Keyboards/Keys-7.wav"
+            }
+          ]
+        },
+        {
+          "name": "Perc",
+          "loops": [
+            {
+              "url": "Perc/perc-1.wav"
+            },
+            {
+              "url": "Perc/perc-2.wav"
+            },
+            {
+              "url": "Perc/perc-3.wav"
+            },
+            {
+              "url": "Perc/perc-4.wav"
+            },
+            {
+              "url": "Perc/perc-5.wav"
+            },
+            {
+              "url": "Perc/perc-6.wav"
+            }
+          ]
+        },
+        {
+          "name": "Vocals",
+          "loops": [
+            {
+              "url": "Vocals/vocals-1.wav"
+            },
+            {
+              "url": "Vocals/vocals-2.wav"
+            },
+            {
+              "url": "Vocals/vocals-3.wav"
+            },
+            {
+              "url": "Vocals/vocals-4.wav"
+            },
+            {
+              "url": "Vocals/vocals-5.wav"
+            },
+            {
+              "url": "Vocals/vocals-6.wav"
+            },
+            {
+              "url": "Vocals/vocals-7.wav"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Funk",
+      "url": "SampleSetInfo.json",
+      "tempo": 80,
+      "categories": [
+        {
+          "name": "Bass",
+          "loops": [
+            {
+              "url": "Bass/Bass 21-01.wav"
+            },
+            {
+              "url": "Bass/Bass Loop 32-07.wav"
+            },
+            {
+              "url": "Bass/bass12-04_c_r122_rat5.wav"
+            },
+            {
+              "url": "Bass/Cool Funk 3.wav"
+            },
+            {
+              "url": "Bass/DA Bass 26.wav"
+            },
+            {
+              "url": "Bass/Funky Chesterfield.wav"
+            }
+          ]
+        },
+        {
+          "name": "Drums",
+          "loops": [
+            {
+              "url": "Drums/Fonky02_c_rel=122_rat=2_eq.wav"
+            },
+            {
+              "url": "Drums/Fonky09_c_rel=122_rat=4_eq.wav"
+            },
+            {
+              "url": "Drums/Funky_105a_timefix.wav"
+            },
+            {
+              "url": "Drums/LiveBeats01_c2_r80_rat4_eq2.wav"
+            },
+            {
+              "url": "Drums/Motown 01 e1.wav"
+            },
+            {
+              "url": "Drums/streettipo41_c_eq_timefix.wav"
+            }
+          ]
+        },
+        {
+          "name": "Horns",
+          "loops": [
+            {
+              "url": "Horns/Alto RnB C maj 01.wav"
+            },
+            {
+              "url": "Horns/Alto_RnB_Cmaj.wav"
+            },
+            {
+              "url": "Horns/altoa2_F7.wav"
+            },
+            {
+              "url": "Horns/flute solo 10.wav"
+            },
+            {
+              "url": "Horns/Flute Solo2 10_2.wav"
+            },
+            {
+              "url": "Horns/Sax Section 2 In C.wav"
+            }
+          ]
+        },
+        {
+          "name": "Leads",
+          "loops": [
+            {
+              "url": "Leads/Clavinet 43-08.wav"
+            },
+            {
+              "url": "Leads/FunkGuitar01.wav"
+            },
+            {
+              "url": "Leads/FunkGuitar02.wav"
+            },
+            {
+              "url": "Leads/Guitar 34-10.wav"
+            },
+            {
+              "url": "Leads/sf_b3_02_timefix.wav"
+            },
+            {
+              "url": "Leads/Whirly 01.wav"
+            }
+          ]
+        },
+        {
+          "name": "Perc",
+          "loops": [
+            {
+              "url": "Perc/Bongo 11.wav"
+            },
+            {
+              "url": "Perc/Conga 30.wav"
+            },
+            {
+              "url": "Perc/Cow Bell 23.wav"
+            },
+            {
+              "url": "Perc/Shaker 04.wav"
+            },
+            {
+              "url": "Perc/Tamb Head 02.wav"
+            },
+            {
+              "url": "Perc/Triangle 04.wav"
+            }
+          ]
+        },
+        {
+          "name": "Vocals",
+          "loops": [
+            {
+              "url": "Vocals/Funky Music.wav"
+            },
+            {
+              "url": "Vocals/guttural.wav"
+            },
+            {
+              "url": "Vocals/here come da funk e1.wav"
+            },
+            {
+              "url": "Vocals/Male Solo 012.wav"
+            },
+            {
+              "url": "Vocals/Male Solo 058.wav"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

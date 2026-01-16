@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "F66F8E18-1925-4F45-9A3D-C6B2A8B17153",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:LoopCanvas.xcodeproj",
+      "identifier" : "C19D85442C08AE5900477545",
+      "name" : "LoopCanvas"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:LoopCanvas.xcodeproj",
+        "identifier" : "C19D85542C08AE6500477545",
+        "name" : "LoopCanvasTests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -1,0 +1,1007 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C1015DC62ED21480000B69CD /* CanvasViewModel_BlockEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1015DC52ED21464000B69CD /* CanvasViewModel_BlockEvents.swift */; };
+		C1015DC82ED214D6000B69CD /* CanvasViewModel_BlockGroupEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1015DC72ED214CC000B69CD /* CanvasViewModel_BlockGroupEvents.swift */; };
+		C1015DCA2ED21528000B69CD /* CanvasViewModel_MessageEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1015DC92ED2151E000B69CD /* CanvasViewModel_MessageEvents.swift */; };
+		C1015DCB2ED21642000B69CD /* CanvasViewModel_BlockEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1015DC52ED21464000B69CD /* CanvasViewModel_BlockEvents.swift */; };
+		C1015DCC2ED21648000B69CD /* CanvasViewModel_BlockGroupEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1015DC72ED214CC000B69CD /* CanvasViewModel_BlockGroupEvents.swift */; };
+		C1015DCD2ED2164E000B69CD /* CanvasViewModel_MessageEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1015DC92ED2151E000B69CD /* CanvasViewModel_MessageEvents.swift */; };
+		C1015DCF2ED22C55000B69CD /* SharePlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1015DCE2ED22C49000B69CD /* SharePlayTests.swift */; };
+		C108AA002ECA481600B6865C /* CanvasMessageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C108A9FF2ECA481000B6865C /* CanvasMessageStore.swift */; };
+		C108AA012ECA481600B6865C /* CanvasMessageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C108A9FF2ECA481000B6865C /* CanvasMessageStore.swift */; };
+		C10DE20A2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE2092D1F38BC00466C0C /* URLSessionLoader.swift */; };
+		C10DE20B2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE2092D1F38BC00466C0C /* URLSessionLoader.swift */; };
+		C10DE20D2D1F3C3900466C0C /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE20C2D1F3C3100466C0C /* ToastModifier.swift */; };
+		C10DE20F2D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE20E2D20B65400466C0C /* URLSessionProgressDataLoader.swift */; };
+		C10DE2102D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE20E2D20B65400466C0C /* URLSessionProgressDataLoader.swift */; };
+		C10DE2122D20BD7A00466C0C /* FileDownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE2112D20BD7000466C0C /* FileDownloadManagerTests.swift */; };
+		C125E4D92EC8EB9A00A7A5BA /* MusicEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C125E4D82EC8EB9A00A7A5BA /* MusicEngineTests.swift */; };
+		C125E4DE2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */; };
+		C125E4DF2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */; };
+		C12C6E892C2AF2E200B01C58 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E882C2AF2E200B01C58 /* BlockView.swift */; };
+		C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C6E8A2C2AF39300B01C58 /* HomeView.swift */; };
+		C13BCD9B2C4C12380037AEF4 /* RenameSongSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */; };
+		C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */; };
+		C1498E392C18881900118C38 /* CanvasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E382C18881900118C38 /* CanvasModelTests.swift */; };
+		C1498E3B2C18884A00118C38 /* BlockGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1498E3A2C18884A00118C38 /* BlockGroupTests.swift */; };
+		C15DCC912C6E32430061453B /* CanvasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */; };
+		C15DCC932C6E3E4A0061453B /* CanvasStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C15DCC922C6E3E4A0061453B /* CanvasStoreTests.swift */; };
+		C161307A2D25F79700725FA0 /* DownloadableSampleSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */; };
+		C1706DDB2C6CE4E000DAC858 /* SongListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDA2C6CE4E000DAC858 /* SongListView.swift */; };
+		C1706DDD2C6CE5B700DAC858 /* CanvasStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */; };
+		C17B68032ED60E2F0022DE71 /* CanvasEffectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68022ED60E2F0022DE71 /* CanvasEffectsView.swift */; };
+		C17B68052ED6369A0022DE71 /* CanvasBlocksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */; };
+		C17B68072ED6369E0022DE71 /* BackgroundDots.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B68062ED6369E0022DE71 /* BackgroundDots.swift */; };
+		C17B680D2ED636CE0022DE71 /* FloatingToolbarOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */; };
+		C17B680F2ED672310022DE71 /* EffectsRack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B680E2ED672310022DE71 /* EffectsRack.swift */; };
+		C17B68102ED672310022DE71 /* EffectsRack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17B680E2ED672310022DE71 /* EffectsRack.swift */; };
+		C17B68132ED6741E0022DE71 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = C17B68122ED6741E0022DE71 /* AudioKitEX */; };
+		C17B68162ED6C3E30022DE71 /* DunneAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = C17B68152ED6C3E30022DE71 /* DunneAudioKit */; };
+		C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */; };
+		C185495E2EC431C2008E3D2C /* Waveform in Frameworks */ = {isa = PBXBuildFile; productRef = C185495D2EC431C2008E3D2C /* Waveform */; };
+		C18D4BFF2D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
+		C18D4C002D17355B00595432 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4BFE2D17355200595432 /* FileDownloadManager.swift */; };
+		C18D4C022D17816F00595432 /* DownloadableSampleSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */; };
+		C18D4C032D17816F00595432 /* DownloadableSampleSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */; };
+		C19A08A02C962A06008CCB0E /* Dub in Resources */ = {isa = PBXBuildFile; fileRef = C19A089E2C962A06008CCB0E /* Dub */; };
+		C19A08A12C962A06008CCB0E /* Funk in Resources */ = {isa = PBXBuildFile; fileRef = C19A089F2C962A06008CCB0E /* Funk */; };
+		C19A08A32C963487008CCB0E /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19A08A22C963487008CCB0E /* LibraryTests.swift */; };
+		C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85482C08AE5900477545 /* LoopCanvasApp.swift */; };
+		C19D854D2C08AE6500477545 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19D854C2C08AE6500477545 /* Assets.xcassets */; };
+		C19D85502C08AE6500477545 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C19D854F2C08AE6500477545 /* Preview Assets.xcassets */; };
+		C19D855A2C08AE6500477545 /* CanvasViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85592C08AE6500477545 /* CanvasViewModelTests.swift */; };
+		C19D85642C08AE6500477545 /* LoopCanvasUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */; };
+		C19D85662C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */; };
+		C19D85772C08B00C00477545 /* CanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19D85762C08B00C00477545 /* CanvasView.swift */; };
+		C1B150F92C9F102800B4FAE8 /* SampleSetIndex.json in Resources */ = {isa = PBXBuildFile; fileRef = C1B150F82C9F101C00B4FAE8 /* SampleSetIndex.json */; };
+		C1B150FB2C9F13A300B4FAE8 /* SampleSetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B150FA2C9F13A300B4FAE8 /* SampleSetStore.swift */; };
+		C1B150FC2C9F13A300B4FAE8 /* SampleSetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B150FA2C9F13A300B4FAE8 /* SampleSetStore.swift */; };
+		C1B150FE2C9F153900B4FAE8 /* SampleSetStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B150FD2C9F153900B4FAE8 /* SampleSetStoreTests.swift */; };
+		C1B151002C9F4C0000B4FAE8 /* DownloadGenresSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B150FF2C9F4BF100B4FAE8 /* DownloadGenresSheet.swift */; };
+		C1B564C52C0D243E002FDDD4 /* CanvasModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B564C42C0D243E002FDDD4 /* CanvasModel.swift */; };
+		C1B564C62C0D243E002FDDD4 /* CanvasModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B564C42C0D243E002FDDD4 /* CanvasModel.swift */; };
+		C1B564C82C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */; };
+		C1B564C92C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */; };
+		C1B9BD0B2C14CA2C0030B733 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = C1B9BD0A2C14CA2C0030B733 /* AudioKit */; };
+		C1F5EEA22C133A4900298B00 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEA12C133A4900298B00 /* Library.swift */; };
+		C1F5EEA32C133AAE00298B00 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEA12C133A4900298B00 /* Library.swift */; };
+		C1F5EEE22C13446300298B00 /* Samples in Resources */ = {isa = PBXBuildFile; fileRef = C1F5EEE12C13446300298B00 /* Samples */; };
+		C1F5EEE32C13446300298B00 /* Samples in Resources */ = {isa = PBXBuildFile; fileRef = C1F5EEE12C13446300298B00 /* Samples */; };
+		C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEE42C14AE6F00298B00 /* Block.swift */; };
+		C1F5EEE62C14AE6F00298B00 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEE42C14AE6F00298B00 /* Block.swift */; };
+		C1F5EEE82C14AE9400298B00 /* BlockGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEE72C14AE9400298B00 /* BlockGroup.swift */; };
+		C1F5EEE92C14AE9400298B00 /* BlockGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEE72C14AE9400298B00 /* BlockGroup.swift */; };
+		C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */; };
+		C1F5EEED2C14C64100298B00 /* MusicEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C19D85562C08AE6500477545 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C19D853D2C08AE5900477545 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C19D85442C08AE5900477545;
+			remoteInfo = LoopCanvas;
+		};
+		C19D85602C08AE6500477545 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C19D853D2C08AE5900477545 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C19D85442C08AE5900477545;
+			remoteInfo = LoopCanvas;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C1015DC52ED21464000B69CD /* CanvasViewModel_BlockEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasViewModel_BlockEvents.swift; sourceTree = "<group>"; };
+		C1015DC72ED214CC000B69CD /* CanvasViewModel_BlockGroupEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasViewModel_BlockGroupEvents.swift; sourceTree = "<group>"; };
+		C1015DC92ED2151E000B69CD /* CanvasViewModel_MessageEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasViewModel_MessageEvents.swift; sourceTree = "<group>"; };
+		C1015DCE2ED22C49000B69CD /* SharePlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePlayTests.swift; sourceTree = "<group>"; };
+		C108A9FF2ECA481000B6865C /* CanvasMessageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasMessageStore.swift; sourceTree = "<group>"; };
+		C10DE2092D1F38BC00466C0C /* URLSessionLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionLoader.swift; sourceTree = "<group>"; };
+		C10DE20C2D1F3C3100466C0C /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
+		C10DE20E2D20B65400466C0C /* URLSessionProgressDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionProgressDataLoader.swift; sourceTree = "<group>"; };
+		C10DE2112D20BD7000466C0C /* FileDownloadManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManagerTests.swift; sourceTree = "<group>"; };
+		C125E4D82EC8EB9A00A7A5BA /* MusicEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicEngineTests.swift; sourceTree = "<group>"; };
+		C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroupDetailsSheet.swift; sourceTree = "<group>"; };
+		C12C6E882C2AF2E200B01C58 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
+		C12C6E8A2C2AF39300B01C58 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameSongSheet.swift; sourceTree = "<group>"; };
+		C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryPickerSheet.swift; sourceTree = "<group>"; };
+		C1498E382C18881900118C38 /* CanvasModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasModelTests.swift; sourceTree = "<group>"; };
+		C1498E3A2C18884A00118C38 /* BlockGroupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroupTests.swift; sourceTree = "<group>"; };
+		C15DCC922C6E3E4A0061453B /* CanvasStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasStoreTests.swift; sourceTree = "<group>"; };
+		C16130782D20CEE100725FA0 /* LoopCanvas.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = LoopCanvas.xctestplan; sourceTree = "<group>"; };
+		C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadableSampleSetTests.swift; sourceTree = "<group>"; };
+		C1706DDA2C6CE4E000DAC858 /* SongListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongListView.swift; sourceTree = "<group>"; };
+		C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasStore.swift; sourceTree = "<group>"; };
+		C17B68022ED60E2F0022DE71 /* CanvasEffectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasEffectsView.swift; sourceTree = "<group>"; };
+		C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasBlocksView.swift; sourceTree = "<group>"; };
+		C17B68062ED6369E0022DE71 /* BackgroundDots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDots.swift; sourceTree = "<group>"; };
+		C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToolbarOverlay.swift; sourceTree = "<group>"; };
+		C17B680E2ED672310022DE71 /* EffectsRack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectsRack.swift; sourceTree = "<group>"; };
+		C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockDetailsSheet.swift; sourceTree = "<group>"; };
+		C18D4BFE2D17355200595432 /* FileDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadManager.swift; sourceTree = "<group>"; };
+		C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadableSampleSet.swift; sourceTree = "<group>"; };
+		C19A089E2C962A06008CCB0E /* Dub */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Dub; sourceTree = "<group>"; };
+		C19A089F2C962A06008CCB0E /* Funk */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Funk; sourceTree = "<group>"; };
+		C19A08A22C963487008CCB0E /* LibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryTests.swift; sourceTree = "<group>"; };
+		C19D85452C08AE5900477545 /* LoopCanvas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoopCanvas.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C19D85482C08AE5900477545 /* LoopCanvasApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasApp.swift; sourceTree = "<group>"; };
+		C19D854C2C08AE6500477545 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C19D854F2C08AE6500477545 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C19D85552C08AE6500477545 /* LoopCanvasTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopCanvasTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C19D85592C08AE6500477545 /* CanvasViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasViewModelTests.swift; sourceTree = "<group>"; };
+		C19D855F2C08AE6500477545 /* LoopCanvasUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopCanvasUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasUITests.swift; sourceTree = "<group>"; };
+		C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopCanvasUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C19D85762C08B00C00477545 /* CanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasView.swift; sourceTree = "<group>"; };
+		C1B150F82C9F101C00B4FAE8 /* SampleSetIndex.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = SampleSetIndex.json; sourceTree = "<group>"; };
+		C1B150FA2C9F13A300B4FAE8 /* SampleSetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleSetStore.swift; sourceTree = "<group>"; };
+		C1B150FD2C9F153900B4FAE8 /* SampleSetStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleSetStoreTests.swift; sourceTree = "<group>"; };
+		C1B150FF2C9F4BF100B4FAE8 /* DownloadGenresSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadGenresSheet.swift; sourceTree = "<group>"; };
+		C1B564C22C0CC77A002FDDD4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C1B564C42C0D243E002FDDD4 /* CanvasModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasModel.swift; sourceTree = "<group>"; };
+		C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasViewModel.swift; sourceTree = "<group>"; };
+		C1F5EEA12C133A4900298B00 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
+		C1F5EEE12C13446300298B00 /* Samples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Samples; sourceTree = "<group>"; };
+		C1F5EEE42C14AE6F00298B00 /* Block.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
+		C1F5EEE72C14AE9400298B00 /* BlockGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGroup.swift; sourceTree = "<group>"; };
+		C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicEngine.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C19D85422C08AE5900477545 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C17B68132ED6741E0022DE71 /* AudioKitEX in Frameworks */,
+				C17B68162ED6C3E30022DE71 /* DunneAudioKit in Frameworks */,
+				C1B9BD0B2C14CA2C0030B733 /* AudioKit in Frameworks */,
+				C185495E2EC431C2008E3D2C /* Waveform in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D85522C08AE6500477545 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D855C2C08AE6500477545 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C10DE2082D1F386700466C0C /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				C10DE20E2D20B65400466C0C /* URLSessionProgressDataLoader.swift */,
+				C10DE2092D1F38BC00466C0C /* URLSessionLoader.swift */,
+				C18D4BFE2D17355200595432 /* FileDownloadManager.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		C185495A2EC15B70008E3D2C /* Sheets */ = {
+			isa = PBXGroup;
+			children = (
+				C18549562EC15B1C008E3D2C /* BlockDetailsSheet.swift */,
+				C1B150FF2C9F4BF100B4FAE8 /* DownloadGenresSheet.swift */,
+				C13F79F92EBE89E900535BE9 /* LibraryPickerSheet.swift */,
+				C13BCD9A2C4C12380037AEF4 /* RenameSongSheet.swift */,
+				C125E4DB2EC94C3900A7A5BA /* BlockGroupDetailsSheet.swift */,
+			);
+			path = Sheets;
+			sourceTree = "<group>";
+		};
+		C185495C2EC431C2008E3D2C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C18B9B802ED3BCFE006799EE /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C1B564C72C0D25D0002FDDD4 /* CanvasViewModel.swift */,
+				C1015DC52ED21464000B69CD /* CanvasViewModel_BlockEvents.swift */,
+				C1015DC72ED214CC000B69CD /* CanvasViewModel_BlockGroupEvents.swift */,
+				C1015DC92ED2151E000B69CD /* CanvasViewModel_MessageEvents.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		C19D853C2C08AE5900477545 = {
+			isa = PBXGroup;
+			children = (
+				C16130782D20CEE100725FA0 /* LoopCanvas.xctestplan */,
+				C1F5EEDC2C13431900298B00 /* Samples */,
+				C19D85472C08AE5900477545 /* LoopCanvas */,
+				C19D85582C08AE6500477545 /* LoopCanvasTests */,
+				C19D85622C08AE6500477545 /* LoopCanvasUITests */,
+				C185495C2EC431C2008E3D2C /* Frameworks */,
+				C19D85462C08AE5900477545 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C19D85462C08AE5900477545 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C19D85452C08AE5900477545 /* LoopCanvas.app */,
+				C19D85552C08AE6500477545 /* LoopCanvasTests.xctest */,
+				C19D855F2C08AE6500477545 /* LoopCanvasUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C19D85472C08AE5900477545 /* LoopCanvas */ = {
+			isa = PBXGroup;
+			children = (
+				C1F5EE372C1337BE00298B00 /* Resources */,
+				C1B564C22C0CC77A002FDDD4 /* Info.plist */,
+				C19D85752C08AF2B00477545 /* App */,
+				C19D85742C08AF2400477545 /* Views */,
+				C18B9B802ED3BCFE006799EE /* ViewModels */,
+				C19D85732C08AF1A00477545 /* Models */,
+				C1F5EEEA2C14C62500298B00 /* Music */,
+				C10DE2082D1F386700466C0C /* Networking */,
+				C19D854C2C08AE6500477545 /* Assets.xcassets */,
+				C19D854E2C08AE6500477545 /* Preview Content */,
+			);
+			path = LoopCanvas;
+			sourceTree = "<group>";
+		};
+		C19D854E2C08AE6500477545 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C19D854F2C08AE6500477545 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C19D85582C08AE6500477545 /* LoopCanvasTests */ = {
+			isa = PBXGroup;
+			children = (
+				C1015DCE2ED22C49000B69CD /* SharePlayTests.swift */,
+				C125E4D82EC8EB9A00A7A5BA /* MusicEngineTests.swift */,
+				C16130792D25F79400725FA0 /* DownloadableSampleSetTests.swift */,
+				C10DE2112D20BD7000466C0C /* FileDownloadManagerTests.swift */,
+				C19D85592C08AE6500477545 /* CanvasViewModelTests.swift */,
+				C1498E382C18881900118C38 /* CanvasModelTests.swift */,
+				C1498E3A2C18884A00118C38 /* BlockGroupTests.swift */,
+				C15DCC922C6E3E4A0061453B /* CanvasStoreTests.swift */,
+				C19A08A22C963487008CCB0E /* LibraryTests.swift */,
+				C1B150FD2C9F153900B4FAE8 /* SampleSetStoreTests.swift */,
+			);
+			path = LoopCanvasTests;
+			sourceTree = "<group>";
+		};
+		C19D85622C08AE6500477545 /* LoopCanvasUITests */ = {
+			isa = PBXGroup;
+			children = (
+				C19D85632C08AE6500477545 /* LoopCanvasUITests.swift */,
+				C19D85652C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift */,
+			);
+			path = LoopCanvasUITests;
+			sourceTree = "<group>";
+		};
+		C19D85732C08AF1A00477545 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C108A9FF2ECA481000B6865C /* CanvasMessageStore.swift */,
+				C1B564C42C0D243E002FDDD4 /* CanvasModel.swift */,
+				C1F5EEA12C133A4900298B00 /* Library.swift */,
+				C1F5EEE42C14AE6F00298B00 /* Block.swift */,
+				C1F5EEE72C14AE9400298B00 /* BlockGroup.swift */,
+				C1706DDC2C6CE5B700DAC858 /* CanvasStore.swift */,
+				C1B150FA2C9F13A300B4FAE8 /* SampleSetStore.swift */,
+				C18D4C012D17816F00595432 /* DownloadableSampleSet.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C19D85742C08AF2400477545 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C185495A2EC15B70008E3D2C /* Sheets */,
+				C1E5D1812D1DCD870021D803 /* SubViews */,
+				C1E5D1802D1DCD430021D803 /* Screens */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C19D85752C08AF2B00477545 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C19D85482C08AE5900477545 /* LoopCanvasApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C1E5D1802D1DCD430021D803 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				C1706DDA2C6CE4E000DAC858 /* SongListView.swift */,
+				C12C6E8A2C2AF39300B01C58 /* HomeView.swift */,
+				C19D85762C08B00C00477545 /* CanvasView.swift */,
+				C17B68022ED60E2F0022DE71 /* CanvasEffectsView.swift */,
+				C17B68042ED6369A0022DE71 /* CanvasBlocksView.swift */,
+				C17B68062ED6369E0022DE71 /* BackgroundDots.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		C1E5D1812D1DCD870021D803 /* SubViews */ = {
+			isa = PBXGroup;
+			children = (
+				C10DE20C2D1F3C3100466C0C /* ToastModifier.swift */,
+				C12C6E882C2AF2E200B01C58 /* BlockView.swift */,
+				C17B680C2ED636CE0022DE71 /* FloatingToolbarOverlay.swift */,
+			);
+			path = SubViews;
+			sourceTree = "<group>";
+		};
+		C1F5EE372C1337BE00298B00 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C1F5EEE12C13446300298B00 /* Samples */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C1F5EEDC2C13431900298B00 /* Samples */ = {
+			isa = PBXGroup;
+			children = (
+				C1B150F82C9F101C00B4FAE8 /* SampleSetIndex.json */,
+				C19A089E2C962A06008CCB0E /* Dub */,
+				C19A089F2C962A06008CCB0E /* Funk */,
+			);
+			name = Samples;
+			path = LoopCanvas/Resources/Samples;
+			sourceTree = "<group>";
+		};
+		C1F5EEEA2C14C62500298B00 /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				C1F5EEEB2C14C64100298B00 /* MusicEngine.swift */,
+				C17B680E2ED672310022DE71 /* EffectsRack.swift */,
+			);
+			path = Music;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C19D85442C08AE5900477545 /* LoopCanvas */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C19D85692C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvas" */;
+			buildPhases = (
+				C1B564C32C0CC9AC002FDDD4 /* SwiftLint */,
+				C19D85412C08AE5900477545 /* Sources */,
+				C19D85422C08AE5900477545 /* Frameworks */,
+				C19D85432C08AE5900477545 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LoopCanvas;
+			packageProductDependencies = (
+				C1B9BD0A2C14CA2C0030B733 /* AudioKit */,
+				C185495D2EC431C2008E3D2C /* Waveform */,
+				C17B68122ED6741E0022DE71 /* AudioKitEX */,
+				C17B68152ED6C3E30022DE71 /* DunneAudioKit */,
+			);
+			productName = LoopCanvas;
+			productReference = C19D85452C08AE5900477545 /* LoopCanvas.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C19D85542C08AE6500477545 /* LoopCanvasTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C19D856C2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasTests" */;
+			buildPhases = (
+				C19D85512C08AE6500477545 /* Sources */,
+				C19D85522C08AE6500477545 /* Frameworks */,
+				C19D85532C08AE6500477545 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C19D85572C08AE6500477545 /* PBXTargetDependency */,
+			);
+			name = LoopCanvasTests;
+			productName = LoopCanvasTests;
+			productReference = C19D85552C08AE6500477545 /* LoopCanvasTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C19D855E2C08AE6500477545 /* LoopCanvasUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C19D856F2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasUITests" */;
+			buildPhases = (
+				C19D855B2C08AE6500477545 /* Sources */,
+				C19D855C2C08AE6500477545 /* Frameworks */,
+				C19D855D2C08AE6500477545 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C19D85612C08AE6500477545 /* PBXTargetDependency */,
+			);
+			name = LoopCanvasUITests;
+			productName = LoopCanvasUITests;
+			productReference = C19D855F2C08AE6500477545 /* LoopCanvasUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C19D853D2C08AE5900477545 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					C19D85442C08AE5900477545 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					C19D85542C08AE6500477545 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = C19D85442C08AE5900477545;
+					};
+					C19D855E2C08AE6500477545 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = C19D85442C08AE5900477545;
+					};
+				};
+			};
+			buildConfigurationList = C19D85402C08AE5900477545 /* Build configuration list for PBXProject "LoopCanvas" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C19D853C2C08AE5900477545;
+			packageReferences = (
+				C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */,
+				C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */,
+				C17B68112ED6741E0022DE71 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
+				C17B68142ED6BD6F0022DE71 /* XCRemoteSwiftPackageReference "DunneAudioKit" */,
+			);
+			productRefGroup = C19D85462C08AE5900477545 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C19D85442C08AE5900477545 /* LoopCanvas */,
+				C19D85542C08AE6500477545 /* LoopCanvasTests */,
+				C19D855E2C08AE6500477545 /* LoopCanvasUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C19D85432C08AE5900477545 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C19A08A12C962A06008CCB0E /* Funk in Resources */,
+				C1F5EEE22C13446300298B00 /* Samples in Resources */,
+				C19D85502C08AE6500477545 /* Preview Assets.xcassets in Resources */,
+				C1B150F92C9F102800B4FAE8 /* SampleSetIndex.json in Resources */,
+				C19A08A02C962A06008CCB0E /* Dub in Resources */,
+				C19D854D2C08AE6500477545 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D85532C08AE6500477545 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1F5EEE32C13446300298B00 /* Samples in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D855D2C08AE6500477545 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C1B564C32C0CC9AC002FDDD4 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "PATH=/opt/homebrew/bin:$PATH\nif [ -f ~/com.raywenderlich.swiftlint.yml ]; then\n  if which swiftlint >/dev/null; then\n    swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml\n  fi\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C19D85412C08AE5900477545 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C108AA002ECA481600B6865C /* CanvasMessageStore.swift in Sources */,
+				C1B564C82C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */,
+				C1B151002C9F4C0000B4FAE8 /* DownloadGenresSheet.swift in Sources */,
+				C1F5EEE82C14AE9400298B00 /* BlockGroup.swift in Sources */,
+				C12C6E892C2AF2E200B01C58 /* BlockView.swift in Sources */,
+				C1015DC82ED214D6000B69CD /* CanvasViewModel_BlockGroupEvents.swift in Sources */,
+				C17B68052ED6369A0022DE71 /* CanvasBlocksView.swift in Sources */,
+				C1F5EEA22C133A4900298B00 /* Library.swift in Sources */,
+				C1706DDB2C6CE4E000DAC858 /* SongListView.swift in Sources */,
+				C18D4C022D17816F00595432 /* DownloadableSampleSet.swift in Sources */,
+				C10DE20D2D1F3C3900466C0C /* ToastModifier.swift in Sources */,
+				C1706DDD2C6CE5B700DAC858 /* CanvasStore.swift in Sources */,
+				C18D4C002D17355B00595432 /* FileDownloadManager.swift in Sources */,
+				C17B68102ED672310022DE71 /* EffectsRack.swift in Sources */,
+				C1B564C52C0D243E002FDDD4 /* CanvasModel.swift in Sources */,
+				C13BCD9B2C4C12380037AEF4 /* RenameSongSheet.swift in Sources */,
+				C19D85492C08AE5900477545 /* LoopCanvasApp.swift in Sources */,
+				C19D85772C08B00C00477545 /* CanvasView.swift in Sources */,
+				C17B68072ED6369E0022DE71 /* BackgroundDots.swift in Sources */,
+				C17B680D2ED636CE0022DE71 /* FloatingToolbarOverlay.swift in Sources */,
+				C1B150FB2C9F13A300B4FAE8 /* SampleSetStore.swift in Sources */,
+				C1F5EEEC2C14C64100298B00 /* MusicEngine.swift in Sources */,
+				C12C6E8B2C2AF39300B01C58 /* HomeView.swift in Sources */,
+				C10DE2102D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */,
+				C18549572EC15B1C008E3D2C /* BlockDetailsSheet.swift in Sources */,
+				C17B68032ED60E2F0022DE71 /* CanvasEffectsView.swift in Sources */,
+				C13F79FA2EBE89F500535BE9 /* LibraryPickerSheet.swift in Sources */,
+				C1F5EEE52C14AE6F00298B00 /* Block.swift in Sources */,
+				C125E4DE2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */,
+				C1015DCA2ED21528000B69CD /* CanvasViewModel_MessageEvents.swift in Sources */,
+				C10DE20A2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */,
+				C1015DC62ED21480000B69CD /* CanvasViewModel_BlockEvents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D85512C08AE6500477545 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1F5EEE62C14AE6F00298B00 /* Block.swift in Sources */,
+				C1015DCB2ED21642000B69CD /* CanvasViewModel_BlockEvents.swift in Sources */,
+				C17B680F2ED672310022DE71 /* EffectsRack.swift in Sources */,
+				C125E4D92EC8EB9A00A7A5BA /* MusicEngineTests.swift in Sources */,
+				C19A08A32C963487008CCB0E /* LibraryTests.swift in Sources */,
+				C19D855A2C08AE6500477545 /* CanvasViewModelTests.swift in Sources */,
+				C1B150FC2C9F13A300B4FAE8 /* SampleSetStore.swift in Sources */,
+				C1B564C62C0D243E002FDDD4 /* CanvasModel.swift in Sources */,
+				C10DE2122D20BD7A00466C0C /* FileDownloadManagerTests.swift in Sources */,
+				C1498E392C18881900118C38 /* CanvasModelTests.swift in Sources */,
+				C18D4BFF2D17355B00595432 /* FileDownloadManager.swift in Sources */,
+				C108AA012ECA481600B6865C /* CanvasMessageStore.swift in Sources */,
+				C1B150FE2C9F153900B4FAE8 /* SampleSetStoreTests.swift in Sources */,
+				C1015DCF2ED22C55000B69CD /* SharePlayTests.swift in Sources */,
+				C1498E3B2C18884A00118C38 /* BlockGroupTests.swift in Sources */,
+				C15DCC932C6E3E4A0061453B /* CanvasStoreTests.swift in Sources */,
+				C10DE20B2D1F38BC00466C0C /* URLSessionLoader.swift in Sources */,
+				C161307A2D25F79700725FA0 /* DownloadableSampleSetTests.swift in Sources */,
+				C15DCC912C6E32430061453B /* CanvasStore.swift in Sources */,
+				C1015DCC2ED21648000B69CD /* CanvasViewModel_BlockGroupEvents.swift in Sources */,
+				C1015DCD2ED2164E000B69CD /* CanvasViewModel_MessageEvents.swift in Sources */,
+				C10DE20F2D20B65700466C0C /* URLSessionProgressDataLoader.swift in Sources */,
+				C18D4C032D17816F00595432 /* DownloadableSampleSet.swift in Sources */,
+				C1B564C92C0D25D0002FDDD4 /* CanvasViewModel.swift in Sources */,
+				C1F5EEA32C133AAE00298B00 /* Library.swift in Sources */,
+				C1F5EEE92C14AE9400298B00 /* BlockGroup.swift in Sources */,
+				C1F5EEED2C14C64100298B00 /* MusicEngine.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C19D855B2C08AE6500477545 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C19D85662C08AE6500477545 /* LoopCanvasUITestsLaunchTests.swift in Sources */,
+				C125E4DF2EC94FD400A7A5BA /* BlockGroupDetailsSheet.swift in Sources */,
+				C19D85642C08AE6500477545 /* LoopCanvasUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C19D85572C08AE6500477545 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C19D85442C08AE5900477545 /* LoopCanvas */;
+			targetProxy = C19D85562C08AE6500477545 /* PBXContainerItemProxy */;
+		};
+		C19D85612C08AE6500477545 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C19D85442C08AE5900477545 /* LoopCanvas */;
+			targetProxy = C19D85602C08AE6500477545 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		C19D85672C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C19D85682C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C19D856A2C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LoopCanvas/Preview Content\"";
+				DEVELOPMENT_TEAM = C583XJY628;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LoopCanvas/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvas;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C19D856B2C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LoopCanvas/Preview Content\"";
+				DEVELOPMENT_TEAM = C583XJY628;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LoopCanvas/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvas;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C19D856D2C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoopCanvas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LoopCanvas";
+			};
+			name = Debug;
+		};
+		C19D856E2C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LoopCanvas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LoopCanvas";
+			};
+			name = Release;
+		};
+		C19D85702C08AE6500477545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LoopCanvas;
+			};
+			name = Debug;
+		};
+		C19D85712C08AE6500477545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C583XJY628;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pwrice.LoopCanvasUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LoopCanvas;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C19D85402C08AE5900477545 /* Build configuration list for PBXProject "LoopCanvas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D85672C08AE6500477545 /* Debug */,
+				C19D85682C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C19D85692C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D856A2C08AE6500477545 /* Debug */,
+				C19D856B2C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C19D856C2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D856D2C08AE6500477545 /* Debug */,
+				C19D856E2C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C19D856F2C08AE6500477545 /* Build configuration list for PBXNativeTarget "LoopCanvasUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19D85702C08AE6500477545 /* Debug */,
+				C19D85712C08AE6500477545 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C17B68112ED6741E0022DE71 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKitEX.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.2;
+			};
+		};
+		C17B68142ED6BD6F0022DE71 /* XCRemoteSwiftPackageReference "DunneAudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/DunneAudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.1;
+			};
+		};
+		C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/Waveform.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
+		C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C17B68122ED6741E0022DE71 /* AudioKitEX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C17B68112ED6741E0022DE71 /* XCRemoteSwiftPackageReference "AudioKitEX" */;
+			productName = AudioKitEX;
+		};
+		C17B68152ED6C3E30022DE71 /* DunneAudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C17B68142ED6BD6F0022DE71 /* XCRemoteSwiftPackageReference "DunneAudioKit" */;
+			productName = DunneAudioKit;
+		};
+		C185495D2EC431C2008E3D2C /* Waveform */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C185495B2EC43088008E3D2C /* XCRemoteSwiftPackageReference "Waveform" */;
+			productName = Waveform;
+		};
+		C1B9BD0A2C14CA2C0030B733 /* AudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1F5EEEE2C14C8BC00298B00 /* XCRemoteSwiftPackageReference "AudioKit" */;
+			productName = AudioKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = C19D853D2C08AE5900477545 /* Project object */;
+}
